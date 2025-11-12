@@ -179,23 +179,97 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
   return (
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none`}</style>
-      <Box className="w-full h-full max-w-sm mx-auto bg-white flex flex-col">
-        {/* Header */}
-        <AppBar elevation={0} position="static" sx={{ bgcolor:'#fff', color:'#111', borderBottom:`1px solid ${EV.light}` }}>
-          <Toolbar className="!min-h-[56px] px-2" sx={{ position: 'relative' }}>
-            <IconButton aria-label="Back" onClick={onBack}><ArrowBackRoundedIcon/></IconButton>
-            <Avatar src={avatar} sx={{ width:36, height:36, mr:1 }} />
-            <Box sx={{ minWidth:0, flexGrow:1, pr: 12 }}>
-              <Typography variant="subtitle1" className="font-semibold" sx={{ whiteSpace:'nowrap' }}>{title}</Typography>
-              <Box sx={{ display:'flex', alignItems:'center', gap:0.75, minWidth:0 }}>
-                <Chip size="small" label={moduleLabel} sx={{ borderColor: EV.green, color:'#0f5132', bgcolor: lighten(EV.green,0.12), border:`1px solid ${lighten(EV.green,0.28)}` }} />
-                <Typography variant="caption" className="text-gray-500 truncate">{meta}</Typography>
+      <Box sx={{ 
+        width: '100%', 
+        height: '100%', 
+        maxWidth: 390, 
+        mx: 'auto', 
+        bgcolor: '#fff', 
+        display: 'flex', 
+        flexDirection: 'column',
+        position: 'relative'
+      }}>
+        {/* Header - Fixed at top */}
+        <AppBar 
+          elevation={0} 
+          position="fixed" 
+          sx={{ 
+            bgcolor:'#fff', 
+            color:'#111', 
+            borderBottom:`1px solid ${EV.light}`,
+            top: 56, // Below main shell header
+            width: '100%',
+            maxWidth: 390,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 1100,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+          }}
+        >
+          <Toolbar className="!min-h-[56px] !px-3" sx={{ position: 'relative' }}>
+            <IconButton 
+              aria-label="Back" 
+              onClick={onBack}
+              sx={{ mr: 1 }}
+            >
+              <ArrowBackRoundedIcon/>
+            </IconButton>
+            <Avatar 
+              src={avatar} 
+              sx={{ 
+                width: 36, 
+                height: 36, 
+                mr: 1.5,
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+              }} 
+            />
+            <Box sx={{ minWidth: 0, flexGrow: 1, pr: 12 }}>
+              <Typography 
+                variant="subtitle1" 
+                sx={{ 
+                  whiteSpace:'nowrap',
+                  fontSize: '15px',
+                  fontWeight: 600,
+                  lineHeight: 1.2
+                }}
+              >
+                {title}
+              </Typography>
+              <Box sx={{ display:'flex', alignItems:'center', gap:0.75, minWidth:0, mt: 0.25 }}>
+                <Chip 
+                  size="small" 
+                  label={moduleLabel} 
+                  sx={{ 
+                    borderColor: EV.green, 
+                    color:'#0f5132', 
+                    bgcolor: lighten(EV.green,0.12), 
+                    border:`1px solid ${lighten(EV.green,0.28)}`,
+                    height: 20,
+                    fontSize: '10px',
+                    fontWeight: 600
+                  }} 
+                />
+                <Typography 
+                  variant="caption" 
+                  sx={{ 
+                    fontSize: '11px',
+                    color: '#666'
+                  }}
+                >
+                  {meta}
+                </Typography>
               </Box>
             </Box>
-            <Box sx={{ position:'absolute', top: 4, right: 4, display:'flex', gap: 0.5 }}>
-              <IconButton aria-label="Video" size="small"><VideocamRoundedIcon/></IconButton>
-              <IconButton aria-label="Call" size="small"><CallRoundedIcon/></IconButton>
-              <IconButton aria-label="More" onClick={openHeaderMenu} size="small"><MoreVertRoundedIcon/></IconButton>
+            <Box sx={{ position:'absolute', top: 8, right: 4, display:'flex', gap: 0.5 }}>
+              <IconButton aria-label="Video" size="small" sx={{ color: '#666' }}>
+                <VideocamRoundedIcon fontSize="small"/>
+              </IconButton>
+              <IconButton aria-label="Call" size="small" sx={{ color: '#666' }}>
+                <CallRoundedIcon fontSize="small"/>
+              </IconButton>
+              <IconButton aria-label="More" onClick={openHeaderMenu} size="small" sx={{ color: '#666' }}>
+                <MoreVertRoundedIcon fontSize="small"/>
+              </IconButton>
             </Box>
           </Toolbar>
         </AppBar>
@@ -220,17 +294,46 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
           <MenuItem onClick={closeHeaderMenu}><ListItemIcon><DescriptionRoundedIcon fontSize="small"/></ListItemIcon><ListItemText primary="Report"/></MenuItem>
         </Menu>
 
-        {/* Messages */}
-        <Box ref={listRef} className="flex-1 p-3 no-scrollbar" sx={{ overflowY:'auto' }}>
-          <div className="space-y-2">
+        {/* Messages - with proper spacing from top header and bottom composer + bottom nav */}
+        <Box 
+          ref={listRef} 
+          className="flex-1 no-scrollbar" 
+          sx={{ 
+            overflowY:'auto', 
+            pt: '112px', // 56px shell header + 56px conversation header
+            pb: '180px', // Space for composer (88px) + bottom nav (88px) + padding
+            px: 3,
+            minHeight: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            bgcolor: '#fafafa'
+          }}
+        >
+          <div className="space-y-3" style={{ paddingTop: 8, paddingBottom: 8 }}>
             {messages.map(m=> (
               <Bubble key={m.id} msg={m} onQuote={(mm)=>setReplyTo(mm)} onAction={handleAction} scrollTo={scrollToMsg} />
             ))}
           </div>
         </Box>
 
-        {/* Composer */}
-        <Box className="px-2 py-2 border-t sticky bottom-0 bg-white" sx={{ borderColor: EV.light }}>
+        {/* Composer - fixed above bottom nav */}
+        <Box 
+          sx={{ 
+            borderTop: `1px solid ${EV.light}`,
+            bgcolor: '#fff',
+            px: 2,
+            py: 1.5,
+            position: 'fixed',
+            bottom: 88, // Above bottom nav (72px height + 16px padding)
+            left: 0,
+            right: 0,
+            width: '100%',
+            maxWidth: 390,
+            mx: 'auto',
+            zIndex: 1200,
+            boxShadow: '0 -2px 8px rgba(0,0,0,0.04)'
+          }}
+        >
           {replyTo && (
             <Box className="mb-1 px-2 py-1 rounded-md" sx={{ bgcolor: EV.light, border:`1px solid ${EV.light}` }}>
               <div className="text-[11.5px] text-gray-600">Replying to: {replyTo.text.slice(0,72)}{replyTo.text.length>72?'…':''}</div>

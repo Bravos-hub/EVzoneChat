@@ -86,22 +86,83 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
       {/* Hide scrollbars globally for this component */}
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
 
-      <Box className="w-full max-w-sm mx-auto bg-white h-full flex flex-col">
+      <Box sx={{ 
+        width: '100%', 
+        maxWidth: 390, 
+        mx: 'auto', 
+        bgcolor: '#fff', 
+        height: '100%', 
+        display: 'flex', 
+        flexDirection: 'column'
+      }}>
         {/* Header */}
-        <AppBar elevation={0} position="static" sx={{ bgcolor: '#fff', color: '#111', borderBottom: `1px solid ${EV.light}` }}>
-          <Toolbar className="!min-h-[56px]">
-            <Typography variant="h6" className="font-bold">Messages</Typography>
+        <AppBar 
+          elevation={0} 
+          position="static" 
+          sx={{ 
+            bgcolor: '#fff', 
+            color: '#111', 
+            borderBottom: `1px solid ${EV.light}`,
+            boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+          }}
+        >
+          <Toolbar className="!min-h-[56px] !px-3">
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                fontSize: '18px',
+                fontWeight: 700,
+                color: '#111'
+              }}
+            >
+              Messages
+            </Typography>
             <Box sx={{ flexGrow: 1 }} />
-            <IconButton aria-label="Refresh" onClick={onRefresh}><RefreshRoundedIcon /></IconButton>
-            <IconButton aria-label="New message" onClick={onNew}><AddCommentRoundedIcon /></IconButton>
+            <IconButton 
+              aria-label="Refresh" 
+              onClick={onRefresh}
+              sx={{ color: '#666', mr: 0.5 }}
+            >
+              <RefreshRoundedIcon />
+            </IconButton>
+            <IconButton 
+              aria-label="New message" 
+              onClick={onNew}
+              sx={{ color: '#666' }}
+            >
+              <AddCommentRoundedIcon />
+            </IconButton>
           </Toolbar>
         </AppBar>
 
         {/* Search */}
-        <Box className="p-3">
+        <Box sx={{ p: 2, pb: 2.5 }}>
           <TextField
-            fullWidth size="small" value={q} onChange={(e)=>setQ(e.target.value)} placeholder="Search people, channels, messages"
-            InputProps={{ startAdornment: (<InputAdornment position="start"><SearchRoundedIcon /></InputAdornment>) }}
+            fullWidth 
+            size="small" 
+            value={q} 
+            onChange={(e)=>setQ(e.target.value)} 
+            placeholder="Search people, channels, messages"
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                bgcolor: '#f5f5f5',
+                borderRadius: 2,
+                '&:hover': {
+                  bgcolor: '#eeeeee'
+                },
+                '&.Mui-focused': {
+                  bgcolor: '#fff',
+                  boxShadow: '0 0 0 2px rgba(3, 205, 140, 0.1)'
+                }
+              }
+            }}
+            InputProps={{ 
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchRoundedIcon sx={{ color: '#999', fontSize: 20 }} />
+                </InputAdornment>
+              ) 
+            }}
           />
         </Box>
 

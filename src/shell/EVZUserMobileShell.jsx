@@ -74,20 +74,68 @@ function useTabFromLocation(){
 ------------------------------------------------------------ */
 function ShellFrame({ children }){
   const navigate = useNavigate();
+  const location = useLocation();
   const [menuEl, setMenuEl] = useState(null);
   const openMenu = (e) => setMenuEl(e.currentTarget);
   const closeMenu = () => setMenuEl(null);
   const go = (path) => { closeMenu(); navigate(path); };
+  
+  // Check if we're on a conversation page
+  const isConversationPage = location.pathname.startsWith('/conversation') || location.pathname.startsWith('/new-message');
 
   return (
-    <Box sx={{ bgcolor: EV.light, minHeight:'100vh' }}>
-      {/* Header (mobile frame) */}
-      <AppBar elevation={0} position="fixed" sx={{ bgcolor: EV.green, color:'#fff' }}>
-        <Toolbar className="!min-h-[56px]" sx={{ width:'100%', maxWidth:390, mx:'auto' }}>
-          <Avatar onClick={()=>navigate('/profile')} sx={{ bgcolor:'#fff', color:EV.green, width: 32, height: 32, mr: 1, cursor:'pointer' }} title="Open profile">EV</Avatar>
-          <Typography variant="subtitle1" className="font-semibold">EVzone Chat</Typography>
+    <Box sx={{ 
+      bgcolor: EV.light, 
+      minHeight:'100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      width: '100%',
+      maxWidth: 390,
+      mx: 'auto',
+      position: 'relative'
+    }}>
+      {/* Header (mobile frame) - always visible for consistent mobile experience */}
+      <AppBar 
+        elevation={0} 
+        position="fixed" 
+        sx={{ 
+          bgcolor: EV.green, 
+          color:'#fff',
+          width: '100%',
+          maxWidth: 390,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 1200
+        }}
+      >
+        <Toolbar className="!min-h-[56px] !px-3" sx={{ width:'100%' }}>
+          <Avatar 
+            onClick={()=>navigate('/profile')} 
+            sx={{ 
+              bgcolor:'#fff', 
+              color:EV.green, 
+              width: 32, 
+              height: 32, 
+              mr: 1.5, 
+              cursor:'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+            }} 
+            title="Open profile"
+          >
+            EV
+          </Avatar>
+          <Typography variant="subtitle1" className="font-semibold" sx={{ fontSize: '16px', fontWeight: 600 }}>
+            EVzone Chat
+          </Typography>
           <Box sx={{ flexGrow:1 }} />
-          <IconButton size="small" sx={{ color:'#fff' }} aria-label="More" onClick={openMenu}><MoreHorizRoundedIcon/></IconButton>
+          <IconButton 
+            size="small" 
+            sx={{ color:'#fff' }} 
+            aria-label="More" 
+            onClick={openMenu}
+          >
+            <MoreHorizRoundedIcon/>
+          </IconButton>
         </Toolbar>
       </AppBar>
 
@@ -153,22 +201,51 @@ function ShellFrame({ children }){
         </MenuItem>
       </Menu>
 
-      {/* Content (mobile frame) */}
-      <Box sx={{ pt:'56px', pb:'88px', width:'100%', maxWidth:390, mx:'auto', minHeight: 'calc(100vh - 144px)' }}>
+      {/* Content (mobile frame) - always has padding for header and bottom nav */}
+      <Box sx={{ 
+        pt: '56px', 
+        pb: '88px', 
+        width:'100%', 
+        minHeight: 'calc(100vh - 144px)',
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
         {children}
       </Box>
 
-      {/* Bottom nav (mobile frame) */}
-      <Box sx={{ position:'fixed', left:0, right:0, bottom:0, bgcolor:'transparent', pb:'env(safe-area-inset-bottom)' }}>
-        <Box sx={{ width:'100%', maxWidth:390, mx:'auto', px: 2, pb: 1.5 }}>
-          <Box sx={{ borderRadius: 14, bgcolor: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(8px)', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 8px 30px rgba(0,0,0,0.12)' }}>
+      {/* Bottom nav (mobile frame) - always visible for consistent mobile navigation */}
+      <Box sx={{ 
+        position:'fixed', 
+        left:0, 
+        right:0, 
+        bottom:0, 
+        bgcolor:'transparent', 
+        pb:'env(safe-area-inset-bottom)',
+        zIndex: 1100,
+        display: 'flex',
+        justifyContent: 'center'
+      }}>
+        <Box sx={{ 
+          width:'100%', 
+          maxWidth:390, 
+          px: 2, 
+          pb: 1.5 
+        }}>
+          <Box sx={{ 
+            borderRadius: 16, 
+            bgcolor: 'rgba(255,255,255,0.95)', 
+            backdropFilter: 'blur(12px)', 
+            border: '1px solid rgba(0,0,0,0.08)', 
+            boxShadow: '0 -4px 20px rgba(0,0,0,0.08)'
+          }}>
             <MobileBottomNav/>
           </Box>
         </Box>
       </Box>
 
-      {/* Launcher — fixed to right edge of the mobile frame */}
-      <Launcher unread={2}/>
+      {/* Launcher — fixed to right edge of the mobile frame (hidden on conversation pages) */}
+      {!isConversationPage && <Launcher unread={2}/>}
     </Box>
   );
 }
@@ -179,12 +256,36 @@ function ShellFrame({ children }){
 function MobileBottomNav(){
   const value = useTabFromLocation();
   const nav = useNavigate();
+  
   return (
     <BottomNavigation
       value={value}
       onChange={(_, v)=>{ const map={ inbox:'/inbox', search:'/search', call:'/call', media:'/media', settings:'/settings' }; if(map[v]) nav(map[v]); }}
       showLabels
-      sx={{ height:72, bgcolor:'transparent', '& .Mui-selected':{ color: EV.green }, '& .MuiBottomNavigationAction-root':{ minWidth:0, pt:1.5 }, '& .MuiSvgIcon-root':{ fontSize:22 }, '& .MuiBottomNavigationAction-label':{ fontSize:11, fontWeight:600 } }}
+      sx={{ 
+        height: 72, 
+        bgcolor:'transparent', 
+        '& .Mui-selected':{ 
+          color: EV.green,
+          '& .MuiSvgIcon-root': {
+            transform: 'scale(1.1)'
+          }
+        }, 
+        '& .MuiBottomNavigationAction-root':{ 
+          minWidth: 0, 
+          pt: 1.5,
+          transition: 'all 0.2s ease'
+        }, 
+        '& .MuiSvgIcon-root':{ 
+          fontSize: 24,
+          transition: 'transform 0.2s ease'
+        }, 
+        '& .MuiBottomNavigationAction-label':{ 
+          fontSize: 11, 
+          fontWeight: 600,
+          mt: 0.5
+        } 
+      }}
     >
       <BottomNavigationAction value="inbox" label="Inbox" icon={<ChatBubbleOutlineRoundedIcon/>} />
       <BottomNavigationAction value="search" label="Search" icon={<SearchRoundedIcon/>} />
@@ -199,23 +300,52 @@ function MobileBottomNav(){
    Floating Launcher — centered to mobile frame then right-aligned
 ------------------------------------------------------------ */
 function Launcher({ unread=0 }){
+  const navigate = useNavigate();
   return (
-    <div className="fixed inset-x-0 z-50 flex justify-center" style={{ bottom: 96 }}>
-      <div className="relative w-full max-w-[390px] px-4 pb-4">
-        <button
-          aria-label="Open chat"
-          className="absolute right-0 bottom-0 h-14 w-14 rounded-full shadow-xl grid place-items-center"
-          style={{ background: EV.orange, color:'#fff' }}
+    <Box sx={{
+      position: 'fixed',
+      left: 0,
+      right: 0,
+      bottom: 96,
+      display: 'flex',
+      justifyContent: 'center',
+      zIndex: 1000,
+      pointerEvents: 'none'
+    }}>
+      <Box sx={{
+        position: 'relative',
+        width: '100%',
+        maxWidth: 390,
+        px: 2,
+        pb: 1
+      }}>
+        <IconButton
+          aria-label="New message"
+          onClick={() => navigate('/new-message')}
+          sx={{
+            position: 'absolute',
+            right: 16,
+            bottom: 0,
+            width: 56,
+            height: 56,
+            bgcolor: EV.orange,
+            color: '#fff',
+            boxShadow: '0 4px 16px rgba(247, 127, 0, 0.4)',
+            '&:hover': {
+              bgcolor: '#e06f00',
+              boxShadow: '0 6px 20px rgba(247, 127, 0, 0.5)',
+              transform: 'scale(1.05)'
+            },
+            transition: 'all 0.2s ease',
+            pointerEvents: 'auto'
+          }}
         >
-          <span className="inline-block relative">
-            <Badge color="error" badgeContent={unread} overlap="circular">
-              {/* Chat bubble outline only (bigger) */}
-              <ChatBubbleOutlineRoundedIcon sx={{ fontSize: 40 }} />
-            </Badge>
-          </span>
-        </button>
-      </div>
-    </div>
+          <Badge color="error" badgeContent={unread} overlap="circular">
+            <ChatBubbleOutlineRoundedIcon sx={{ fontSize: 28 }} />
+          </Badge>
+        </IconButton>
+      </Box>
+    </Box>
   );
 }
 
@@ -226,12 +356,40 @@ function RouteWrapper({ Component, ...props }) {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Provide navigation props to components that need them
+  // Provide comprehensive navigation props to components that need them
   const navProps = {
     onBack: () => navigate(-1),
     onClose: () => navigate(-1),
     onNavigate: navigate,
     location,
+    // Navigation handlers for common actions
+    onOpen: (item) => {
+      // Navigate to conversation or detail view
+      if (item?.id) {
+        navigate(`/conversation/${item.id}`);
+      }
+    },
+    onNew: () => navigate('/new-message'),
+    onRefresh: () => {
+      // Could trigger a refresh action, for now just log
+      console.log('Refresh triggered');
+    },
+    onLiveOpen: (live) => {
+      // Navigate to live session
+      if (live?.id) {
+        navigate(`/live/${live.id}`);
+      }
+    },
+    onModuleChange: (module) => {
+      // Handle module filter change
+      console.log('Module changed to:', module);
+    },
+    onStart: (selected) => {
+      // Start new conversation with selected contacts
+      if (selected && selected.length > 0) {
+        navigate(`/conversation/new?contacts=${selected.join(',')}`);
+      }
+    },
   };
   
   if (!Component) return <Screen title="Page not found" />;
@@ -254,6 +412,8 @@ export default function MobileUserShell({ registry = {} }){
   const DND = getComponent(registry, 'U09-27', () => <Screen title="Quiet hours / DND"/>);
   const Safety = getComponent(registry, 'U12-34', () => <Screen title="Safety Center"/>);
   const Profile = getComponent(registry, 'U09-25', () => <Screen title="Profile"/>);
+  const NewMessage = getComponent(registry, 'U02-04', () => <Screen title="New Message"/>);
+  const Conversation = getComponent(registry, 'U02-05', () => <Screen title="Conversation"/>);
 
   return (
     <BrowserRouter>
@@ -273,6 +433,10 @@ export default function MobileUserShell({ registry = {} }){
           <Route path="/dnd" element={<RouteWrapper Component={DND} />} />
           <Route path="/safety" element={<RouteWrapper Component={Safety} />} />
           <Route path="/profile" element={<RouteWrapper Component={Profile} />} />
+          {/* Conversation routes */}
+          <Route path="/new-message" element={<RouteWrapper Component={NewMessage} />} />
+          <Route path="/conversation/:id" element={<RouteWrapper Component={Conversation} />} />
+          <Route path="/conversation/new" element={<RouteWrapper Component={Conversation} />} />
         </Routes>
       </ShellFrame>
     </BrowserRouter>
