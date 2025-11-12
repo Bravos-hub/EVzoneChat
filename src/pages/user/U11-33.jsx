@@ -9,11 +9,7 @@ import {
   Divider,
   Button,
   Avatar,
-  Grid,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText
+  Grid
 } from "@mui/material";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
