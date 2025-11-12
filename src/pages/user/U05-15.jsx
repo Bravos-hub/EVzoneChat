@@ -59,6 +59,7 @@ export default function BreakoutRoomsManager({ onBack }) {
 
   const assign = (userId, roomId) => setPeople(ps => ps.map(p => p.id===userId ? { ...p, room: roomId } : p));
   const move = (userId, roomId) => assign(userId, roomId);
+  // eslint-disable-next-line no-unused-vars
   const unassign = (userId) => assign(userId, null);
 
   const randomize = () => {

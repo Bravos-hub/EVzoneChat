@@ -6,7 +6,7 @@ import {
   Typography,
   Box,
   Chip,
-  Divider,
+  Divider, // eslint-disable-line no-unused-vars
   TextField,
   List,
   ListItem,

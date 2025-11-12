@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-  AppBar, Toolbar, IconButton, Typography, Box, Avatar, Button, Menu, MenuItem, ListItemIcon, ListItemText
+  AppBar, Toolbar, IconButton, Box, Avatar, Button, Menu, MenuItem, ListItemIcon, ListItemText
 } from "@mui/material";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
@@ -40,7 +40,9 @@ export default function OneToOneCall({
   // Toggles (uncontrolled defaults)
   const [muted, setMuted] = useState(false);
   const [camOn, setCamOn] = useState(type === "video");
+  // eslint-disable-next-line no-unused-vars
   const [speaker, setSpeaker] = useState(true);
+  // eslint-disable-next-line no-unused-vars
   const [sharing, setSharing] = useState(flags.share);
   const [captions, setCaptions] = useState(flags.captions);
   const [menuEl, setMenuEl] = useState(null);

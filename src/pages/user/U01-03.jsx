@@ -63,6 +63,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
   const [idx, setIdx] = useState(0);
   const slideW = 280; // px
 
+  // eslint-disable-next-line no-unused-vars
   const scrollTo = (i) => {
     const el = wrapRef.current; if (!el) return;
     const clamped = Math.max(0, Math.min(i, lives.length - 1));

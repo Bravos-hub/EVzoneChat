@@ -5,13 +5,13 @@ import {
   IconButton,
   Typography,
   Box,
-  Avatar,
-  Chip,
+  Avatar, // eslint-disable-line no-unused-vars
+  Chip, // eslint-disable-line no-unused-vars
   Button
 } from "@mui/material";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import PanToolAltRoundedIcon from "@mui/icons-material/PanToolAltRounded";
-import TagFacesRoundedIcon from "@mui/icons-material/TagFacesRounded";
+import TagFacesRoundedIcon from "@mui/icons-material/TagFacesRounded"; // eslint-disable-line no-unused-vars
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 

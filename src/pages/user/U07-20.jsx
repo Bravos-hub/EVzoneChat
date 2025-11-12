@@ -7,7 +7,7 @@ import {
   Box,
   Button,
   Chip,
-  Divider,
+  Divider, // eslint-disable-line no-unused-vars
   List,
   ListItem,
   ListItemText,

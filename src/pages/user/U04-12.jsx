@@ -35,6 +35,7 @@ const LOBBY = [
 export default function HostControlsLobby({ onBack }) {
   const [locked, setLocked] = useState(false);
   const [waiting, setWaiting] = useState(LOBBY);
+  // eslint-disable-next-line no-unused-vars
   const [mutedAll, setMutedAll] = useState(false);
   const [alert, setAlert] = useState('');
 

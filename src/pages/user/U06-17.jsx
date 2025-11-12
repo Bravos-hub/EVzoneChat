@@ -15,7 +15,7 @@ import {
   Snackbar
 } from "@mui/material";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
-import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
+import CheckRoundedIcon from "@mui/icons-material/CheckRounded"; // eslint-disable-line no-unused-vars
 import VolumeUpRoundedIcon from "@mui/icons-material/VolumeUpRounded";
 import MicRoundedIcon from "@mui/icons-material/MicRounded";
 import VideocamRoundedIcon from "@mui/icons-material/VideocamRounded";
@@ -38,8 +38,11 @@ export default function DeviceNetworkSettings({ onBack }) {
   const [level, setLevel] = useState(0);
   const levelTimer = useRef(null);
 
+  // eslint-disable-next-line no-unused-vars
   const [latency, setLatency] = useState(42);
+  // eslint-disable-next-line no-unused-vars
   const [jitter, setJitter] = useState(8);
+  // eslint-disable-next-line no-unused-vars
   const [loss, setLoss] = useState(0);
   const [snack, setSnack] = useState('');
 
