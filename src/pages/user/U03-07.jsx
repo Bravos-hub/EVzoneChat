@@ -23,7 +23,6 @@ export default function MediaViewerFS({ open, item = { type: 'image', src: '' },
   const renderBody = () => {
     if (type === 'image') return (
       <Box className="w-full h-full grid place-items-center bg-black">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img alt={title || 'image'} src={src} className="max-w-full max-h-full object-contain" />
       </Box>
     );
