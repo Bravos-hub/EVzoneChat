@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Hide scrollbars (visual only) */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+html, body, #root { 
+  height: 100%; 
+  background: #f2f2f2; 
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Ensure mobile-first responsive behavior */
+@media (max-width: 390px) {
+  body {
+    width: 100%;
+    overflow-x: hidden;
+  }
+}
+
+/* Center content on larger screens */
+@media (min-width: 391px) {
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+}

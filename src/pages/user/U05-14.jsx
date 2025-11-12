@@ -1,0 +1,129 @@
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  Typography,
+  Box,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Alert
+} from "@mui/material";
+import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
+import ClosedCaptionRoundedIcon from "@mui/icons-material/ClosedCaptionRounded";
+import FiberManualRecordRoundedIcon from "@mui/icons-material/FiberManualRecordRounded";
+
+const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
+
+/**
+ * U05-14 — Captions & Recording (Consent Flow)
+ * - Toggle captions with language select
+ * - Recording start requires consent; shows red REC banner; stop ends
+ */
+export default function CaptionsRecording({ onBack }) {
+  const [captions, setCaptions] = useState(false);
+  const [lang, setLang] = useState('en');
+  const [recording, setRecording] = useState(false);
+  const [consentOpen, setConsentOpen] = useState(false);
+  const [sample, setSample] = useState('');
+
+  const samples = useMemo(()=> ({
+    en: ['welcome everyone', 'starting in five minutes', 'questions are open'],
+    fr: ['bienvenue à tous', 'début dans cinq minutes', 'questions ouvertes'],
+    zh: ['欢迎大家', '五分钟后开始', '可以提问了'],
+    sw: ['karibuni nyote', 'tunaanza baada ya dakika tano', 'maswali yako wazi'],
+  }), []);
+
+  useEffect(()=>{
+    if (!captions) { setSample(''); return; }
+    let i = 0;
+    const id = setInterval(()=> { setSample(samples[lang][i % samples[lang].length]); i++; }, 2000);
+    return ()=> clearInterval(id);
+  }, [captions, lang, samples]);
+
+  const startRecording = () => setConsentOpen(true);
+  const confirmRecording = () => { setConsentOpen(false); setRecording(true); };
+  const stopRecording = () => setRecording(false);
+
+  return (
+    <>
+      <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
+
+      <Box className="w-full h-full max-w-sm mx-auto bg-black text-white flex flex-col">
+        <AppBar elevation={0} position="static" sx={{ bgcolor:'rgba(0,0,0,0.55)', color:'#fff' }}>
+          <Toolbar className="!min-h-[56px]">
+            <IconButton onClick={onBack} aria-label="Back" sx={{ color:'#fff' }}><ArrowBackRoundedIcon /></IconButton>
+            <Typography variant="h6" className="font-bold">Captions & Recording</Typography>
+          </Toolbar>
+        </AppBar>
+
+        {/* Video placeholder */}
+        <Box className="flex-1 relative">
+          <video className="absolute inset-0 w-full h-full object-cover" muted loop autoPlay playsInline>
+            <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm" type="video/webm" />
+          </video>
+
+          {/* captions overlay */}
+          {captions && (
+            <div className="absolute inset-x-3 bottom-20 bg-black/65 text-white rounded-xl px-3 py-1.5 text-sm">
+              <ClosedCaptionRoundedIcon sx={{ fontSize: 16, verticalAlign:'middle', mr: 0.5 }} /> {sample}
+            </div>
+          )}
+
+          {/* recording banner */}
+          {recording && (
+            <div className="absolute inset-x-3 top-3 bg-red-600/90 text-white rounded-full px-3 py-1 text-xs font-semibold flex items-center gap-1">
+              <FiberManualRecordRoundedIcon sx={{ fontSize: 12 }} /> Recording. Participants are notified.
+            </div>
+          )}
+        </Box>
+
+        {/* Controls */}
+        <Box className="fixed inset-x-0 bottom-0 z-10 flex justify-center" sx={{ pb: 'env(safe-area-inset-bottom)' }}>
+          <Box className="w-full max-w-sm px-3 pb-3">
+            <div className="bg-white/10 rounded-2xl px-3 py-2 backdrop-blur text-white">
+              <div className="grid grid-cols-2 gap-2">
+                <FormControl size="small" fullWidth sx={{ '& .MuiOutlinedInput-root': { color:'#fff' }, '& .MuiSvgIcon-root': { color:'#fff' } }}>
+                  <InputLabel sx={{ color:'#fff' }}>Captions</InputLabel>
+                  <Select label="Captions" value={lang} onChange={(e)=>setLang(e.target.value)} disabled={!captions} sx={{ color:'#fff' }}>
+                    <MenuItem value="en">English</MenuItem>
+                    <MenuItem value="fr">Français</MenuItem>
+                    <MenuItem value="zh">中文</MenuItem>
+                    <MenuItem value="sw">Swahili</MenuItem>
+                  </Select>
+                </FormControl>
+                <Button onClick={()=>setCaptions(c=>!c)} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>{captions? 'Hide captions' : 'Show captions'}</Button>
+                {!recording ? (
+                  <Button onClick={startRecording} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>Start recording</Button>
+                ) : (
+                  <Button onClick={stopRecording} variant="contained" sx={{ bgcolor:'#e53935', textTransform:'none', '&:hover':{ bgcolor:'#c62828' } }}>Stop recording</Button>
+                )}
+                <div />
+              </div>
+            </div>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Consent dialog */}
+      <Dialog open={consentOpen} onClose={()=>setConsentOpen(false)} fullWidth maxWidth="xs">
+        <DialogTitle>Recording consent</DialogTitle>
+        <DialogContent dividers>
+          <Alert severity="info" sx={{ mb: 1 }}>Starting a recording will notify all participants and show a banner in the meeting.</Alert>
+          <Typography variant="body2">By continuing, you confirm that you have obtained necessary permissions and agree to EVzone policies.</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={()=>setConsentOpen(false)} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Cancel</Button>
+          <Button onClick={confirmRecording} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>Confirm & start</Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
+}
