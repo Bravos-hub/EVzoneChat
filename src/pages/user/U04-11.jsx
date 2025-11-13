@@ -91,13 +91,13 @@ export default function GroupCallPro({ onBack, isHost = true }) {
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none`}</style>
 
-      <Box className="w-full h-full max-w-[390px] mx-auto bg-black text-white flex flex-col">
+      <Box className="w-full h-full mx-auto bg-black text-white flex flex-col">
         {/* Header */}
         <AppBar elevation={0} position="fixed" sx={{ bgcolor:'rgba(0,0,0,0.55)' }}>
           <Toolbar className="!min-h-[56px]">
             <IconButton onClick={onBack} aria-label="Back" sx={{ color:'#fff' }}><ArrowBackRoundedIcon /></IconButton>
             <Box className="flex items-center gap-2">
-              <Avatar src={host.avatar} sx={{ width:32, height:32 }} />
+              <Avatar src={host.avatar} sx={{ width: '2rem', height: '2rem' }} />
               <div className="flex flex-col">
                 <span className="font-semibold">{host.name}</span>
                 <span className="text-[11px] opacity-80">{activeCount} active speakers</span>
@@ -117,10 +117,10 @@ export default function GroupCallPro({ onBack, isHost = true }) {
                 <div key={p.id} className={`relative rounded-xl overflow-hidden bg-black border ${p.active? 'ring-2':'border-white/10'}`} style={p.active? { boxShadow:`0 0 0 3px ${EV.green} inset` }: undefined}>
                   <img src={`https://images.unsplash.com/photo-1526178611301-1e3f6dc1f1ae?q=80&w=600&auto=format&fit=crop`} alt="feed" className="w-full h-40 object-cover" />
                   {!p.video && (
-                    <div className="absolute inset-0 grid place-items-center bg-black/60"><Avatar src={p.avatar} sx={{ width: 56, height: 56 }} /></div>
+                    <div className="absolute inset-0 grid place-items-center bg-black/60"><Avatar src={p.avatar} sx={{ width: '3.5rem', height: '3.5rem' }} /></div>
                   )}
                   <div className="absolute left-2 bottom-2 right-2 flex items-center gap-1 text-white">
-                    <Avatar src={p.avatar} sx={{ width: 20, height: 20 }} />
+                    <Avatar src={p.avatar} sx={{ width: '1.25rem', height: '1.25rem' }} />
                     <span className="text-[11px] truncate">{p.name}</span>
                     {p.muted && <MicOffRoundedIcon sx={{ fontSize: 14 }} />}
                     {!p.video && <VideocamOffRoundedIcon sx={{ fontSize: 14 }} />}
@@ -134,7 +134,7 @@ export default function GroupCallPro({ onBack, isHost = true }) {
               <div className="row-span-4 relative rounded-xl overflow-hidden border" style={{ borderColor:'rgba(255,255,255,0.12)' }}>
                 <img src={`https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13?q=80&w=1200&auto=format&fit=crop`} alt="speaker" className="w-full h-full object-cover" />
                 <div className="absolute left-3 bottom-3 right-3 flex items-center gap-2 text-white">
-                  <Avatar src={host.avatar} sx={{ width: 24, height: 24 }} />
+                  <Avatar src={host.avatar} sx={{ width: '1.5rem', height: '1.5rem' }} />
                   <span className="text-sm font-semibold truncate">{host.name} (speaker)</span>
                 </div>
               </div>
@@ -143,7 +143,7 @@ export default function GroupCallPro({ onBack, isHost = true }) {
                   <div key={p.id} className="relative rounded-xl overflow-hidden border" style={{ borderColor:'rgba(255,255,255,0.12)' }}>
                     <img src={`https://images.unsplash.com/photo-1520975940462-39b5d35c6b35?q=80&w=600&auto=format&fit=crop`} alt="viewer" className="w-full h-full object-cover" />
                     <div className="absolute left-2 bottom-2 right-2 flex items-center gap-1 text-white">
-                      <Avatar src={p.avatar} sx={{ width: 20, height: 20 }} />
+                      <Avatar src={p.avatar} sx={{ width: '1.25rem', height: '1.25rem' }} />
                       <span className="text-[11px] truncate">{p.name}</span>
                       {p.muted && <MicOffRoundedIcon sx={{ fontSize: 14 }} />}
                       {!p.video && <VideocamOffRoundedIcon sx={{ fontSize: 14 }} />}
@@ -157,7 +157,7 @@ export default function GroupCallPro({ onBack, isHost = true }) {
 
         {/* Bottom controls */}
         <Box className="fixed inset-x-0 bottom-0 z-10 flex justify-center" sx={{ pb: 'env(safe-area-inset-bottom)' }}>
-          <Box className="w-full max-w-[390px] px-3 pb-3">
+          <Box className="w-full px-3 pb-3">
             <div className="flex items-center justify-between bg-white/10 rounded-2xl px-3 py-2 backdrop-blur">
               <Tooltip title={selfMuted? 'Unmute' : 'Mute'}>
                 <IconButton onClick={toggleMute} aria-label="mute" sx={{ color:'#fff' }}>
@@ -207,7 +207,7 @@ export default function GroupCallPro({ onBack, isHost = true }) {
           onClose={closeHeaderMenu}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-          PaperProps={{ sx:{ width: 360, maxWidth: 'calc(100vw - 16px)', borderRadius:2 } }}
+          PaperProps={{ sx:{ width: '90vw', maxWidth: 'calc(100vw - 1rem)', borderRadius:2 } }}
         >
           <MenuItem onClick={()=>{ closeHeaderMenu(); setSnack('Recording started'); }}>
             <ListItemIcon><RecordVoiceOverRoundedIcon/></ListItemIcon>
@@ -243,7 +243,7 @@ export default function GroupCallPro({ onBack, isHost = true }) {
         {/* Participants Drawer */}
         <Drawer anchor="bottom" open={openParticipants} onClose={()=>setOpenParticipants(false)}
           PaperProps={{ sx:{ borderTopLeftRadius:16, borderTopRightRadius:16 } }}>
-          <Box className="p-3" sx={{ maxWidth:390, mx:'auto' }}>
+          <Box className="p-3" sx={{ width: '100%', mx:'auto' }}>
             <div className="w-10 h-1 rounded-full bg-gray-300 mx-auto mb-2"/>
             <div className="flex items-center justify-between mb-2">
               <Typography variant="subtitle1" className="font-semibold">Participants</Typography>

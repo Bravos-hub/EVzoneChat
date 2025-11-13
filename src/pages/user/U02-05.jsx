@@ -41,12 +41,11 @@ import IosShareRoundedIcon from "@mui/icons-material/IosShareRounded";
 import DeleteSweepRoundedIcon from "@mui/icons-material/DeleteSweepRounded";
 import BlockRoundedIcon from "@mui/icons-material/BlockRounded";
 import DescriptionRoundedIcon from "@mui/icons-material/DescriptionRounded";
-import InsertPhotoRoundedIcon from "@mui/icons-material/InsertPhotoRounded"; // eslint-disable-line no-unused-vars
-import HeadphonesRoundedIcon from "@mui/icons-material/HeadphonesRounded"; // eslint-disable-line no-unused-vars
-import LocationOnRoundedIcon from "@mui/icons-material/LocationOnRounded"; // eslint-disable-line no-unused-vars
-import ContactsRoundedIcon from "@mui/icons-material/ContactsRounded"; // eslint-disable-line no-unused-vars
-import QrCode2RoundedIcon from "@mui/icons-material/QrCode2Rounded"; // eslint-disable-line no-unused-vars
-import PollRoundedIcon from "@mui/icons-material/PollRounded"; // eslint-disable-line no-unused-vars
+import LocationOnRoundedIcon from "@mui/icons-material/LocationOnRounded";
+import ContactsRoundedIcon from "@mui/icons-material/ContactsRounded";
+import AddRoundedIcon from "@mui/icons-material/AddRounded";
+import ImageRoundedIcon from "@mui/icons-material/ImageRounded";
+import MusicNoteRoundedIcon from "@mui/icons-material/MusicNoteRounded";
 import DoneAllRoundedIcon from "@mui/icons-material/DoneAllRounded";
 import PushPinRoundedIcon from "@mui/icons-material/PushPinRounded"; // eslint-disable-line no-unused-vars
 
@@ -82,7 +81,7 @@ function Bubble({ msg, onQuote, onAction, scrollTo }){
     <div id={`msg-${msg.id}`} className={`w-full flex ${isMine? 'justify-end':'justify-start'}`}>
       <div className="max-w-[78%]">
         <div className="flex items-end gap-2 mb-1">
-          {!isMine && <Avatar src={msg.author.avatar} sx={{ width: 28, height: 28 }} />}
+          {!isMine && <Avatar src={msg.author.avatar} sx={{ width: '1.75rem', height: '1.75rem' }} />}
           <Paper elevation={0} onContextMenu={(e)=>{e.preventDefault(); setMenuEl(e.currentTarget);}} onClick={(e)=>setMenuEl(e.currentTarget)} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} sx={{ p:1.25, px:1.5, bgcolor:bg, border:br, borderRadius:2 }}>
             {!recalled ? (
               <>
@@ -129,7 +128,7 @@ function Bubble({ msg, onQuote, onAction, scrollTo }){
         </Box>
       </Popover>
       <Popover open={Boolean(reactFullEl)} anchorEl={reactFullEl} onClose={()=>setReactFullEl(null)} anchorOrigin={{ vertical:'top', horizontal:'center' }} transformOrigin={{ vertical:'bottom', horizontal:'center' }}>
-        <Box className="p-2 grid grid-cols-8 gap-1 max-w-[320px]">
+        <Box className="p-2 grid grid-cols-8 gap-1" sx={{ maxWidth: '85vw' }}>
           {["😀","😁","😂","🤣","😊","😍","😘","😜","🤪","🤝","👍","👎","👏","🙌","🔥","🎉","💯","💡","✅","❗","😮","😢","🙏","😴","🤔","😇","🤩","🥳","🤯","😡","😱","🤗","🫶"].map(em => (
             <Button key={em} onClick={()=>{ setReactions(p=>[...p, em]); setReactFullEl(null); }} sx={{ minWidth:28, minHeight:28, fontSize:18 }}>{em}</Button>
           ))}
@@ -144,6 +143,15 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
   const [replyTo, setReplyTo] = useState(null);
   const [draft, setDraft] = useState('');
   const [menuEl, setMenuEl] = useState(null);
+  const [emojiEl, setEmojiEl] = useState(null);
+  const [attachEl, setAttachEl] = useState(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const fileInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
+  const imageInputRef = useRef(null);
+  const audioInputRef = useRef(null);
+  const recordingIntervalRef = useRef(null);
   const listRef = useRef(null);
 
   const openHeaderMenu = (e)=> setMenuEl(e.currentTarget);
@@ -168,12 +176,132 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
   };
 
   const send = ()=>{
-    if(!draft.trim()) return;
+    if(!draft.trim() && !isRecording) return;
     const ts = new Date();
     const newMsg = { id:'m'+Date.now(), author:{ id:'me', name:'You', avatar:'https://i.pravatar.cc/100?img=2' }, text:draft, time: ts.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }), mine:true, read:false, replyTo: replyTo? { id: replyTo.id, text: replyTo.text } : undefined };
     setMessages(prev=> [...prev, newMsg]);
     setDraft(''); setReplyTo(null);
     requestAnimationFrame(()=>{ const el=listRef.current; if(el) el.scrollTop = el.scrollHeight; });
+  };
+
+  // Emoji picker handler
+  const insertEmoji = (emoji) => {
+    setDraft(prev => prev + emoji);
+    setEmojiEl(null);
+  };
+
+  // Attachment handlers
+  const handleAttachOption = (option) => {
+    setAttachEl(null);
+    switch(option) {
+      case 'document':
+        fileInputRef.current?.click();
+        break;
+      case 'gallery':
+        imageInputRef.current?.click();
+        break;
+      case 'camera':
+        cameraInputRef.current?.click();
+        break;
+      case 'audio':
+        audioInputRef.current?.click();
+        break;
+      case 'location':
+        alert('Location sharing - Coming soon');
+        break;
+      case 'contact':
+        alert('Contact sharing - Coming soon');
+        break;
+      default:
+        break;
+    }
+  };
+
+  // Voice recording handlers
+  const startRecording = () => {
+    setIsRecording(true);
+    setRecordingTime(0);
+    recordingIntervalRef.current = setInterval(() => {
+      setRecordingTime(prev => prev + 1);
+    }, 1000);
+  };
+
+  const stopRecording = () => {
+    setIsRecording(false);
+    if(recordingIntervalRef.current) {
+      clearInterval(recordingIntervalRef.current);
+      recordingIntervalRef.current = null;
+    }
+    // Simulate sending voice message
+    if(recordingTime > 0) {
+      const ts = new Date();
+      const newMsg = { 
+        id:'m'+Date.now(), 
+        author:{ id:'me', name:'You', avatar:'https://i.pravatar.cc/100?img=2' }, 
+        text: `🎤 Voice message (${Math.floor(recordingTime/60)}:${String(recordingTime%60).padStart(2,'0')})`, 
+        time: ts.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }), 
+        mine:true, 
+        read:false 
+      };
+      setMessages(prev=> [...prev, newMsg]);
+      requestAnimationFrame(()=>{ const el=listRef.current; if(el) el.scrollTop = el.scrollHeight; });
+    }
+    setRecordingTime(0);
+  };
+
+  // File handlers
+  const handleFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if(file) {
+      const ts = new Date();
+      const newMsg = { 
+        id:'m'+Date.now(), 
+        author:{ id:'me', name:'You', avatar:'https://i.pravatar.cc/100?img=2' }, 
+        text: `📄 ${file.name}`, 
+        time: ts.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }), 
+        mine:true, 
+        read:false 
+      };
+      setMessages(prev=> [...prev, newMsg]);
+      requestAnimationFrame(()=>{ const el=listRef.current; if(el) el.scrollTop = el.scrollHeight; });
+    }
+    e.target.value = ''; // Reset input
+  };
+
+  const handleImageSelect = (e) => {
+    const file = e.target.files?.[0];
+    if(file) {
+      const ts = new Date();
+      const newMsg = { 
+        id:'m'+Date.now(), 
+        author:{ id:'me', name:'You', avatar:'https://i.pravatar.cc/100?img=2' }, 
+        text: `🖼️ ${file.name}`, 
+        time: ts.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }), 
+        mine:true, 
+        read:false 
+      };
+      setMessages(prev=> [...prev, newMsg]);
+      requestAnimationFrame(()=>{ const el=listRef.current; if(el) el.scrollTop = el.scrollHeight; });
+    }
+    e.target.value = '';
+  };
+
+  const handleCameraCapture = (e) => {
+    const file = e.target.files?.[0];
+    if(file) {
+      const ts = new Date();
+      const newMsg = { 
+        id:'m'+Date.now(), 
+        author:{ id:'me', name:'You', avatar:'https://i.pravatar.cc/100?img=2' }, 
+        text: `📷 Photo`, 
+        time: ts.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }), 
+        mine:true, 
+        read:false 
+      };
+      setMessages(prev=> [...prev, newMsg]);
+      requestAnimationFrame(()=>{ const el=listRef.current; if(el) el.scrollTop = el.scrollHeight; });
+    }
+    e.target.value = '';
   };
 
   return (
@@ -182,7 +310,6 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
       <Box sx={{ 
         width: '100%', 
         height: '100%', 
-        maxWidth: 390, 
         mx: 'auto', 
         bgcolor: '#fff', 
         display: 'flex', 
@@ -197,11 +324,8 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
             bgcolor:'#fff', 
             color:'#111', 
             borderBottom:`1px solid ${EV.light}`,
-            top: 56, // Below main shell header
+            top: '3.5rem', // Below main shell header
             width: '100%',
-            maxWidth: 390,
-            left: '50%',
-            transform: 'translateX(-50%)',
             zIndex: 1100,
             boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
           }}
@@ -217,8 +341,8 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
             <Avatar 
               src={avatar} 
               sx={{ 
-                width: 36, 
-                height: 36, 
+                width: '2.25rem', 
+                height: '2.25rem', 
                 mr: 1.5,
                 boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
               }} 
@@ -281,7 +405,7 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
           onClose={closeHeaderMenu}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-          PaperProps={{ sx:{ width: 360, maxWidth: 'calc(100vw - 16px)', mx: 'auto', borderRadius: 2, py: 0.5 } }}
+          PaperProps={{ sx:{ width: '90vw', maxWidth: 'calc(100vw - 1rem)', mx: 'auto', borderRadius: 2, py: 0.5 } }}
         >
           <MenuItem onClick={closeHeaderMenu}><ListItemIcon><InfoOutlinedIcon fontSize="small"/></ListItemIcon><ListItemText primary="View contact / group info"/></MenuItem>
           <MenuItem onClick={closeHeaderMenu}><ListItemIcon><NotificationsOffRoundedIcon fontSize="small"/></ListItemIcon><ListItemText primary="Mute notifications"/></MenuItem>
@@ -300,8 +424,8 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
           className="flex-1 no-scrollbar" 
           sx={{ 
             overflowY:'auto', 
-            pt: '112px', // 56px shell header + 56px conversation header
-            pb: '180px', // Space for composer (88px) + bottom nav (88px) + padding
+            pt: '7rem', // shell header + conversation header
+            pb: '11.25rem', // Space for composer + bottom nav + padding
             px: 3,
             minHeight: 0,
             display: 'flex',
@@ -324,11 +448,10 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
             px: 2,
             py: 1.5,
             position: 'fixed',
-            bottom: 88, // Above bottom nav (72px height + 16px padding)
+            bottom: '5.5rem', // Above bottom nav
             left: 0,
             right: 0,
             width: '100%',
-            maxWidth: 390,
             mx: 'auto',
             zIndex: 1200,
             boxShadow: '0 -2px 8px rgba(0,0,0,0.04)'
@@ -340,24 +463,147 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
             </Box>
           )}
           <Box className="flex items-end gap-1.5">
-            <IconButton aria-label="Emoji"><InsertEmoticonRoundedIcon/></IconButton>
-            <IconButton aria-label="Attach"><AttachFileRoundedIcon/></IconButton>
+            {/* Emoji picker button */}
+            <IconButton 
+              aria-label="Emoji" 
+              onClick={(e)=>setEmojiEl(emojiEl ? null : e.currentTarget)}
+              sx={{ color: emojiEl ? EV.orange : '#666' }}
+            >
+              <InsertEmoticonRoundedIcon/>
+            </IconButton>
+            
+            {/* Attachment menu button (WhatsApp-style + icon) */}
+            <IconButton 
+              aria-label="Attach" 
+              onClick={(e)=>setAttachEl(attachEl ? null : e.currentTarget)}
+              sx={{ color: attachEl ? EV.orange : '#666' }}
+            >
+              {attachEl ? <AddRoundedIcon sx={{ transform: 'rotate(45deg)' }} /> : <AttachFileRoundedIcon/>}
+            </IconButton>
+            
+            {/* Hidden file inputs */}
+            <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept=".pdf,.doc,.docx,.txt" onChange={handleFileSelect} />
+            <input type="file" ref={imageInputRef} style={{ display: 'none' }} accept="image/*" multiple onChange={handleImageSelect} />
+            <input type="file" ref={cameraInputRef} style={{ display: 'none' }} accept="image/*" capture="environment" onChange={handleCameraCapture} />
+            <input type="file" ref={audioInputRef} style={{ display: 'none' }} accept="audio/*" onChange={handleFileSelect} />
+            
             <TextField
-              fullWidth size="small" placeholder="Type a message"
+              fullWidth 
+              size="small" 
+              placeholder={isRecording ? `Recording... ${Math.floor(recordingTime/60)}:${String(recordingTime%60).padStart(2,'0')}` : "Type a message"}
               value={draft}
               onChange={(e)=>setDraft(e.target.value)}
               onFocus={()=>{ const el=listRef.current; if(el) el.scrollTop = el.scrollHeight; }}
-              multiline minRows={1} maxRows={6}
+              onKeyDown={(e)=>{ if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
+              multiline 
+              minRows={1} 
+              maxRows={6}
+              disabled={isRecording}
               InputProps={{ sx:{ bgcolor:'#fff' } }}
             />
-            <IconButton aria-label="Camera"><CameraAltRoundedIcon/></IconButton>
+            
             {draft.trim().length>0 ? (
-              <IconButton aria-label="Send" sx={{ color: EV.orange }} onClick={send}><SendRoundedIcon/></IconButton>
+              <IconButton aria-label="Send" sx={{ color: EV.orange }} onClick={send}>
+                <SendRoundedIcon/>
+              </IconButton>
             ) : (
-              <IconButton aria-label="Record" sx={{ color: EV.orange }}><MicRoundedIcon/></IconButton>
+              <IconButton 
+                aria-label="Record" 
+                sx={{ color: isRecording ? '#e53935' : EV.orange }}
+                onMouseDown={startRecording}
+                onMouseUp={stopRecording}
+                onTouchStart={startRecording}
+                onTouchEnd={stopRecording}
+              >
+                {isRecording ? <StopRoundedIcon/> : <MicRoundedIcon/>}
+              </IconButton>
             )}
           </Box>
         </Box>
+
+        {/* WhatsApp-style Attachment Menu */}
+        <Popover
+          open={Boolean(attachEl)}
+          anchorEl={attachEl}
+          onClose={()=>setAttachEl(null)}
+          anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+          transformOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          PaperProps={{ 
+            sx:{ 
+              borderRadius: 3, 
+              p: 1.5, 
+              minWidth: 200,
+              boxShadow: '0 4px 20px rgba(0,0,0,0.15)'
+            } 
+          }}
+        >
+          <Box className="grid grid-cols-3 gap-3">
+            {[
+              { icon: <DescriptionRoundedIcon sx={{ fontSize: 28 }} />, label: 'Document', action: 'document' },
+              { icon: <ImageRoundedIcon sx={{ fontSize: 28 }} />, label: 'Gallery', action: 'gallery' },
+              { icon: <CameraAltRoundedIcon sx={{ fontSize: 28 }} />, label: 'Camera', action: 'camera' },
+              { icon: <MusicNoteRoundedIcon sx={{ fontSize: 28 }} />, label: 'Audio', action: 'audio' },
+              { icon: <LocationOnRoundedIcon sx={{ fontSize: 28 }} />, label: 'Location', action: 'location' },
+              { icon: <ContactsRoundedIcon sx={{ fontSize: 28 }} />, label: 'Contact', action: 'contact' },
+            ].map((item) => (
+              <Box
+                key={item.action}
+                onClick={()=>handleAttachOption(item.action)}
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 0.5,
+                  p: 1.5,
+                  borderRadius: 2,
+                  cursor: 'pointer',
+                  '&:hover': { bgcolor: EV.light },
+                  transition: 'background-color 0.2s'
+                }}
+              >
+                <Box sx={{ color: EV.green }}>{item.icon}</Box>
+                <Typography variant="caption" sx={{ fontSize: '11px', textAlign: 'center', color: '#666' }}>
+                  {item.label}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        </Popover>
+
+        {/* Emoji Picker */}
+        <Popover
+          open={Boolean(emojiEl)}
+          anchorEl={emojiEl}
+          onClose={()=>setEmojiEl(null)}
+          anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+          transformOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          PaperProps={{ 
+            sx:{ 
+              borderRadius: 3, 
+              p: 1.5, 
+              maxWidth: '85vw',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.15)'
+            } 
+          }}
+        >
+          <Box className="grid grid-cols-8 gap-1" sx={{ maxHeight: '40vh', overflowY: 'auto' }}>
+            {["😀","😁","😂","🤣","😊","😍","😘","😜","🤪","🤝","👍","👎","👏","🙌","🔥","🎉","💯","💡","✅","❗","😮","😢","🙏","😴","🤔","😇","🤩","🥳","🤯","😡","😱","🤗","🫶","❤️","💔","💋","🌹","🎁","🎂","🎈","🎊","🎉","🏆","⭐","🌟","✨","💫","🌈","☀️","🌙","⭐","🌟"].map(em => (
+              <Button 
+                key={em} 
+                onClick={()=>insertEmoji(em)} 
+                sx={{ 
+                  minWidth: 36, 
+                  minHeight: 36, 
+                  fontSize: 20,
+                  p: 0.5,
+                  '&:hover': { bgcolor: EV.light }
+                }}
+              >
+                {em}
+              </Button>
+            ))}
+          </Box>
+        </Popover>
       </Box>
     </>
   );

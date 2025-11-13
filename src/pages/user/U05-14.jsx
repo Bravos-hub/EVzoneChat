@@ -56,7 +56,7 @@ export default function CaptionsRecording({ onBack }) {
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
 
-      <Box className="w-full h-full max-w-sm mx-auto bg-black text-white flex flex-col">
+      <Box className="w-full h-full mx-auto bg-black text-white flex flex-col">
         <AppBar elevation={0} position="static" sx={{ bgcolor:'rgba(0,0,0,0.55)', color:'#fff' }}>
           <Toolbar className="!min-h-[56px]">
             <IconButton onClick={onBack} aria-label="Back" sx={{ color:'#fff' }}><ArrowBackRoundedIcon /></IconButton>
@@ -87,7 +87,7 @@ export default function CaptionsRecording({ onBack }) {
 
         {/* Controls */}
         <Box className="fixed inset-x-0 bottom-0 z-10 flex justify-center" sx={{ pb: 'env(safe-area-inset-bottom)' }}>
-          <Box className="w-full max-w-sm px-3 pb-3">
+          <Box className="w-full mx-auto px-3 pb-3">
             <div className="bg-white/10 rounded-2xl px-3 py-2 backdrop-blur text-white">
               <div className="grid grid-cols-2 gap-2">
                 <FormControl size="small" fullWidth sx={{ '& .MuiOutlinedInput-root': { color:'#fff' }, '& .MuiSvgIcon-root': { color:'#fff' } }}>

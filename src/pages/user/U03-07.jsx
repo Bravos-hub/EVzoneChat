@@ -68,7 +68,7 @@ export default function MediaViewerFS({ open, item = { type: 'image', src: '' },
 
       {/* Actions */}
       <Box className="fixed inset-x-0 bottom-0 z-10 flex justify-center" sx={{ pb: 'env(safe-area-inset-bottom)' }}>
-        <Box className="w-full max-w-sm bg-white/95 backdrop-blur px-3 py-2 border-t" sx={{ borderColor: EV.light }}>
+        <Box className="w-full mx-auto bg-white/95 backdrop-blur px-3 py-2 border-t" sx={{ borderColor: EV.light }}>
           <div className="grid grid-cols-3 gap-2">
             <Button onClick={()=>onSave?.(item)} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Save</Button>
             <Button onClick={()=>onShare?.(item)} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Share</Button>

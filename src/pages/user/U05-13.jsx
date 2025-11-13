@@ -139,7 +139,7 @@ export default function ScreenshareWithChatPro({ onBack, remote = { name:'Group 
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
 
-      <Box className="w-full h-full max-w-[390px] mx-auto bg-black text-white flex flex-col">
+      <Box className="w-full h-full mx-auto bg-black text-white flex flex-col">
         {/* Header */}
         <AppBar elevation={0} position="fixed" sx={{ bgcolor: 'rgba(0,0,0,0.55)' }}>
           <Toolbar className="!min-h-[56px]">
@@ -184,7 +184,7 @@ export default function ScreenshareWithChatPro({ onBack, remote = { name:'Group 
 
         {/* Bottom controls */}
         <Box className="fixed inset-x-0 bottom-0 z-10 flex justify-center" sx={{ pb: 'env(safe-area-inset-bottom)' }}>
-          <Box className="w-full max-w-[390px] px-3 pb-3">
+          <Box className="w-full px-3 pb-3">
             <div className="flex items-center justify-between bg-white/10 rounded-2xl px-3 py-2 backdrop-blur gap-2">
               {!sharing ? (
                 <Button onClick={startShare} startIcon={<ScreenShareRoundedIcon />} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform: 'none' }}>Start share</Button>
@@ -208,7 +208,7 @@ export default function ScreenshareWithChatPro({ onBack, remote = { name:'Group 
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         PaperProps={{
-          sx: { width: 360, maxWidth: 'calc(100vw - 16px)', borderRadius: 2, py: 0.5, mx: 'auto' }
+          sx: { width: '90vw', maxWidth: 'calc(100vw - 1rem)', borderRadius: 2, py: 0.5, mx: 'auto' }
         }}
       >
         <MenuItem onClick={() => { setMenuEl(null); setCaptions(c => !c); }}>
@@ -228,7 +228,7 @@ export default function ScreenshareWithChatPro({ onBack, remote = { name:'Group 
 
       {/* Chat drawer */}
       <Drawer anchor="right" open={chatOpen} onClose={() => setChatOpen(false)}
-        PaperProps={{ sx: { width: '86%', maxWidth: 380 } }}
+        PaperProps={{ sx: { width: '86vw', maxWidth: '90vw' } }}
       >
         <Box className="h-full flex flex-col bg-white">
           <Box className="px-3 py-2 border-b" sx={{ borderColor: EV.light }}>

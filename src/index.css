@@ -14,19 +14,4 @@ html, body, #root {
   overflow-x: hidden;
 }
 
-/* Ensure mobile-first responsive behavior */
-@media (max-width: 390px) {
-  body {
-    width: 100%;
-    overflow-x: hidden;
-  }
-}
-
-/* Center content on larger screens */
-@media (min-width: 391px) {
-  body {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-  }
-}
+/* Responsive mobile-first design - fully responsive to all mobile device sizes */
