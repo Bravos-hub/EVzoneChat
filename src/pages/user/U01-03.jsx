@@ -61,18 +61,23 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
   // carousel helpers
   const wrapRef = useRef(null);
   const [idx, setIdx] = useState(0);
-  const slideW = 280; // px
+  const slideW = '72vw'; // responsive width
 
   // eslint-disable-next-line no-unused-vars
   const scrollTo = (i) => {
     const el = wrapRef.current; if (!el) return;
     const clamped = Math.max(0, Math.min(i, lives.length - 1));
-    el.scrollTo({ left: clamped * (slideW + 12), behavior: 'smooth' });
+    const slideWidth = el.offsetWidth * 0.72; // 72% of container width
+    el.scrollTo({ left: clamped * (slideWidth + 12), behavior: 'smooth' });
   };
 
   useEffect(() => {
     const el = wrapRef.current; if (!el) return;
-    const onScroll = () => { const i = Math.round(el.scrollLeft / (slideW + 12)); setIdx(i); };
+    const onScroll = () => { 
+      const slideWidth = el.offsetWidth * 0.72; // 72% of container width
+      const i = Math.round(el.scrollLeft / (slideWidth + 12)); 
+      setIdx(i); 
+    };
     el.addEventListener('scroll', onScroll, { passive: true });
     return () => el.removeEventListener('scroll', onScroll);
   }, []);
@@ -88,7 +93,6 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
 
       <Box sx={{ 
         width: '100%', 
-        maxWidth: 390, 
         mx: 'auto', 
         bgcolor: '#fff', 
         height: '100%', 
@@ -180,7 +184,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                   onClick={()=>onLiveOpen?.(s)}
                   elevation={0}
                   className="shrink-0 rounded-2xl p-3"
-                  style={{ width: slideW, scrollSnapAlign:'start', border:`1px solid ${EV.light}` }}
+                  style={{ width: slideW, minWidth: '85vw', scrollSnapAlign:'start', border:`1px solid ${EV.light}` }}
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <Chip size="small" label="LIVE" sx={{ bgcolor: EV.orange, color:'#fff', height:22, borderRadius:1 }} />

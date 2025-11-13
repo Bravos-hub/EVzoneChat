@@ -70,7 +70,7 @@ function useTabFromLocation(){
 }
 
 /* -----------------------------------------------------------
-   Fixed mobile frame shell (maxWidth 390px)
+   Responsive mobile shell - adapts to all mobile device sizes
 ------------------------------------------------------------ */
 function ShellFrame({ children }){
   const navigate = useNavigate();
@@ -90,7 +90,6 @@ function ShellFrame({ children }){
       display: 'flex',
       flexDirection: 'column',
       width: '100%',
-      maxWidth: 390,
       mx: 'auto',
       position: 'relative'
     }}>
@@ -102,9 +101,6 @@ function ShellFrame({ children }){
           bgcolor: EV.green, 
           color:'#fff',
           width: '100%',
-          maxWidth: 390,
-          left: '50%',
-          transform: 'translateX(-50%)',
           zIndex: 1200
         }}
       >
@@ -114,8 +110,8 @@ function ShellFrame({ children }){
             sx={{ 
               bgcolor:'#fff', 
               color:EV.green, 
-              width: 32, 
-              height: 32, 
+              width: '2rem', 
+              height: '2rem', 
               mr: 1.5, 
               cursor:'pointer',
               boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
@@ -146,7 +142,7 @@ function ShellFrame({ children }){
         onClose={closeMenu}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        PaperProps={{ sx:{ width: 360, maxWidth: 'calc(100vw - 16px)', borderRadius: 2, py: 0.5, mx: 'auto' } }}
+          PaperProps={{ sx:{ width: '90vw', maxWidth: 'calc(100vw - 1rem)', borderRadius: 2, py: 0.5, mx: 'auto' } }}
       >
         {/* Global quick actions */}
         <MenuItem onClick={()=>go('/inbox')}>
@@ -215,20 +211,19 @@ function ShellFrame({ children }){
       </Box>
 
       {/* Bottom nav (mobile frame) - always visible for consistent mobile navigation */}
-      <Box sx={{ 
-        position:'fixed', 
-        left:0, 
-        right:0, 
-        bottom:0, 
-        bgcolor:'transparent', 
-        pb:'env(safe-area-inset-bottom)',
-        zIndex: 1100,
-        display: 'flex',
-        justifyContent: 'center'
-      }}>
+        <Box sx={{ 
+          position:'fixed', 
+          left:0, 
+          right:0, 
+          bottom:0, 
+          bgcolor:'transparent', 
+          pb:'env(safe-area-inset-bottom)',
+          zIndex: 1100,
+          display: 'flex',
+          justifyContent: 'center'
+        }}>
         <Box sx={{ 
           width:'100%', 
-          maxWidth:390, 
           px: 2, 
           pb: 1.5 
         }}>
@@ -263,7 +258,7 @@ function MobileBottomNav(){
       onChange={(_, v)=>{ const map={ inbox:'/inbox', search:'/search', call:'/call', media:'/media', settings:'/settings' }; if(map[v]) nav(map[v]); }}
       showLabels
       sx={{ 
-        height: 72, 
+        height: '4.5rem', 
         bgcolor:'transparent', 
         '& .Mui-selected':{ 
           color: EV.green,
@@ -312,22 +307,21 @@ function Launcher({ unread=0 }){
       zIndex: 1000,
       pointerEvents: 'none'
     }}>
-      <Box sx={{
-        position: 'relative',
-        width: '100%',
-        maxWidth: 390,
-        px: 2,
-        pb: 1
-      }}>
+        <Box sx={{
+          position: 'relative',
+          width: '100%',
+          px: 2,
+          pb: 1
+        }}>
         <IconButton
           aria-label="New message"
           onClick={() => navigate('/new-message')}
           sx={{
             position: 'absolute',
-            right: 16,
+            right: '1rem',
             bottom: 0,
-            width: 56,
-            height: 56,
+            width: '3.5rem',
+            height: '3.5rem',
             bgcolor: EV.orange,
             color: '#fff',
             boxShadow: '0 4px 16px rgba(247, 127, 0, 0.4)',

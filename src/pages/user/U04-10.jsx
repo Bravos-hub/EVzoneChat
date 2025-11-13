@@ -70,8 +70,13 @@ export default function OneToOneCall({
   const onPipMove = (e) => {
     if (!drag.current.active) return;
     const t = ("touches" in e ? e.touches?.[0] : e);
-    setPip({ x: Math.max(12, Math.min(12 + 390 - 12 - 112, drag.current.ox + (t.clientX - drag.current.sx))),
-             y: Math.max(12, Math.min(12 + 640 - 12 - 160, drag.current.oy + (t.clientY - drag.current.sy))) });
+    const container = pipRef.current?.parentElement;
+    const containerWidth = container?.offsetWidth || window.innerWidth;
+    const containerHeight = container?.offsetHeight || window.innerHeight;
+    const pipWidth = 112; // w-28 = 7rem = 112px
+    const pipHeight = 160; // h-40 = 10rem = 160px
+    setPip({ x: Math.max(12, Math.min(containerWidth - pipWidth - 12, drag.current.ox + (t.clientX - drag.current.sx))),
+             y: Math.max(12, Math.min(containerHeight - pipHeight - 12, drag.current.oy + (t.clientY - drag.current.sy))) });
   };
   const onPipUp = (e) => {
     if (!drag.current.active) return;
@@ -106,7 +111,7 @@ export default function OneToOneCall({
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none`}</style>
 
-      <Box className="w-full h-full max-w-sm mx-auto bg-black text-white flex flex-col">
+      <Box className="w-full h-full mx-auto bg-black text-white flex flex-col">
         {/* Header */}
         <AppBar elevation={0} position="static" sx={{ bgcolor: "rgba(0,0,0,0.55)", color: "#fff" }}>
           <Toolbar className="!min-h-[56px]">
@@ -131,7 +136,7 @@ export default function OneToOneCall({
           onClose={()=>setMenuEl(null)}
           anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
           transformOrigin={{ vertical: "top", horizontal: "right" }}
-          PaperProps={{ sx:{ width: 360, maxWidth: "calc(100vw - 16px)", borderRadius: 2, py: 0.5, mx: "auto" } }}
+          PaperProps={{ sx:{ width: '90vw', maxWidth: "calc(100vw - 1rem)", borderRadius: 2, py: 0.5, mx: "auto" } }}
         >
           <MenuItem onClick={()=>{ setMenuEl(null); setCaptions(c=>!c); }}>
             <ListItemIcon><ClosedCaptionRoundedIcon fontSize="small"/></ListItemIcon>
@@ -186,7 +191,7 @@ export default function OneToOneCall({
           ) : (
             <div className="absolute inset-0 grid place-items-center">
               <div className="flex flex-col items-center gap-2">
-                <Avatar src={remote.avatar} sx={{ width: 104, height: 104 }} />
+                <Avatar src={remote.avatar} sx={{ width: '6.5rem', height: '6.5rem' }} />
                 <div className="text-sm opacity-80">{state === "connected" ? `Connected • ${hhmmss}` : status}</div>
               </div>
             </div>
@@ -217,7 +222,7 @@ export default function OneToOneCall({
 
         {/* Controls (glass) */}
         <Box className="fixed inset-x-0 bottom-0 z-10 flex justify-center" sx={{ pb: "env(safe-area-inset-bottom)" }}>
-          <Box className="w-full max-w-sm px-3 pb-3">
+          <Box className="w-full px-3 pb-3">
             <div className="flex items-center justify-between bg-white/10 rounded-2xl px-3 py-2 backdrop-blur">
               {/* mic */}
               <IconButton onClick={()=>setMuted(m=>!m)} aria-label="Mute" sx={{ color:"#fff" }}>

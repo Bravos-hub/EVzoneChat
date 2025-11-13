@@ -44,7 +44,7 @@ export default function ConversationGallery({ onBack, items = DEMO, onOpen }) {
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
 
-      <Box className="w-full h-full max-w-sm mx-auto bg-white flex flex-col">
+      <Box className="w-full h-full mx-auto bg-white flex flex-col">
         <AppBar elevation={0} position="static" sx={{ bgcolor:'#fff', color:'#111', borderBottom:`1px solid ${EV.light}` }}>
           <Toolbar className="!min-h-[56px]">
             <IconButton onClick={onBack} aria-label="Back"><ArrowBackRoundedIcon /></IconButton>
@@ -69,9 +69,9 @@ export default function ConversationGallery({ onBack, items = DEMO, onOpen }) {
               <Grid item xs={4} key={it.id}>
                 <Card elevation={0} sx={{ borderRadius: 2, overflow:'hidden', border:`1px solid ${EV.light}` }}>
                   <CardActionArea onClick={()=>onOpen?.(it)}>
-                    <CardMedia component="img" src={it.thumb || it.src} alt="thumb" sx={{ height: 98, objectFit:'cover' }} />
+                    <CardMedia component="img" src={it.thumb || it.src} alt="thumb" sx={{ height: '6.125rem', objectFit:'cover' }} />
                     <div className="absolute bottom-1 left-1 inline-flex items-center gap-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded-full">
-                      <Avatar src={it.by?.avatar} sx={{ width: 14, height: 14 }} />
+                      <Avatar src={it.by?.avatar} sx={{ width: '0.875rem', height: '0.875rem' }} />
                       <span>{it.type}</span>
                     </div>
                   </CardActionArea>

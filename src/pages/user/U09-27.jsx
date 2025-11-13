@@ -55,7 +55,7 @@ export default function NotificationsPrivacy({ onBack }) {
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
 
-      <Box className="w-full h-full max-w-sm mx-auto bg-white flex flex-col">
+      <Box className="w-full h-full mx-auto bg-white flex flex-col">
         <AppBar elevation={0} position="static" sx={{ bgcolor:'#fff', color:'#111', borderBottom:`1px solid ${EV.light}` }}>
           <Toolbar className="!min-h-[56px]">
             <IconButton onClick={onBack} aria-label="Back"><ArrowBackRoundedIcon /></IconButton>

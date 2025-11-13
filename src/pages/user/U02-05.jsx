@@ -82,7 +82,7 @@ function Bubble({ msg, onQuote, onAction, scrollTo }){
     <div id={`msg-${msg.id}`} className={`w-full flex ${isMine? 'justify-end':'justify-start'}`}>
       <div className="max-w-[78%]">
         <div className="flex items-end gap-2 mb-1">
-          {!isMine && <Avatar src={msg.author.avatar} sx={{ width: 28, height: 28 }} />}
+          {!isMine && <Avatar src={msg.author.avatar} sx={{ width: '1.75rem', height: '1.75rem' }} />}
           <Paper elevation={0} onContextMenu={(e)=>{e.preventDefault(); setMenuEl(e.currentTarget);}} onClick={(e)=>setMenuEl(e.currentTarget)} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} sx={{ p:1.25, px:1.5, bgcolor:bg, border:br, borderRadius:2 }}>
             {!recalled ? (
               <>
@@ -129,7 +129,7 @@ function Bubble({ msg, onQuote, onAction, scrollTo }){
         </Box>
       </Popover>
       <Popover open={Boolean(reactFullEl)} anchorEl={reactFullEl} onClose={()=>setReactFullEl(null)} anchorOrigin={{ vertical:'top', horizontal:'center' }} transformOrigin={{ vertical:'bottom', horizontal:'center' }}>
-        <Box className="p-2 grid grid-cols-8 gap-1 max-w-[320px]">
+        <Box className="p-2 grid grid-cols-8 gap-1" sx={{ maxWidth: '85vw' }}>
           {["😀","😁","😂","🤣","😊","😍","😘","😜","🤪","🤝","👍","👎","👏","🙌","🔥","🎉","💯","💡","✅","❗","😮","😢","🙏","😴","🤔","😇","🤩","🥳","🤯","😡","😱","🤗","🫶"].map(em => (
             <Button key={em} onClick={()=>{ setReactions(p=>[...p, em]); setReactFullEl(null); }} sx={{ minWidth:28, minHeight:28, fontSize:18 }}>{em}</Button>
           ))}
@@ -144,6 +144,12 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
   const [replyTo, setReplyTo] = useState(null);
   const [draft, setDraft] = useState('');
   const [menuEl, setMenuEl] = useState(null);
+  const [emojiEl, setEmojiEl] = useState(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const fileInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
+  const recordingIntervalRef = useRef(null);
   const listRef = useRef(null);
 
   const openHeaderMenu = (e)=> setMenuEl(e.currentTarget);
@@ -182,7 +188,6 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
       <Box sx={{ 
         width: '100%', 
         height: '100%', 
-        maxWidth: 390, 
         mx: 'auto', 
         bgcolor: '#fff', 
         display: 'flex', 
@@ -197,11 +202,8 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
             bgcolor:'#fff', 
             color:'#111', 
             borderBottom:`1px solid ${EV.light}`,
-            top: 56, // Below main shell header
+            top: '3.5rem', // Below main shell header
             width: '100%',
-            maxWidth: 390,
-            left: '50%',
-            transform: 'translateX(-50%)',
             zIndex: 1100,
             boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
           }}
@@ -217,8 +219,8 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
             <Avatar 
               src={avatar} 
               sx={{ 
-                width: 36, 
-                height: 36, 
+                width: '2.25rem', 
+                height: '2.25rem', 
                 mr: 1.5,
                 boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
               }} 
@@ -281,7 +283,7 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
           onClose={closeHeaderMenu}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-          PaperProps={{ sx:{ width: 360, maxWidth: 'calc(100vw - 16px)', mx: 'auto', borderRadius: 2, py: 0.5 } }}
+          PaperProps={{ sx:{ width: '90vw', maxWidth: 'calc(100vw - 1rem)', mx: 'auto', borderRadius: 2, py: 0.5 } }}
         >
           <MenuItem onClick={closeHeaderMenu}><ListItemIcon><InfoOutlinedIcon fontSize="small"/></ListItemIcon><ListItemText primary="View contact / group info"/></MenuItem>
           <MenuItem onClick={closeHeaderMenu}><ListItemIcon><NotificationsOffRoundedIcon fontSize="small"/></ListItemIcon><ListItemText primary="Mute notifications"/></MenuItem>
@@ -300,8 +302,8 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
           className="flex-1 no-scrollbar" 
           sx={{ 
             overflowY:'auto', 
-            pt: '112px', // 56px shell header + 56px conversation header
-            pb: '180px', // Space for composer (88px) + bottom nav (88px) + padding
+            pt: '7rem', // shell header + conversation header
+            pb: '11.25rem', // Space for composer + bottom nav + padding
             px: 3,
             minHeight: 0,
             display: 'flex',
@@ -324,11 +326,10 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
             px: 2,
             py: 1.5,
             position: 'fixed',
-            bottom: 88, // Above bottom nav (72px height + 16px padding)
+            bottom: '5.5rem', // Above bottom nav
             left: 0,
             right: 0,
             width: '100%',
-            maxWidth: 390,
             mx: 'auto',
             zIndex: 1200,
             boxShadow: '0 -2px 8px rgba(0,0,0,0.04)'
