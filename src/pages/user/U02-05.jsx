@@ -812,18 +812,24 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
               </Box>
               <Box sx={{ position:'absolute', top: 8, right: 4, display:'flex', gap: 0.5 }}>
                 <IconButton 
-                  aria-label="Video" 
+                  aria-label="Video call" 
                   size="small" 
                   sx={{ color: 'text.secondary' }}
-                  onClick={()=>onNavigate?.('/call?type=video&contact=' + encodeURIComponent(title))}
+                  onClick={()=>{
+                    // Navigate to call page with video type and contact name
+                    onNavigate?.(`/call?type=video&contact=${encodeURIComponent(title)}&state=dialing`);
+                  }}
                 >
                   <VideocamRoundedIcon fontSize="small"/>
                 </IconButton>
                 <IconButton 
-                  aria-label="Call" 
+                  aria-label="Voice call" 
                   size="small" 
                   sx={{ color: 'text.secondary' }}
-                  onClick={()=>onNavigate?.('/call?type=voice&contact=' + encodeURIComponent(title))}
+                  onClick={()=>{
+                    // Navigate to call page with voice type and contact name
+                    onNavigate?.(`/call?type=voice&contact=${encodeURIComponent(title)}&state=dialing`);
+                  }}
                 >
                   <CallRoundedIcon fontSize="small"/>
                 </IconButton>

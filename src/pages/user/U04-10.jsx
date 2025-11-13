@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
+import { useTheme } from "../../context/ThemeContext";
 import {
   AppBar, Toolbar, IconButton, Box, Avatar, Button, Menu, MenuItem, ListItemIcon, ListItemText,
   List, ListItem, ListItemAvatar, ListItemText as ListItemTextComp, Divider, Chip, Typography
@@ -53,6 +54,11 @@ export default function OneToOneCall({
     return params.get('contact') || remote.name;
   }, [location, remote.name]);
 
+  const callStateFromUrl = useMemo(() => {
+    const params = new URLSearchParams(location?.search || '');
+    return params.get('state') || state;
+  }, [location, state]);
+
   const actualType = callType === 'voice' ? 'voice' : 'video';
   const actualRemote = { ...remote, name: contactName };
 
@@ -72,6 +78,7 @@ export default function OneToOneCall({
 
   // All hooks must be called before any conditional returns
   const muiTheme = useMuiTheme();
+  const { actualMode } = useTheme();
   // Toggles (uncontrolled defaults)
   const [muted, setMuted] = useState(false);
   const [camOn, setCamOn] = useState(actualType === "video");
@@ -82,13 +89,36 @@ export default function OneToOneCall({
   const [captions, setCaptions] = useState(flags.captions);
   const [menuEl, setMenuEl] = useState(null);
 
-  // Timer for connected
+  // Call state management - auto-transition through dialing states
+  const [callState, setCallState] = useState(callStateFromUrl);
   const [elapsed, setElapsed] = useState(0);
+  
+  // Update state when URL changes
   useEffect(() => {
-    if (state !== "connected") return;
+    setCallState(callStateFromUrl);
+  }, [callStateFromUrl]);
+  
+  // Auto-transition dialing states
+  useEffect(() => {
+    if (callState === "dialing") {
+      const timer1 = setTimeout(() => setCallState("ringing"), 1500);
+      return () => clearTimeout(timer1);
+    } else if (callState === "ringing") {
+      const timer2 = setTimeout(() => setCallState("connecting"), 2000);
+      return () => clearTimeout(timer2);
+    } else if (callState === "connecting") {
+      const timer3 = setTimeout(() => setCallState("connected"), 1500);
+      return () => clearTimeout(timer3);
+    }
+  }, [callState]);
+
+  // Timer for connected state
+  useEffect(() => {
+    if (callState !== "connected") return;
     const t = setInterval(() => setElapsed((e) => e + 1), 1000);
     return () => clearInterval(t);
-  }, [state]);
+  }, [callState]);
+  
   const hhmmss = useMemo(
     () => `${String(Math.floor(elapsed / 60)).padStart(2, "0")}:${String(elapsed % 60).padStart(2, "0")}`,
     [elapsed]
@@ -131,7 +161,7 @@ export default function OneToOneCall({
 
   // Derived label
   const status = useMemo(() => {
-    switch (state) {
+    switch (callState) {
       case "incoming": return "Incoming call…";
       case "dialing": return "Dialing…";
       case "ringing": return "Ringing…";
@@ -140,17 +170,17 @@ export default function OneToOneCall({
       case "connected": return (actualType === "voice" ? `Voice • ${hhmmss}` : `Video • ${hhmmss}`);
       default: return "";
     }
-  }, [state, actualType, hhmmss]);
+  }, [callState, actualType, hhmmss]);
 
   // If showing calls list, render list view (after all hooks)
   if (showCallList) {
     return (
       <>
         <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none`}</style>
-        <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.paper' }}>
+        <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.default' }}>
           <AppBar elevation={0} position="static" sx={{ bgcolor: 'background.paper', color: 'text.primary', borderBottom: `1px solid ${muiTheme.palette.divider}` }}>
             <Toolbar className="!min-h-[56px]">
-              <Typography variant="h6" className="font-bold ml-1">Calls</Typography>
+              <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>Calls</Typography>
               <Box sx={{ flexGrow: 1 }} />
               <IconButton onClick={()=>onNavigate?.('/new-message')} aria-label="New call" sx={{ color: EV.orange }}>
                 <CallRoundedIcon />
@@ -164,7 +194,7 @@ export default function OneToOneCall({
                 <React.Fragment key={call.id}>
                   <ListItem 
                     button 
-                    onClick={()=>onNavigate?.(`/call?type=${call.type}&contact=${encodeURIComponent(call.name)}`)}
+                    onClick={()=>onNavigate?.(`/call?type=${call.type}&contact=${encodeURIComponent(call.name)}&state=dialing`)}
                   >
                     <ListItemAvatar>
                       <Avatar src={call.avatar} />
@@ -200,16 +230,20 @@ export default function OneToOneCall({
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none`}</style>
 
-      <Box className="w-full h-full mx-auto bg-black text-white flex flex-col">
+      <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: '#000', color: '#fff' }}>
         {/* Header */}
         <AppBar elevation={0} position="static" sx={{ bgcolor: "rgba(0,0,0,0.55)", color: "#fff" }}>
           <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back" sx={{ color: "#fff" }}>
+            <IconButton onClick={() => {
+              setCallState("dialing");
+              setElapsed(0);
+              onBack?.();
+            }} aria-label="Back" sx={{ color: "#fff" }}>
               <ArrowBackRoundedIcon />
             </IconButton>
             <div className="flex flex-col">
-              <span className="font-semibold -mb-0.5" style={{ whiteSpace: "nowrap" }}>{actualRemote.name}</span>
-              <span className="text-[11px] opacity-80">{status}</span>
+              <span className="font-semibold -mb-0.5" style={{ whiteSpace: "nowrap", color: "#fff" }}>{actualRemote.name}</span>
+              <span className="text-[11px] opacity-80" style={{ color: "#fff" }}>{status}</span>
             </div>
             <Box sx={{ flexGrow: 1 }} />
             <IconButton aria-label="More" onClick={(e)=>setMenuEl(e.currentTarget)} sx={{ color: "#fff" }}>
@@ -239,20 +273,37 @@ export default function OneToOneCall({
             } 
           }}
         >
-          <MenuItem onClick={()=>{ setMenuEl(null); setCaptions(c=>!c); }}>
-            <ListItemIcon><ClosedCaptionRoundedIcon fontSize="small"/></ListItemIcon>
+          <MenuItem onClick={()=>{ 
+            setMenuEl(null); 
+            setCaptions(c=>!c); 
+            alert(captions ? 'Captions disabled' : 'Captions enabled');
+          }}>
+            <ListItemIcon><ClosedCaptionRoundedIcon fontSize="small" sx={{ color: 'text.primary' }}/></ListItemIcon>
             <ListItemText primary={captions? "Disable captions" : "Enable captions"} />
           </MenuItem>
-          <MenuItem onClick={()=>{ setMenuEl(null); onOpenChat?.(); }}>
-            <ListItemIcon><ChatBubbleOutlineRoundedIcon fontSize="small"/></ListItemIcon>
+          <MenuItem onClick={()=>{ 
+            setMenuEl(null); 
+            // Navigate to conversation with this contact
+            onNavigate?.(`/conversation/${encodeURIComponent(actualRemote.name)}`);
+            onOpenChat?.();
+          }}>
+            <ListItemIcon><ChatBubbleOutlineRoundedIcon fontSize="small" sx={{ color: 'text.primary' }}/></ListItemIcon>
             <ListItemText primary="Open chat" />
           </MenuItem>
-          <MenuItem onClick={()=>{ setMenuEl(null); onReport?.(); }}>
-            <ListItemIcon><SignalCellularAltRoundedIcon fontSize="small"/></ListItemIcon>
+          <MenuItem onClick={()=>{ 
+            setMenuEl(null); 
+            alert('Quality report submitted. Thank you for your feedback!');
+            onReport?.();
+          }}>
+            <ListItemIcon><SignalCellularAltRoundedIcon fontSize="small" sx={{ color: 'text.primary' }}/></ListItemIcon>
             <ListItemText primary="Report quality" />
           </MenuItem>
-          <MenuItem onClick={()=>{ setMenuEl(null); onHelp?.(); }}>
-            <ListItemIcon><ArrowBackRoundedIcon fontSize="small"/></ListItemIcon>
+          <MenuItem onClick={()=>{ 
+            setMenuEl(null); 
+            onNavigate?.('/help');
+            onHelp?.();
+          }}>
+            <ListItemIcon><ArrowBackRoundedIcon fontSize="small" sx={{ color: 'text.primary' }}/></ListItemIcon>
             <ListItemText primary="Help" />
           </MenuItem>
         </Menu>
@@ -282,24 +333,70 @@ export default function OneToOneCall({
                 </video>
               </div>
 
-              {/* Dialing/connecting overlays */}
-              {state !== "connected" && (
+              {/* Dialing/connecting overlays with animation */}
+              {callState !== "connected" && callState !== "incoming" && (
                 <div className="absolute inset-0 grid place-items-center">
-                  <div className="px-3 py-1.5 rounded-full bg-white/10 backdrop-blur text-sm">{status}</div>
+                  <div className="flex flex-col items-center gap-4">
+                    {/* Pulsing animation for dialing/ringing/connecting */}
+                    <div className="relative" style={{ width: '5rem', height: '5rem' }}>
+                      <div className="absolute inset-0 rounded-full bg-white/20 call-pulse" />
+                      <div className="absolute inset-0 rounded-full bg-white/10 call-pulse-delayed" />
+                      <Avatar 
+                        src={actualRemote.avatar} 
+                        sx={{ 
+                          width: '5rem', 
+                          height: '5rem',
+                          position: 'relative',
+                          zIndex: 1,
+                          border: '3px solid rgba(255,255,255,0.3)'
+                        }} 
+                      />
+                    </div>
+                    <div className="px-4 py-2 rounded-full bg-white/10 backdrop-blur text-sm font-medium" style={{ color: '#fff' }}>{status}</div>
+                    {callState === "ringing" && (
+                      <div className="text-xs opacity-70" style={{ color: '#fff' }}>Waiting for answer...</div>
+                    )}
+                  </div>
                 </div>
               )}
             </>
           ) : (
             <div className="absolute inset-0 grid place-items-center">
-              <div className="flex flex-col items-center gap-2">
-                <Avatar src={actualRemote.avatar} sx={{ width: '6.5rem', height: '6.5rem' }} />
-                <div className="text-sm opacity-80">{state === "connected" ? `Connected • ${hhmmss}` : status}</div>
+              <div className="flex flex-col items-center gap-4">
+                {callState !== "connected" && callState !== "incoming" ? (
+                  <>
+                    {/* Pulsing animation for voice call dialing */}
+                    <div className="relative" style={{ width: '6.5rem', height: '6.5rem' }}>
+                      <div className="absolute inset-0 rounded-full bg-white/20 call-pulse" />
+                      <div className="absolute inset-0 rounded-full bg-white/10 call-pulse-delayed" />
+                      <Avatar 
+                        src={actualRemote.avatar} 
+                        sx={{ 
+                          width: '6.5rem', 
+                          height: '6.5rem',
+                          position: 'relative',
+                          zIndex: 1,
+                          border: '3px solid rgba(255,255,255,0.3)'
+                        }} 
+                      />
+                    </div>
+                    <div className="px-4 py-2 rounded-full bg-white/10 backdrop-blur text-sm font-medium" style={{ color: '#fff' }}>{status}</div>
+                    {callState === "ringing" && (
+                      <div className="text-xs opacity-70" style={{ color: '#fff' }}>Waiting for answer...</div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <Avatar src={actualRemote.avatar} sx={{ width: '6.5rem', height: '6.5rem' }} />
+                    <div className="text-sm opacity-80" style={{ color: '#fff' }}>{callState === "connected" ? `Connected • ${hhmmss}` : status}</div>
+                  </>
+                )}
               </div>
             </div>
           )}
 
           {/* Incoming sheet */}
-          {state === "incoming" && (
+          {callState === "incoming" && (
             <div className="absolute inset-x-0 bottom-24 grid place-items-center">
               <div className="flex gap-6">
                 <Button
@@ -372,7 +469,15 @@ export default function OneToOneCall({
               </IconButton>
 
               {/* end call */}
-              <IconButton onClick={onEnd} aria-label="End call" sx={{ color:"#fff", bgcolor:"#e53935", "&:hover":{ bgcolor:"#c62828" } }}>
+              <IconButton 
+                onClick={() => {
+                  setCallState("dialing"); // Reset state
+                  setElapsed(0);
+                  onEnd?.();
+                }} 
+                aria-label="End call" 
+                sx={{ color:"#fff", bgcolor:"#e53935", "&:hover":{ bgcolor:"#c62828" } }}
+              >
                 <CallEndRoundedIcon/>
               </IconButton>
             </div>
