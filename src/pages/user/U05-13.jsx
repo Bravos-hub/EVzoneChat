@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
+import { useTheme as useMuiTheme } from "@mui/material/styles";
 import {
   AppBar,
   Toolbar,
@@ -42,6 +43,7 @@ const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2
  * - Mobile-sized header menu, safe‑area insets, 390px frame
  */
 export default function ScreenshareWithChatPro({ onBack, remote = { name:'Group Call' } }) {
+  const muiTheme = useMuiTheme();
   const [sharing, setSharing] = useState(false);
   const [paused, setPaused] = useState(false);
   const [captions, setCaptions] = useState(false);
@@ -208,7 +210,17 @@ export default function ScreenshareWithChatPro({ onBack, remote = { name:'Group 
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         PaperProps={{
-          sx: { width: '90vw', maxWidth: 'calc(100vw - 1rem)', borderRadius: 2, py: 0.5, mx: 'auto' }
+          sx: { 
+            width: '90vw', 
+            maxWidth: 'calc(100vw - 1rem)', 
+            borderRadius: 2, 
+            py: 0.5, 
+            mx: 'auto',
+            bgcolor: 'background.paper',
+            '& .MuiMenuItem-root': {
+              color: 'text.primary',
+            }
+          }
         }}
       >
         <MenuItem onClick={() => { setMenuEl(null); setCaptions(c => !c); }}>
@@ -230,28 +242,38 @@ export default function ScreenshareWithChatPro({ onBack, remote = { name:'Group 
       <Drawer anchor="right" open={chatOpen} onClose={() => setChatOpen(false)}
         PaperProps={{ sx: { width: '86vw', maxWidth: '90vw' } }}
       >
-        <Box className="h-full flex flex-col bg-white">
-          <Box className="px-3 py-2 border-b" sx={{ borderColor: EV.light }}>
+        <Box className="h-full flex flex-col" sx={{ bgcolor: 'background.paper' }}>
+          <Box className="px-3 py-2 border-b" sx={{ borderColor: 'divider' }}>
             <div className="flex items-center gap-2">
               <Avatar src="https://i.pravatar.cc/100?img=5" />
               <div className="flex-1">
-                <div className="font-semibold">In‑meeting chat</div>
-                <div className="text-[11px] text-gray-500">Only participants can see messages</div>
+                <div className="font-semibold" style={{ color: muiTheme.palette.text.primary }}>In‑meeting chat</div>
+                <div className="text-[11px]" style={{ color: muiTheme.palette.text.secondary }}>Only participants can see messages</div>
               </div>
-              <IconButton onClick={() => setChatOpen(false)}><ArrowBackRoundedIcon /></IconButton>
+              <IconButton onClick={() => setChatOpen(false)} sx={{ color: 'text.primary' }}><ArrowBackRoundedIcon /></IconButton>
             </div>
           </Box>
           <Box className="flex-1 p-3 no-scrollbar" sx={{ overflowY: 'auto' }}>
             <List>
               {messages.map((m, idx) => (
                 <React.Fragment key={m.id}>
-                  <ListItem alignItems="flex-start">
+                  <ListItem 
+                    alignItems="flex-start"
+                    sx={{
+                      '& .MuiListItemText-primary': {
+                        color: 'text.primary',
+                      },
+                      '& .MuiListItemText-secondary': {
+                        color: 'text.secondary',
+                      },
+                    }}
+                  >
                     <ListItemAvatar><Avatar src={m.who.avatar} /></ListItemAvatar>
                     <ListItemText
                       primary={<span className="font-semibold">{m.who.name}</span>}
-                      secondary={<span className="text-[12px] text-gray-700">{m.text}</span>}
+                      secondary={<span className="text-[12px]">{m.text}</span>}
                     />
-                    <span className="text-[11px] text-gray-500 ml-2">{m.time}</span>
+                    <span className="text-[11px] ml-2" style={{ color: muiTheme.palette.text.secondary }}>{m.time}</span>
                   </ListItem>
                   {idx < messages.length - 1 && <Divider component="li" />}
                 </React.Fragment>
@@ -259,7 +281,7 @@ export default function ScreenshareWithChatPro({ onBack, remote = { name:'Group 
             </List>
           </Box>
           {/* composer sticky */}
-          <Box className="border-t" sx={{ borderColor: EV.light }}>
+          <Box className="border-t" sx={{ borderColor: 'divider' }}>
             <Box className="p-2 flex items-end gap-1">
               <TextField
                 fullWidth
@@ -273,10 +295,19 @@ export default function ScreenshareWithChatPro({ onBack, remote = { name:'Group 
                     send();
                   }
                 }}
+                sx={{
+                  '& .MuiInputBase-input': {
+                    color: 'text.primary',
+                  },
+                  '& .MuiInputBase-input::placeholder': {
+                    color: 'text.secondary',
+                    opacity: 1,
+                  },
+                }}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton aria-label="Send" onClick={send} sx={{ color: '#fff', bgcolor: '#f77f00', '&:hover': { color:'#fff', bgcolor: '#e06f00' } }}>
+                      <IconButton aria-label="Send" onClick={send} sx={{ textTransform: 'none' }}>
                         <SendRoundedIcon />
                       </IconButton>
                     </InputAdornment>

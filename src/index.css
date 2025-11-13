@@ -8,10 +8,22 @@
 
 html, body, #root { 
   height: 100%; 
-  background: #f2f2f2; 
   margin: 0;
   padding: 0;
   overflow-x: hidden;
+  transition: background-color 0.3s ease;
+}
+
+/* Light mode default */
+body {
+  background: #f2f2f2;
+  color: #111;
+}
+
+/* Dark mode */
+body.dark-mode {
+  background: #121212;
+  color: #fff;
 }
 
 /* Responsive mobile-first design - fully responsive to all mobile device sizes */

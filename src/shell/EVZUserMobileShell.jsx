@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
+import { useTheme as useMuiTheme } from "@mui/material/styles";
 import {
   AppBar,
   Toolbar,
@@ -23,6 +25,7 @@ import ImageRoundedIcon from "@mui/icons-material/ImageRounded";
 import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
 import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
 import AddCommentRoundedIcon from "@mui/icons-material/AddCommentRounded";
+import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import GroupAddRoundedIcon from "@mui/icons-material/GroupAddRounded";
 import QrCode2RoundedIcon from "@mui/icons-material/QrCode2Rounded";
 import CallRoundedIcon from "@mui/icons-material/CallRounded";
@@ -41,7 +44,7 @@ const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2
 const Screen = ({ title }) => (
   <Box className="p-4 space-y-3">
     <Typography variant="h6" className="font-semibold">{title}</Typography>
-    <Box className="rounded-2xl p-4 bg-white shadow-sm"><Typography variant="body2">Placeholder content for {title}.</Typography></Box>
+    <Box className="rounded-2xl p-4 shadow-sm" sx={{ bgcolor: 'background.paper' }}><Typography variant="body2" sx={{ color: 'text.primary' }}>Placeholder content for {title}.</Typography></Box>
   </Box>
 );
 
@@ -75,6 +78,7 @@ function useTabFromLocation(){
 function ShellFrame({ children }){
   const navigate = useNavigate();
   const location = useLocation();
+  const { actualMode, accent } = useTheme();
   const [menuEl, setMenuEl] = useState(null);
   const openMenu = (e) => setMenuEl(e.currentTarget);
   const closeMenu = () => setMenuEl(null);
@@ -82,30 +86,62 @@ function ShellFrame({ children }){
   
   // Check if we're on a conversation page
   const isConversationPage = location.pathname.startsWith('/conversation') || location.pathname.startsWith('/new-message');
+  
+  const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
+  
+  // Apply dark mode class to body and update meta theme-color
+  useEffect(() => {
+    const body = document.body;
+    const html = document.documentElement;
+    
+    if (actualMode === 'dark') {
+      body.classList.add('dark-mode');
+      html.style.colorScheme = 'dark';
+    } else {
+      body.classList.remove('dark-mode');
+      html.style.colorScheme = 'light';
+    }
+
+    // Update meta theme-color for mobile browsers
+    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (!metaThemeColor) {
+      metaThemeColor = document.createElement('meta');
+      metaThemeColor.setAttribute('name', 'theme-color');
+      document.head.appendChild(metaThemeColor);
+    }
+    metaThemeColor.setAttribute('content', actualMode === 'dark' ? '#121212' : accentColor);
+
+    return () => {
+      html.style.colorScheme = '';
+    };
+  }, [actualMode, accentColor]);
 
   return (
     <Box sx={{ 
-      bgcolor: EV.light, 
+      bgcolor: actualMode === 'dark' ? '#121212' : EV.light, 
       minHeight:'100vh',
       display: 'flex',
       flexDirection: 'column',
       width: '100%',
       mx: 'auto',
-      position: 'relative'
+      position: 'relative',
+      transition: 'background-color 0.3s ease'
     }}>
       {/* Header (mobile frame) - always visible for consistent mobile experience */}
       <AppBar 
         elevation={0} 
         position="fixed" 
         sx={{ 
-          bgcolor: EV.green, 
+          bgcolor: accentColor, 
           color:'#fff',
           width: '100%',
-          zIndex: 1200
+          zIndex: 1200,
+          transition: 'background-color 0.3s ease'
         }}
       >
         <Toolbar className="!min-h-[56px] !px-3" sx={{ width:'100%' }}>
           <Avatar 
+            src="https://i.pravatar.cc/100?img=20"
             onClick={()=>navigate('/profile')} 
             sx={{ 
               bgcolor:'#fff', 
@@ -117,9 +153,7 @@ function ShellFrame({ children }){
               boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
             }} 
             title="Open profile"
-          >
-            EV
-          </Avatar>
+          />
           <Typography variant="subtitle1" className="font-semibold" sx={{ fontSize: '16px', fontWeight: 600 }}>
             EVzone Chat
           </Typography>
@@ -142,10 +176,22 @@ function ShellFrame({ children }){
         onClose={closeMenu}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-          PaperProps={{ sx:{ width: '90vw', maxWidth: 'calc(100vw - 1rem)', borderRadius: 2, py: 0.5, mx: 'auto' } }}
+        PaperProps={{ 
+          sx:{ 
+            width: '90vw', 
+            maxWidth: 'calc(100vw - 1rem)', 
+            borderRadius: 2, 
+            py: 0.5, 
+            mx: 'auto',
+            bgcolor: 'background.paper',
+            '& .MuiMenuItem-root': {
+              color: 'text.primary',
+            }
+          } 
+        }}
       >
         {/* Global quick actions */}
-        <MenuItem onClick={()=>go('/inbox')}>
+        <MenuItem onClick={()=>go('/new-message')}>
           <ListItemIcon><AddCommentRoundedIcon fontSize="small"/></ListItemIcon>
           <ListItemText primary="New message" />
         </MenuItem>
@@ -181,7 +227,7 @@ function ShellFrame({ children }){
           <ListItemIcon><ShieldRoundedIcon fontSize="small"/></ListItemIcon>
           <ListItemText primary="Safety Center" />
         </MenuItem>
-        <MenuItem onClick={()=>{ closeMenu(); alert('Help center'); }}>
+        <MenuItem onClick={()=>go('/help')}>
           <ListItemIcon><HelpOutlineRoundedIcon fontSize="small"/></ListItemIcon>
           <ListItemText primary="Help" />
         </MenuItem>
@@ -205,7 +251,9 @@ function ShellFrame({ children }){
         minHeight: 'calc(100vh - 144px)',
         flex: 1,
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        bgcolor: actualMode === 'dark' ? '#121212' : 'transparent',
+        transition: 'background-color 0.3s ease'
       }}>
         {children}
       </Box>
@@ -229,10 +277,10 @@ function ShellFrame({ children }){
         }}>
           <Box sx={{ 
             borderRadius: 16, 
-            bgcolor: 'rgba(255,255,255,0.95)', 
+            bgcolor: actualMode === 'dark' ? 'rgba(18,18,18,0.95)' : 'rgba(255,255,255,0.95)', 
             backdropFilter: 'blur(12px)', 
-            border: '1px solid rgba(0,0,0,0.08)', 
-            boxShadow: '0 -4px 20px rgba(0,0,0,0.08)'
+            border: actualMode === 'dark' ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.08)', 
+            boxShadow: actualMode === 'dark' ? '0 -4px 20px rgba(0,0,0,0.5)' : '0 -4px 20px rgba(0,0,0,0.08)'
           }}>
             <MobileBottomNav/>
           </Box>
@@ -246,11 +294,15 @@ function ShellFrame({ children }){
 }
 
 /* -----------------------------------------------------------
-   Bottom Navigation (labels under icons)
+Bottom Navigation (labels under icons)
 ------------------------------------------------------------ */
 function MobileBottomNav(){
   const value = useTabFromLocation();
   const nav = useNavigate();
+  const { actualMode, accent } = useTheme();
+  const muiTheme = useMuiTheme();
+  
+  const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
   
   return (
     <BottomNavigation
@@ -261,15 +313,19 @@ function MobileBottomNav(){
         height: '4.5rem', 
         bgcolor:'transparent', 
         '& .Mui-selected':{ 
-          color: EV.green,
+          color: accentColor,
           '& .MuiSvgIcon-root': {
             transform: 'scale(1.1)'
+          },
+          '& .MuiBottomNavigationAction-label': {
+            color: accentColor
           }
         }, 
         '& .MuiBottomNavigationAction-root':{ 
           minWidth: 0, 
           pt: 1.5,
-          transition: 'all 0.2s ease'
+          transition: 'all 0.2s ease',
+          color: muiTheme.palette.text.secondary
         }, 
         '& .MuiSvgIcon-root':{ 
           fontSize: 24,
@@ -278,7 +334,8 @@ function MobileBottomNav(){
         '& .MuiBottomNavigationAction-label':{ 
           fontSize: 11, 
           fontWeight: 600,
-          mt: 0.5
+          mt: 0.5,
+          color: muiTheme.palette.text.secondary
         } 
       }}
     >
@@ -335,7 +392,17 @@ function Launcher({ unread=0 }){
           }}
         >
           <Badge color="error" badgeContent={unread} overlap="circular">
-            <ChatBubbleOutlineRoundedIcon sx={{ fontSize: 28 }} />
+            <ChatBubbleOutlineRoundedIcon sx={{ fontSize: 28, position: 'relative' }} />
+            <AddRoundedIcon sx={{ 
+              fontSize: 16, 
+              position: 'absolute', 
+              bottom: '0.25rem', 
+              right: '0.25rem', 
+              bgcolor: EV.green, 
+              borderRadius: '50%', 
+              p: 0.25,
+              border: '2px solid #fff'
+            }} />
           </Badge>
         </IconButton>
       </Box>
@@ -378,10 +445,16 @@ function RouteWrapper({ Component, ...props }) {
       // Handle module filter change
       console.log('Module changed to:', module);
     },
-    onStart: (selected) => {
+    onStart: (selected, forwardMessages) => {
       // Start new conversation with selected contacts
       if (selected && selected.length > 0) {
-        navigate(`/conversation/new?contacts=${selected.join(',')}`);
+        const forwardParam = forwardMessages ? `&forward=${forwardMessages.join(',')}` : '';
+        // If multiple contacts, automatically open as group chat
+        if (selected.length > 1) {
+          navigate(`/conversation/new?contacts=${selected.join(',')}&group=true${forwardParam}`);
+        } else {
+          navigate(`/conversation/new?contacts=${selected.join(',')}${forwardParam}`);
+        }
       }
     },
   };
@@ -408,6 +481,7 @@ export default function MobileUserShell({ registry = {} }){
   const Profile = getComponent(registry, 'U09-25', () => <Screen title="Profile"/>);
   const NewMessage = getComponent(registry, 'U02-04', () => <Screen title="New Message"/>);
   const Conversation = getComponent(registry, 'U02-05', () => <Screen title="Conversation"/>);
+  const Help = getComponent(registry, 'U12-34', () => <Screen title="Help Center"/>);
 
   return (
     <BrowserRouter>
@@ -427,6 +501,7 @@ export default function MobileUserShell({ registry = {} }){
           <Route path="/dnd" element={<RouteWrapper Component={DND} />} />
           <Route path="/safety" element={<RouteWrapper Component={Safety} />} />
           <Route path="/profile" element={<RouteWrapper Component={Profile} />} />
+          <Route path="/help" element={<RouteWrapper Component={Help} />} />
           {/* Conversation routes */}
           <Route path="/new-message" element={<RouteWrapper Component={NewMessage} />} />
           <Route path="/conversation/:id" element={<RouteWrapper Component={Conversation} />} />

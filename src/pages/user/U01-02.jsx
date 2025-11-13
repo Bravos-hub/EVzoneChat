@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTheme as useMuiTheme } from "@mui/material/styles";
 import {
   AppBar,
   Toolbar,
@@ -32,6 +33,7 @@ const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2
  * - No visible scrollbars
  */
 export default function OnboardingPermissionsFinal({ onClose, onContinue, requireSensitiveConsent = true }) {
+  const muiTheme = useMuiTheme();
   const [mic, setMic] = useState(false);
   const [cam, setCam] = useState(false);
   const [notif, setNotif] = useState(false);
@@ -101,41 +103,68 @@ export default function OnboardingPermissionsFinal({ onClose, onContinue, requir
       {/* Hide scrollbars visually */}
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
 
-      <Box className="w-full h-full mx-auto bg-white flex flex-col">
-        <AppBar elevation={0} position="static" sx={{ bgcolor: '#fff', color: '#111', borderBottom: `1px solid ${EV.light}` }}>
+      <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.paper' }}>
+        <AppBar elevation={0} position="static" sx={{ bgcolor: 'background.paper', color: 'text.primary', borderBottom: `1px solid ${muiTheme.palette.divider}` }}>
           <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onClose} aria-label="Close"><CloseRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold ml-1">First‑time Setup</Typography>
+            <IconButton onClick={onClose} aria-label="Close" sx={{ color: 'text.primary' }}><CloseRoundedIcon /></IconButton>
+            <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>First‑time Setup</Typography>
           </Toolbar>
         </AppBar>
 
         <Box className="p-4 flex-1" sx={{ overflowY: 'auto', '&::-webkit-scrollbar': { display: 'none' }, scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-          <Typography variant="subtitle1" className="font-semibold mb-2">Enable access & confirm consents</Typography>
-          <Typography variant="body2" className="text-gray-600 mb-3">Allow the permissions below, then confirm your consents. You can change these later in Settings.</Typography>
+          <Typography variant="subtitle1" className="font-semibold mb-2" sx={{ color: 'text.primary' }}>Enable access & confirm consents</Typography>
+          <Typography variant="body2" className="mb-3" sx={{ color: 'text.secondary' }}>Allow the permissions below, then confirm your consents. You can change these later in Settings.</Typography>
 
           {err && <Alert role="status" aria-live="polite" severity="warning" className="mb-3">{err}</Alert>}
 
           {/* Permissions */}
-          <Paper elevation={0} sx={{ border: `1px solid ${EV.light}`, borderRadius: 2, overflow: 'hidden' }}>
+          <Paper elevation={0} sx={{ border: `1px solid ${muiTheme.palette.divider}`, borderRadius: 2, overflow: 'hidden', bgcolor: 'background.paper' }}>
             <List>
-              <ListItem>
+              <ListItem
+                sx={{
+                  '& .MuiListItemText-primary': {
+                    color: 'text.primary',
+                  },
+                  '& .MuiListItemText-secondary': {
+                    color: 'text.secondary',
+                  },
+                }}
+              >
                 <ListItemText primary={<span className="font-semibold">Microphone</span>} secondary="Required for voice calls & voice notes" />
                 <ListItemSecondaryAction>
-                  <Button aria-label="Allow microphone" onClick={requestMic} size="small" variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform: 'none', '&:hover': { borderColor: '#e06f00', bgcolor: EV.light } }}>Allow</Button>
+                  <Button aria-label="Allow microphone" onClick={requestMic} size="small" variant="outlined" sx={{ textTransform: 'none' }}>Allow</Button>
                 </ListItemSecondaryAction>
               </ListItem>
               <Divider />
-              <ListItem>
+              <ListItem
+                sx={{
+                  '& .MuiListItemText-primary': {
+                    color: 'text.primary',
+                  },
+                  '& .MuiListItemText-secondary': {
+                    color: 'text.secondary',
+                  },
+                }}
+              >
                 <ListItemText primary={<span className="font-semibold">Camera</span>} secondary="Optional, needed for video calls" />
                 <ListItemSecondaryAction>
-                  <Button aria-label="Allow camera" onClick={requestCam} size="small" variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform: 'none', '&:hover': { borderColor: '#e06f00', bgcolor: EV.light } }}>Allow</Button>
+                  <Button aria-label="Allow camera" onClick={requestCam} size="small" variant="outlined" sx={{ textTransform: 'none' }}>Allow</Button>
                 </ListItemSecondaryAction>
               </ListItem>
               <Divider />
-              <ListItem>
+              <ListItem
+                sx={{
+                  '& .MuiListItemText-primary': {
+                    color: 'text.primary',
+                  },
+                  '& .MuiListItemText-secondary': {
+                    color: 'text.secondary',
+                  },
+                }}
+              >
                 <ListItemText primary={<span className="font-semibold">Notifications</span>} secondary="Required for message alerts & call ringing" />
                 <ListItemSecondaryAction>
-                  <Button aria-label="Allow notifications" onClick={requestNotif} size="small" variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform: 'none', '&:hover': { borderColor: '#e06f00', bgcolor: EV.light } }}>Allow</Button>
+                  <Button aria-label="Allow notifications" onClick={requestNotif} size="small" variant="outlined" sx={{ textTransform: 'none' }}>Allow</Button>
                 </ListItemSecondaryAction>
               </ListItem>
             </List>
@@ -143,31 +172,49 @@ export default function OnboardingPermissionsFinal({ onClose, onContinue, requir
 
           {/* Granted states */}
           <Box className="mt-3 space-y-2">
-            <Box className="flex items-center gap-2">{mic ? <CheckCircleRoundedIcon sx={{ color: EV.green }} /> : <RadioButtonUncheckedRoundedIcon sx={{ color: EV.grey }} />}<Typography variant="body2">Microphone {mic ? 'granted' : 'required'}</Typography></Box>
-            <Box className="flex items-center gap-2">{cam ? <CheckCircleRoundedIcon sx={{ color: EV.green }} /> : <RadioButtonUncheckedRoundedIcon sx={{ color: EV.grey }} />}<Typography variant="body2">Camera {cam ? 'granted' : 'optional'}</Typography></Box>
-            <Box className="flex items-center gap-2">{notif ? <CheckCircleRoundedIcon sx={{ color: EV.green }} /> : <RadioButtonUncheckedRoundedIcon sx={{ color: EV.grey }} />}<Typography variant="body2">Notifications {notif ? 'granted' : 'required'}</Typography></Box>
+            <Box className="flex items-center gap-2">{mic ? <CheckCircleRoundedIcon sx={{ color: EV.green }} /> : <RadioButtonUncheckedRoundedIcon sx={{ color: 'text.secondary' }} />}<Typography variant="body2" sx={{ color: 'text.primary' }}>Microphone {mic ? 'granted' : 'required'}</Typography></Box>
+            <Box className="flex items-center gap-2">{cam ? <CheckCircleRoundedIcon sx={{ color: EV.green }} /> : <RadioButtonUncheckedRoundedIcon sx={{ color: 'text.secondary' }} />}<Typography variant="body2" sx={{ color: 'text.primary' }}>Camera {cam ? 'granted' : 'optional'}</Typography></Box>
+            <Box className="flex items-center gap-2">{notif ? <CheckCircleRoundedIcon sx={{ color: EV.green }} /> : <RadioButtonUncheckedRoundedIcon sx={{ color: 'text.secondary' }} />}<Typography variant="body2" sx={{ color: 'text.primary' }}>Notifications {notif ? 'granted' : 'required'}</Typography></Box>
           </Box>
 
           {/* Consents */}
-          <Typography variant="subtitle1" className="font-semibold mt-4 mb-2">Consents</Typography>
-          <Paper elevation={0} sx={{ border: `1px solid ${EV.light}`, borderRadius: 2 }}>
+          <Typography variant="subtitle1" className="font-semibold mt-4 mb-2" sx={{ color: 'text.primary' }}>Consents</Typography>
+          <Paper elevation={0} sx={{ border: `1px solid ${muiTheme.palette.divider}`, borderRadius: 2, bgcolor: 'background.paper' }}>
             <List>
-              <ListItem>
+              <ListItem
+                sx={{
+                  '& .MuiListItemText-primary': {
+                    color: 'text.primary',
+                  },
+                  '& .MuiListItemText-secondary': {
+                    color: 'text.secondary',
+                  },
+                }}
+              >
                 <Checkbox sx={{ color: EV.orange, '&.Mui-checked': { color: EV.orange } }} checked={recordingConsent} onChange={(e)=>setRecordingConsent(e.target.checked)} />
                 <ListItemText primary={<span className="font-semibold">I consent to call recording when enabled</span>} secondary="A banner is shown to all participants during recording. Stored securely per EVzone policy." />
               </ListItem>
               <Divider />
-              <ListItem>
+              <ListItem
+                sx={{
+                  '& .MuiListItemText-primary': {
+                    color: 'text.primary',
+                  },
+                  '& .MuiListItemText-secondary': {
+                    color: 'text.secondary',
+                  },
+                }}
+              >
                 <Checkbox sx={{ color: EV.orange, '&.Mui-checked': { color: EV.orange } }} checked={sensitiveConsent} onChange={(e)=>setSensitiveConsent(e.target.checked)} />
                 <ListItemText primary={<span className="font-semibold">I acknowledge sensitive/medical chats have stricter privacy</span>} secondary="Certain modules apply extra safeguards. Avoid sharing unnecessary personal data." />
               </ListItem>
             </List>
           </Paper>
 
-          <Button disabled={busy} onClick={allowAll} fullWidth variant="outlined" sx={{ mt: 3, borderColor: EV.orange, color: EV.orange, textTransform: 'none', '&:hover': { borderColor: '#e06f00', bgcolor: EV.light } }}>Allow all</Button>
-          <Button disabled={!canContinue || busy} onClick={() => onContinue?.({ granted: { mic, cam, notif }, consents: { recordingConsent, sensitiveConsent } })} fullWidth variant="contained" size="large" sx={{ mt: 1.5, bgcolor: EV.orange, textTransform: 'none', '&:hover': { bgcolor: '#e06f00' } }}>Continue</Button>
+          <Button disabled={busy} onClick={allowAll} fullWidth variant="outlined" sx={{ mt: 3, textTransform: 'none' }}>Allow all</Button>
+          <Button disabled={!canContinue || busy} onClick={() => onContinue?.({ granted: { mic, cam, notif }, consents: { recordingConsent, sensitiveConsent } })} fullWidth variant="contained" size="large" sx={{ mt: 1.5, textTransform: 'none' }}>Continue</Button>
 
-          <Typography variant="caption" className="text-gray-500 mt-2 block">By continuing, you agree to EVzone Terms & Privacy.</Typography>
+          <Typography variant="caption" className="mt-2 block" sx={{ color: 'text.secondary' }}>By continuing, you agree to EVzone Terms & Privacy.</Typography>
         </Box>
       </Box>
     </>

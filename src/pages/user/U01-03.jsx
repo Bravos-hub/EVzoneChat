@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useTheme as useMuiTheme } from "@mui/material/styles";
 import {
   AppBar,
   Toolbar,
@@ -45,6 +46,7 @@ const MODULES = ["All","Rides","Marketplace","School","Medical","Charging","Trav
  * Includes: Live Now carousel (no visible scrollbars), wrapped module chips (no horizontal scroll), search, conversation list.
  */
 export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, onRefresh, onNew, onLiveOpen, onModuleChange }) {
+  const muiTheme = useMuiTheme();
   const [q, setQ] = useState("");
   const [module, setModule] = useState("All");
 
@@ -94,7 +96,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
       <Box sx={{ 
         width: '100%', 
         mx: 'auto', 
-        bgcolor: '#fff', 
+        bgcolor: 'background.default', 
         height: '100%', 
         display: 'flex', 
         flexDirection: 'column'
@@ -104,10 +106,10 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
           elevation={0} 
           position="static" 
           sx={{ 
-            bgcolor: '#fff', 
-            color: '#111', 
-            borderBottom: `1px solid ${EV.light}`,
-            boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+            bgcolor: 'background.paper', 
+            color: 'text.primary', 
+            borderBottom: `1px solid ${muiTheme.palette.divider}`,
+            boxShadow: muiTheme.palette.mode === 'dark' ? '0 1px 3px rgba(0,0,0,0.3)' : '0 1px 3px rgba(0,0,0,0.05)'
           }}
         >
           <Toolbar className="!min-h-[56px] !px-3">
@@ -116,7 +118,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
               sx={{ 
                 fontSize: '18px',
                 fontWeight: 700,
-                color: '#111'
+                color: 'text.primary'
               }}
             >
               Messages
@@ -125,14 +127,14 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
             <IconButton 
               aria-label="Refresh" 
               onClick={onRefresh}
-              sx={{ color: '#666', mr: 0.5 }}
+              sx={{ color: 'text.secondary', mr: 0.5 }}
             >
               <RefreshRoundedIcon />
             </IconButton>
             <IconButton 
               aria-label="New message" 
               onClick={onNew}
-              sx={{ color: '#666' }}
+              sx={{ color: 'text.secondary' }}
             >
               <AddCommentRoundedIcon />
             </IconButton>
@@ -141,33 +143,40 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
 
         {/* Search */}
         <Box sx={{ p: 2, pb: 2.5 }}>
-          <TextField
-            fullWidth 
-            size="small" 
-            value={q} 
-            onChange={(e)=>setQ(e.target.value)} 
-            placeholder="Search people, channels, messages"
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                bgcolor: '#f5f5f5',
-                borderRadius: 2,
-                '&:hover': {
-                  bgcolor: '#eeeeee'
-                },
-                '&.Mui-focused': {
-                  bgcolor: '#fff',
-                  boxShadow: '0 0 0 2px rgba(3, 205, 140, 0.1)'
+            <TextField
+              fullWidth 
+              size="small" 
+              value={q} 
+              onChange={(e)=>setQ(e.target.value)} 
+              placeholder="Search people, channels, messages"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  bgcolor: 'background.default',
+                  borderRadius: 2,
+                  '&:hover': {
+                    bgcolor: 'action.hover'
+                  },
+                  '&.Mui-focused': {
+                    bgcolor: 'background.paper',
+                    boxShadow: '0 0 0 2px rgba(3, 205, 140, 0.1)'
+                  },
+                  '& .MuiInputBase-input': {
+                    color: 'text.primary',
+                  },
+                  '& .MuiInputBase-input::placeholder': {
+                    color: 'text.secondary',
+                    opacity: 1,
+                  },
                 }
-              }
-            }}
-            InputProps={{ 
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchRoundedIcon sx={{ color: '#999', fontSize: 20 }} />
-                </InputAdornment>
-              ) 
-            }}
-          />
+              }}
+              InputProps={{ 
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchRoundedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                  </InputAdornment>
+                ) 
+              }}
+            />
         </Box>
 
         {/* Live Now Carousel (no visible scrollbars, pure mobile swipe — no arrows) */}
@@ -184,17 +193,23 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                   onClick={()=>onLiveOpen?.(s)}
                   elevation={0}
                   className="shrink-0 rounded-2xl p-3"
-                  style={{ width: slideW, minWidth: '85vw', scrollSnapAlign:'start', border:`1px solid ${EV.light}` }}
+                  sx={{ 
+                    width: slideW, 
+                    minWidth: '85vw', 
+                    scrollSnapAlign:'start', 
+                    border: `1px solid ${muiTheme.palette.divider}`,
+                    bgcolor: 'background.paper'
+                  }}
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <Chip size="small" label="LIVE" sx={{ bgcolor: EV.orange, color:'#fff', height:22, borderRadius:1 }} />
-                    <Chip size="small" label={s.module} sx={{ bgcolor: EV.light }} />
-                    <span className="text-xs text-gray-500 ml-auto">{s.startedAt}</span>
+                    <Chip size="small" label={s.module} sx={{ bgcolor: 'background.default', color: 'text.primary' }} />
+                    <span className="text-xs ml-auto" style={{ color: muiTheme.palette.text.secondary }}>{s.startedAt}</span>
                   </div>
-                  <div className="text-sm font-semibold truncate">{s.title}</div>
-                  <div className="text-xs text-gray-600 truncate">{s.subtitle}</div>
-                  <div className="text-[11px] text-gray-500 mt-1">Host: {s.host}</div>
-                  <Button variant="contained" size="small" sx={{ mt: 1.5, bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>{s.cta || 'Open'}</Button>
+                  <div className="text-sm font-semibold truncate" style={{ color: muiTheme.palette.text.primary }}>{s.title}</div>
+                  <div className="text-xs truncate" style={{ color: muiTheme.palette.text.secondary }}>{s.subtitle}</div>
+                  <div className="text-[11px] mt-1" style={{ color: muiTheme.palette.text.secondary }}>Host: {s.host}</div>
+                  <Button variant="contained" size="small" sx={{ mt: 1.5, textTransform:'none' }}>{s.cta || 'Open'}</Button>
                 </Paper>
               ))}
             </div>
@@ -213,9 +228,9 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                 label={m}
                 onClick={()=>{ setModule(m); onModuleChange?.(m); }}
                 sx={{
-                  bgcolor: module===m?EV.green:EV.light,
-                  color: module===m?'#fff':'#111',
-                  '&:hover':{ bgcolor: module===m?'#e06f00':'#e9e9e9' }
+                  bgcolor: module===m?EV.green:'background.default',
+                  color: module===m?'#fff':'text.primary',
+                  '&:hover':{ bgcolor: module===m?'#02b37b':'action.hover' }
                 }}
               />
             ))}
@@ -230,18 +245,18 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                 <ListItem button onClick={() => onOpen?.(c)} alignItems="flex-start">
                   <ListItemAvatar>
                     <Badge color="success" invisible={!c.unread} badgeContent={c.unread} overlap="circular">
-                      <Avatar src={c.avatar || `https://i.pravatar.cc/100?u=${c.id}`} sx={{ bgcolor: EV.light, color: '#222' }} />
+                      <Avatar src={c.avatar || `https://i.pravatar.cc/100?u=${c.id}`} sx={{ bgcolor: 'background.default', color: 'text.primary' }} />
                     </Badge>
                   </ListItemAvatar>
                   <ListItemText
-                    primary={<div className="flex items-center gap-2"><span className="font-semibold truncate">{c.name}</span><Chip size="small" label={c.module} sx={{ bgcolor: EV.light }} /><span className="text-xs text-gray-500 ml-auto">{c.time}</span></div>}
-                    secondary={<div className="flex items-center gap-2 mt-1">{c.typing ? (<span className="text-[12px]" style={{ color: EV.green }}>typing…</span>) : (<span className="text-[12px] text-gray-600 truncate">{c.last}</span>)}</div>}
+                    primary={<div className="flex items-center gap-2"><span className="font-semibold truncate" style={{ color: muiTheme.palette.text.primary }}>{c.name}</span><Chip size="small" label={c.module} sx={{ bgcolor: 'background.default', color: 'text.primary' }} /><span className="text-xs ml-auto" style={{ color: muiTheme.palette.text.secondary }}>{c.time}</span></div>}
+                    secondary={<div className="flex items-center gap-2 mt-1">{c.typing ? (<span className="text-[12px]" style={{ color: EV.green }}>typing…</span>) : (<span className="text-[12px] truncate" style={{ color: muiTheme.palette.text.secondary }}>{c.last}</span>)}</div>}
                   />
                 </ListItem>
                 {idx < filtered.length - 1 && <Divider component="li" />}
               </React.Fragment>
             ))}
-            {filtered.length === 0 && (<Box className="px-4 py-10 text-center text-gray-500">No conversations match your search.</Box>)}
+            {filtered.length === 0 && (<Box className="px-4 py-10 text-center" sx={{ color: 'text.secondary' }}>No conversations match your search.</Box>)}
           </List>
         </Box>
 
