@@ -21,7 +21,7 @@ const getSystemPreference = () => {
 };
 
 export const ThemeContextProvider = ({ children }) => {
-  // Load theme from localStorage or default based on system preference
+  // Load theme from localStorage or default to 'system' to adapt to system preference
   const [mode, setMode] = useState(() => {
     try {
       const saved = localStorage.getItem('themeMode');
@@ -31,8 +31,8 @@ export const ThemeContextProvider = ({ children }) => {
     } catch (e) {
       console.warn('Failed to read theme from localStorage', e);
     }
-    // Default to system if system prefers dark, otherwise light
-    return getSystemPreference() === 'dark' ? 'system' : 'light';
+    // Default to 'system' so it always adapts to the system's current theme preference
+    return 'system';
   });
 
   const [accent, setAccent] = useState(() => {
