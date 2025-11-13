@@ -19,9 +19,17 @@ import {
   Slider,
   Button,
   Divider,
-  Snackbar
+  Snackbar,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText
 } from "@mui/material";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
+import BrushRoundedIcon from "@mui/icons-material/BrushRounded";
+import SecurityRoundedIcon from "@mui/icons-material/SecurityRounded";
+import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
+import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
@@ -29,7 +37,7 @@ const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2
  * U10-29 — Language & Translation / Accessibility / Data & Storage
  * One screen with three tabs
  */
-export default function LTASettings({ onBack }) {
+export default function LTASettings({ onBack, onNavigate }) {
   const muiTheme = useMuiTheme();
   // const { actualMode } = useTheme();
   const [tab, setTab] = useState(0);
@@ -73,6 +81,46 @@ export default function LTASettings({ onBack }) {
         </Tabs>
 
         <Box className="flex-1 p-3 space-y-3 no-scrollbar" sx={{ overflowY:'auto' }}>
+          {/* Settings navigation links */}
+          <Box className="rounded-2xl" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper', mb: 2 }}>
+            <List sx={{ py: 0 }}>
+              <ListItem 
+                button 
+                onClick={() => onNavigate?.('/theme')}
+                sx={{ borderRadius: '8px 8px 0 0' }}
+              >
+                <ListItemIcon>
+                  <BrushRoundedIcon sx={{ color: 'text.primary' }} />
+                </ListItemIcon>
+                <ListItemText primary="Theme" secondary="Light · Dark · System" sx={{ color: 'text.primary' }} />
+                <ChevronRightRoundedIcon sx={{ color: 'text.secondary' }} />
+              </ListItem>
+              <Divider />
+              <ListItem 
+                button 
+                onClick={() => onNavigate?.('/security')}
+              >
+                <ListItemIcon>
+                  <SecurityRoundedIcon sx={{ color: 'text.primary' }} />
+                </ListItemIcon>
+                <ListItemText primary="Security" secondary="Sessions & 2FA" sx={{ color: 'text.primary' }} />
+                <ChevronRightRoundedIcon sx={{ color: 'text.secondary' }} />
+              </ListItem>
+              <Divider />
+              <ListItem 
+                button 
+                onClick={() => onNavigate?.('/profile')}
+                sx={{ borderRadius: '0 0 8px 8px' }}
+              >
+                <ListItemIcon>
+                  <PersonRoundedIcon sx={{ color: 'text.primary' }} />
+                </ListItemIcon>
+                <ListItemText primary="Profile" secondary="Edit your profile" sx={{ color: 'text.primary' }} />
+                <ChevronRightRoundedIcon sx={{ color: 'text.secondary' }} />
+              </ListItem>
+            </List>
+          </Box>
+
           {tab===0 && (
             <>
               <FormControl fullWidth size="small">

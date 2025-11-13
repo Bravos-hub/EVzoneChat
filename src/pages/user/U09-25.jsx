@@ -12,10 +12,19 @@ import {
   TextField,
   Switch,
   FormControlLabel,
-  Snackbar
+  Snackbar,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Divider
 } from "@mui/material";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
+import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
+import SecurityRoundedIcon from "@mui/icons-material/SecurityRounded";
+import BrushRoundedIcon from "@mui/icons-material/BrushRounded";
+import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
@@ -30,7 +39,7 @@ const CONTACTS = {
  * Avatar edit, name/handle, bio, presence (online/away/DND/custom), share status across modules
  * Also handles viewing other contacts' profiles via ?contact= parameter
  */
-export default function ProfileSelfPresence({ onBack, initial, location }) {
+export default function ProfileSelfPresence({ onBack, initial, location, onNavigate }) {
   const muiTheme = useMuiTheme();
   // const { actualMode } = useTheme();
   
@@ -126,6 +135,50 @@ export default function ProfileSelfPresence({ onBack, initial, location }) {
               </Box>
             )}
           </Box>
+
+          {/* Settings links - Only show for own profile */}
+          {!isViewingContact && (
+            <Box className="px-4 mt-4">
+              <Box className="rounded-2xl" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
+                <List sx={{ py: 0 }}>
+                  <ListItem 
+                    button 
+                    onClick={() => onNavigate?.('/settings')}
+                    sx={{ borderRadius: '8px 8px 0 0' }}
+                  >
+                    <ListItemIcon>
+                      <SettingsRoundedIcon sx={{ color: 'text.primary' }} />
+                    </ListItemIcon>
+                    <ListItemText primary="Settings" secondary="Language, Accessibility & Storage" sx={{ color: 'text.primary' }} />
+                    <ChevronRightRoundedIcon sx={{ color: 'text.secondary' }} />
+                  </ListItem>
+                  <Divider />
+                  <ListItem 
+                    button 
+                    onClick={() => onNavigate?.('/security')}
+                  >
+                    <ListItemIcon>
+                      <SecurityRoundedIcon sx={{ color: 'text.primary' }} />
+                    </ListItemIcon>
+                    <ListItemText primary="Security" secondary="Sessions & 2FA" sx={{ color: 'text.primary' }} />
+                    <ChevronRightRoundedIcon sx={{ color: 'text.secondary' }} />
+                  </ListItem>
+                  <Divider />
+                  <ListItem 
+                    button 
+                    onClick={() => onNavigate?.('/theme')}
+                    sx={{ borderRadius: '0 0 8px 8px' }}
+                  >
+                    <ListItemIcon>
+                      <BrushRoundedIcon sx={{ color: 'text.primary' }} />
+                    </ListItemIcon>
+                    <ListItemText primary="Theme" secondary="Light · Dark · System" sx={{ color: 'text.primary' }} />
+                    <ChevronRightRoundedIcon sx={{ color: 'text.secondary' }} />
+                  </ListItem>
+                </List>
+              </Box>
+            </Box>
+          )}
         </Box>
 
         {/* Footer */}

@@ -36,6 +36,7 @@ import BrushRoundedIcon from "@mui/icons-material/BrushRounded";
 import TranslateRoundedIcon from "@mui/icons-material/TranslateRounded";
 import NotificationsPausedRoundedIcon from "@mui/icons-material/NotificationsPausedRounded";
 import ShieldRoundedIcon from "@mui/icons-material/ShieldRounded";
+import SecurityRoundedIcon from "@mui/icons-material/SecurityRounded";
 import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 
@@ -256,6 +257,10 @@ function ShellFrame({ children }){
         <MenuItem onClick={()=>go('/settings')}>
           <ListItemIcon><SettingsRoundedIcon fontSize="small"/></ListItemIcon>
           <ListItemText primary="Settings" />
+        </MenuItem>
+        <MenuItem onClick={()=>go('/security')}>
+          <ListItemIcon><SecurityRoundedIcon fontSize="small"/></ListItemIcon>
+          <ListItemText primary="Security" />
         </MenuItem>
         <MenuItem onClick={()=>{ closeMenu(); alert('Signed out'); }}>
           <ListItemIcon><LogoutRoundedIcon fontSize="small"/></ListItemIcon>
@@ -582,6 +587,7 @@ export default function MobileUserShell({ registry = {} }){
   const Call = getComponent(registry, 'U04-10', () => <Screen title="Calls"/>);
   const Media = getComponent(registry, 'U03-08', () => <Screen title="Media"/>);
   const Settings = getComponent(registry, 'U10-29', () => <Screen title="Settings"/>);
+  const Security = getComponent(registry, 'U10-28', () => <Screen title="Security"/>);
   const CreateChannel = getComponent(registry, 'U08-22', () => <Screen title="Create group / channel"/>);
   const Invite = getComponent(registry, 'U08-24', () => <Screen title="Scan QR / Invite link"/>);
   const Theme = getComponent(registry, 'U10-30', () => <Screen title="Theme"/>);
@@ -603,6 +609,7 @@ export default function MobileUserShell({ registry = {} }){
           <Route path="/call" element={<RouteWrapper Component={Call} />} />
           <Route path="/media" element={<RouteWrapper Component={Media} />} />
           <Route path="/settings" element={<RouteWrapper Component={Settings} />} />
+          <Route path="/security" element={<RouteWrapper Component={Security} />} />
           {/* Menu target routes */}
           <Route path="/create-channel" element={<RouteWrapper Component={CreateChannel} />} />
           <Route path="/invite" element={<RouteWrapper Component={Invite} />} />
