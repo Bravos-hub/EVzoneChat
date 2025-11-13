@@ -27,7 +27,7 @@ import TimelapseRoundedIcon from "@mui/icons-material/TimelapseRounded";
 import ShuffleRoundedIcon from "@mui/icons-material/ShuffleRounded";
 import CampaignRoundedIcon from "@mui/icons-material/CampaignRounded";
 
-const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
+// const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
 const INITIAL_PARTICIPANTS = [
   { id:'u1', name:'Leslie Alexander', avatar:'https://i.pravatar.cc/100?img=5', room:null },

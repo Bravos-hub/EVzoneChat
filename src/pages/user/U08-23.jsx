@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from "react";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
-import { useTheme } from "../../context/ThemeContext";
 import {
   AppBar,
   Toolbar,
@@ -27,7 +26,7 @@ import ManageAccountsRoundedIcon from "@mui/icons-material/ManageAccountsRounded
 import PersonAddAlt1RoundedIcon from "@mui/icons-material/PersonAddAlt1Rounded";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
 
-const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
+// const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
 const DEMO_MEMBERS = [
   { id:'u1', name:'Leslie Alexander', role:'admin', avatar:'https://i.pravatar.cc/100?img=5' },
@@ -44,7 +43,7 @@ const DEMO_MEMBERS = [
  */
 export default function GroupChannelDetailsModeration({ onBack, onInvite }) {
   const muiTheme = useMuiTheme();
-  const { actualMode } = useTheme();
+  // const { actualMode } = useTheme();
   const [snack, setSnack] = useState('');
   const [members, setMembers] = useState(DEMO_MEMBERS);
   const [search, setSearch] = useState('');

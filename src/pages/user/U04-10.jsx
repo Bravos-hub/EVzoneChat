@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
-import { useTheme } from "../../context/ThemeContext";
+import { useCall } from "../../context/CallContext";
 import {
   AppBar, Toolbar, IconButton, Box, Avatar, Button, Menu, MenuItem, ListItemIcon, ListItemText,
   List, ListItem, ListItemAvatar, ListItemText as ListItemTextComp, Divider, Chip, Typography
@@ -14,6 +14,7 @@ import VideocamOffRoundedIcon from "@mui/icons-material/VideocamOffRounded";
 import ScreenShareRoundedIcon from "@mui/icons-material/ScreenShareRounded";
 import FlipCameraAndroidRoundedIcon from "@mui/icons-material/FlipCameraAndroidRounded";
 import VolumeUpRoundedIcon from "@mui/icons-material/VolumeUpRounded";
+import VolumeDownRoundedIcon from "@mui/icons-material/VolumeDownRounded";
 import CallEndRoundedIcon from "@mui/icons-material/CallEndRounded";
 import CallRoundedIcon from "@mui/icons-material/CallRounded";
 import ChatBubbleOutlineRoundedIcon from "@mui/icons-material/ChatBubbleOutlineRounded";
@@ -78,12 +79,12 @@ export default function OneToOneCall({
 
   // All hooks must be called before any conditional returns
   const muiTheme = useMuiTheme();
-  const { actualMode } = useTheme();
+  const { startCall, endCall, updateCallState, activeCall } = useCall();
+  
   // Toggles (uncontrolled defaults)
   const [muted, setMuted] = useState(false);
   const [camOn, setCamOn] = useState(actualType === "video");
-  // eslint-disable-next-line no-unused-vars
-  const [speaker, setSpeaker] = useState(true);
+  const [speakerMode, setSpeakerMode] = useState('loud'); // 'normal' or 'loud'
   // eslint-disable-next-line no-unused-vars
   const [sharing, setSharing] = useState(flags.share);
   const [captions, setCaptions] = useState(flags.captions);
@@ -97,6 +98,25 @@ export default function OneToOneCall({
   useEffect(() => {
     setCallState(callStateFromUrl);
   }, [callStateFromUrl]);
+  
+  // Sync call state with global call context
+  useEffect(() => {
+    if (callState && (callState === 'dialing' || callState === 'ringing' || callState === 'connecting' || callState === 'connected')) {
+      startCall({
+        type: actualType,
+        contact: actualRemote.name,
+        avatar: actualRemote.avatar,
+        state: callState,
+      });
+    }
+  }, [callState, actualType, actualRemote.name, actualRemote.avatar, startCall]);
+  
+  // Update global call state
+  useEffect(() => {
+    if (activeCall) {
+      updateCallState(callState);
+    }
+  }, [callState, activeCall, updateCallState]);
   
   // Auto-transition dialing states
   useEffect(() => {
@@ -124,27 +144,45 @@ export default function OneToOneCall({
     [elapsed]
   );
 
-  // PiP drag (video)
+  // PiP drag (video) - Positioned from top-left, above control bar
   const pipRef = useRef(null);
-  const [pip, setPip] = useState({ x: 12, y: 12 });
+  const [pip, setPip] = useState({ x: 12, y: 80 }); // Start near top-right, below header
   const drag = useRef({ active: false, sx: 0, sy: 0, ox: 0, oy: 0, t0: 0, taps: 0 });
+  
+  // Control bar height + padding (approximately 5.5rem = 88px from bottom)
+  const CONTROL_BAR_HEIGHT = 88;
+  
   const onPipDown = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     const t = ("touches" in e ? e.touches?.[0] : e);
     drag.current = { active: true, sx: t.clientX, sy: t.clientY, ox: pip.x, oy: pip.y, t0: Date.now(), taps: drag.current.taps };
   };
+  
   const onPipMove = (e) => {
     if (!drag.current.active) return;
+    e.preventDefault();
+    e.stopPropagation();
     const t = ("touches" in e ? e.touches?.[0] : e);
     const container = pipRef.current?.parentElement;
     const containerWidth = container?.offsetWidth || window.innerWidth;
     const containerHeight = container?.offsetHeight || window.innerHeight;
     const pipWidth = 112; // w-28 = 7rem = 112px
     const pipHeight = 160; // h-40 = 10rem = 160px
-    setPip({ x: Math.max(12, Math.min(containerWidth - pipWidth - 12, drag.current.ox + (t.clientX - drag.current.sx))),
-             y: Math.max(12, Math.min(containerHeight - pipHeight - 12, drag.current.oy + (t.clientY - drag.current.sy))) });
+    const headerHeight = 56; // AppBar height
+    const minTop = headerHeight + 12; // Below header
+    const maxTop = containerHeight - pipHeight - CONTROL_BAR_HEIGHT - 12; // Above control bar
+    
+    const newX = Math.max(12, Math.min(containerWidth - pipWidth - 12, drag.current.ox + (t.clientX - drag.current.sx)));
+    const newY = Math.max(minTop, Math.min(maxTop, drag.current.oy + (t.clientY - drag.current.sy)));
+    
+    setPip({ x: newX, y: newY });
   };
+  
   const onPipUp = (e) => {
     if (!drag.current.active) return;
+    e.preventDefault();
+    e.stopPropagation();
     drag.current.active = false;
     // Double-tap swap main <-> pip
     const dt = Date.now() - drag.current.t0;
@@ -158,6 +196,33 @@ export default function OneToOneCall({
       setTimeout(() => (drag.current.taps = 0), 250);
     }
   };
+  
+  // Add global mouse/touch move and up handlers for smooth dragging
+  useEffect(() => {
+    const handleMove = (e) => {
+      if (drag.current.active) {
+        onPipMove(e);
+      }
+    };
+    const handleUp = (e) => {
+      if (drag.current.active) {
+        onPipUp(e);
+      }
+    };
+    
+    window.addEventListener('mousemove', handleMove);
+    window.addEventListener('mouseup', handleUp);
+    window.addEventListener('touchmove', handleMove, { passive: false });
+    window.addEventListener('touchend', handleUp);
+    
+    return () => {
+      window.removeEventListener('mousemove', handleMove);
+      window.removeEventListener('mouseup', handleUp);
+      window.removeEventListener('touchmove', handleMove);
+      window.removeEventListener('touchend', handleUp);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty deps - handlers check drag.current.active internally and functions are stable
 
   // Derived label
   const status = useMemo(() => {
@@ -230,21 +295,25 @@ export default function OneToOneCall({
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none`}</style>
 
-      <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: '#000', color: '#fff' }}>
+      {/* Call interface - Always dark background regardless of theme */}
+      <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: '#000 !important', color: '#fff', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1300 }}>
         {/* Header */}
-        <AppBar elevation={0} position="static" sx={{ bgcolor: "rgba(0,0,0,0.55)", color: "#fff" }}>
+        <AppBar elevation={0} position="static" sx={{ bgcolor: "rgba(0,0,0,0.55) !important", color: "#fff" }}>
           <Toolbar className="!min-h-[56px]">
             <IconButton onClick={() => {
-              setCallState("dialing");
-              setElapsed(0);
+              // Don't end call, just navigate back - call banner will appear
               onBack?.();
             }} aria-label="Back" sx={{ color: "#fff" }}>
               <ArrowBackRoundedIcon />
             </IconButton>
-            <div className="flex flex-col">
-              <span className="font-semibold -mb-0.5" style={{ whiteSpace: "nowrap", color: "#fff" }}>{actualRemote.name}</span>
-              <span className="text-[11px] opacity-80" style={{ color: "#fff" }}>{status}</span>
-            </div>
+            <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+              <Typography variant="subtitle1" sx={{ color: "#fff", fontWeight: 600, fontSize: '1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {actualRemote.name}
+              </Typography>
+              <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.8)", fontSize: '0.6875rem' }}>
+                {status}
+              </Typography>
+            </Box>
             <Box sx={{ flexGrow: 1 }} />
             <IconButton aria-label="More" onClick={(e)=>setMenuEl(e.currentTarget)} sx={{ color: "#fff" }}>
               <MoreVertRoundedIcon />
@@ -309,38 +378,90 @@ export default function OneToOneCall({
         </Menu>
 
         {/* Body */}
-        <Box className="flex-1 relative">
+        <Box className="flex-1 relative" sx={{ bgcolor: '#000', minHeight: 0 }}>
           {actualType === "video" ? (
             <>
-              {/* Remote feed (placeholder) */}
-              <Box className="absolute inset-0 bg-black grid place-items-center">
-                <video className="w-full h-full object-cover" muted loop autoPlay playsInline>
-                  <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm" type="video/webm" />
-                </video>
+              {/* Remote feed (main view) - Always show */}
+              <Box className="absolute inset-0" sx={{ bgcolor: '#000' }}>
+                {callState === "connected" ? (
+                  <video className="w-full h-full object-cover" muted loop autoPlay playsInline>
+                    <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm" type="video/webm" />
+                  </video>
+                ) : (
+                  <Box className="w-full h-full grid place-items-center">
+                    <Avatar src={actualRemote.avatar} sx={{ width: '8rem', height: '8rem' }} />
+                  </Box>
+                )}
               </Box>
 
-              {/* Local preview (PiP) */}
-              <div
-                ref={pipRef}
-                className="absolute w-28 h-40 rounded-xl overflow-hidden shadow-lg border"
-                style={{ bottom: pip.y, right: pip.x, borderColor: "rgba(255,255,255,0.2)" }}
-                onMouseDown={onPipDown} onMouseMove={onPipMove} onMouseUp={onPipUp}
-                onTouchStart={onPipDown} onTouchMove={onPipMove} onTouchEnd={onPipUp}
-                aria-label="Local preview"
-              >
-                <video className="w-full h-full object-cover" muted loop autoPlay playsInline>
-                  <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm" type="video/webm" />
-                </video>
-              </div>
+              {/* Local preview (PiP) - Show only when camera is on and call is connected - Positioned above controls */}
+              {camOn && callState === "connected" && (
+                <Box
+                  ref={pipRef}
+                  sx={{
+                    position: 'absolute',
+                    width: '7rem',
+                    height: '10rem',
+                    top: `${pip.y}px`,
+                    left: `${pip.x}px`,
+                    borderRadius: 2,
+                    overflow: 'hidden',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+                    border: '2px solid rgba(255,255,255,0.3)',
+                    cursor: 'move',
+                    zIndex: 100,
+                    userSelect: 'none',
+                    touchAction: 'none'
+                  }}
+                  onMouseDown={onPipDown}
+                  onTouchStart={onPipDown}
+                  aria-label="Local preview - Drag to move"
+                >
+                  <video className="w-full h-full object-cover" muted loop autoPlay playsInline>
+                    <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm" type="video/webm" />
+                  </video>
+                </Box>
+              )}
+              
+              {/* Camera off indicator - Show avatar when camera is off - Positioned above controls */}
+              {!camOn && callState === "connected" && (
+                <Box
+                  ref={pipRef}
+                  sx={{
+                    position: 'absolute',
+                    width: '7rem',
+                    height: '10rem',
+                    top: `${pip.y}px`,
+                    left: `${pip.x}px`,
+                    borderRadius: 2,
+                    overflow: 'hidden',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+                    border: '2px solid rgba(255,255,255,0.3)',
+                    bgcolor: 'rgba(0,0,0,0.6)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'move',
+                    zIndex: 100,
+                    userSelect: 'none',
+                    touchAction: 'none'
+                  }}
+                  onMouseDown={onPipDown}
+                  onTouchStart={onPipDown}
+                  aria-label="Camera off - Drag to move"
+                >
+                  <Avatar src="https://i.pravatar.cc/100?img=20" sx={{ width: '4rem', height: '4rem' }} />
+                </Box>
+              )}
 
               {/* Dialing/connecting overlays with animation */}
               {callState !== "connected" && callState !== "incoming" && (
-                <div className="absolute inset-0 grid place-items-center">
-                  <div className="flex flex-col items-center gap-4">
+                <Box className="absolute inset-0 grid place-items-center" sx={{ bgcolor: 'rgba(0,0,0,0.7)', zIndex: 10 }}>
+                  <Box className="flex flex-col items-center gap-4" sx={{ zIndex: 1 }}>
                     {/* Pulsing animation for dialing/ringing/connecting */}
-                    <div className="relative" style={{ width: '5rem', height: '5rem' }}>
-                      <div className="absolute inset-0 rounded-full bg-white/20 call-pulse" />
-                      <div className="absolute inset-0 rounded-full bg-white/10 call-pulse-delayed" />
+                    <Box className="relative" sx={{ width: '5rem', height: '5rem' }}>
+                      <Box className="absolute inset-0 rounded-full call-pulse" sx={{ bgcolor: 'rgba(255,255,255,0.2)' }} />
+                      <Box className="absolute inset-0 rounded-full call-pulse-delayed" sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
                       <Avatar 
                         src={actualRemote.avatar} 
                         sx={{ 
@@ -351,24 +472,39 @@ export default function OneToOneCall({
                           border: '3px solid rgba(255,255,255,0.3)'
                         }} 
                       />
-                    </div>
-                    <div className="px-4 py-2 rounded-full bg-white/10 backdrop-blur text-sm font-medium" style={{ color: '#fff' }}>{status}</div>
-                    {callState === "ringing" && (
-                      <div className="text-xs opacity-70" style={{ color: '#fff' }}>Waiting for answer...</div>
-                    )}
-                  </div>
-                </div>
+                    </Box>
+                    <Box sx={{ 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      alignItems: 'center', 
+                      gap: 0.5,
+                      mt: 1
+                    }}>
+                      <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 600, fontSize: '1rem' }}>
+                        {actualRemote.name}
+                      </Typography>
+                      <Box className="px-4 py-2 rounded-full backdrop-blur" sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: '0.875rem', fontWeight: 500 }}>
+                        {status}
+                      </Box>
+                      {callState === "ringing" && (
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.75rem' }}>
+                          Waiting for answer...
+                        </Typography>
+                      )}
+                    </Box>
+                  </Box>
+                </Box>
               )}
             </>
           ) : (
-            <div className="absolute inset-0 grid place-items-center">
-              <div className="flex flex-col items-center gap-4">
+            <Box className="absolute inset-0 grid place-items-center" sx={{ bgcolor: '#000', width: '100%', height: '100%' }}>
+              <Box className="flex flex-col items-center gap-4" sx={{ zIndex: 1 }}>
                 {callState !== "connected" && callState !== "incoming" ? (
                   <>
                     {/* Pulsing animation for voice call dialing */}
-                    <div className="relative" style={{ width: '6.5rem', height: '6.5rem' }}>
-                      <div className="absolute inset-0 rounded-full bg-white/20 call-pulse" />
-                      <div className="absolute inset-0 rounded-full bg-white/10 call-pulse-delayed" />
+                    <Box className="relative" sx={{ width: '6.5rem', height: '6.5rem' }}>
+                      <Box className="absolute inset-0 rounded-full call-pulse" sx={{ bgcolor: 'rgba(255,255,255,0.2)' }} />
+                      <Box className="absolute inset-0 rounded-full call-pulse-delayed" sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
                       <Avatar 
                         src={actualRemote.avatar} 
                         sx={{ 
@@ -379,20 +515,48 @@ export default function OneToOneCall({
                           border: '3px solid rgba(255,255,255,0.3)'
                         }} 
                       />
-                    </div>
-                    <div className="px-4 py-2 rounded-full bg-white/10 backdrop-blur text-sm font-medium" style={{ color: '#fff' }}>{status}</div>
-                    {callState === "ringing" && (
-                      <div className="text-xs opacity-70" style={{ color: '#fff' }}>Waiting for answer...</div>
-                    )}
+                    </Box>
+                    <Box sx={{ 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      alignItems: 'center', 
+                      gap: 0.5,
+                      mt: 1
+                    }}>
+                      <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 600, fontSize: '1rem' }}>
+                        {actualRemote.name}
+                      </Typography>
+                      <Box className="px-4 py-2 rounded-full backdrop-blur" sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: '0.875rem', fontWeight: 500 }}>
+                        {status}
+                      </Box>
+                      {callState === "ringing" && (
+                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.75rem' }}>
+                          Waiting for answer...
+                        </Typography>
+                      )}
+                    </Box>
                   </>
                 ) : (
                   <>
-                    <Avatar src={actualRemote.avatar} sx={{ width: '6.5rem', height: '6.5rem' }} />
-                    <div className="text-sm opacity-80" style={{ color: '#fff' }}>{callState === "connected" ? `Connected • ${hhmmss}` : status}</div>
+                    <Avatar src={actualRemote.avatar} sx={{ width: '6.5rem', height: '6.5rem', border: '3px solid rgba(255,255,255,0.2)' }} />
+                    <Box sx={{ 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      alignItems: 'center', 
+                      gap: 0.5,
+                      mt: 1
+                    }}>
+                      <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 600, fontSize: '1rem' }}>
+                        {actualRemote.name}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.875rem' }}>
+                        {callState === "connected" ? `Connected • ${hhmmss}` : status}
+                      </Typography>
+                    </Box>
                   </>
                 )}
-              </div>
-            </div>
+              </Box>
+            </Box>
           )}
 
           {/* Incoming sheet */}
@@ -418,69 +582,161 @@ export default function OneToOneCall({
           )}
         </Box>
 
-        {/* Controls (glass) */}
+        {/* Controls (glass) - Always visible at bottom */}
         <Box className="fixed inset-x-0 bottom-0 z-10 flex justify-center" sx={{ pb: "env(safe-area-inset-bottom)" }}>
           <Box className="w-full px-3 pb-3">
-            <div className="flex items-center justify-between bg-white/10 rounded-2xl px-3 py-2 backdrop-blur">
-              {/* mic */}
-              <IconButton onClick={()=>setMuted(m=>!m)} aria-label="Mute" sx={{ color:"#fff" }}>
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'space-between', 
+              bgcolor: 'rgba(255,255,255,0.1)', 
+              borderRadius: 2, 
+              px: 3, 
+              py: 2, 
+              backdropFilter: 'blur(12px)',
+              gap: 1,
+              flexWrap: 'wrap'
+            }}>
+              {/* mic - Always visible */}
+              <IconButton 
+                onClick={()=>{
+                  setMuted(m=>!m);
+                }} 
+                aria-label={muted ? "Unmute microphone" : "Mute microphone"}
+                sx={{ 
+                  color:"#fff", 
+                  flexShrink: 0,
+                  bgcolor: muted ? 'rgba(255,255,255,0.2)' : 'transparent'
+                }}
+              >
                 {muted ? <MicOffRoundedIcon/> : <MicNoneRoundedIcon/>}
               </IconButton>
 
-              {/* camera (video) */}
+              {/* camera (video) - Always visible for video calls */}
               {actualType === "video" && (
-                <IconButton onClick={()=>setCamOn(c=>!c)} aria-label="Camera" sx={{ color:"#fff" }}>
+                <IconButton 
+                  onClick={()=>{
+                    setCamOn(c=>!c);
+                  }} 
+                  aria-label={camOn ? "Turn camera off" : "Turn camera on"}
+                  sx={{ 
+                    color:"#fff", 
+                    flexShrink: 0,
+                    bgcolor: !camOn ? 'rgba(255,255,255,0.2)' : 'transparent'
+                  }}
+                >
                   {camOn ? <VideocamRoundedIcon/> : <VideocamOffRoundedIcon/>}
                 </IconButton>
               )}
 
               {/* flip camera (video) */}
               {actualType === "video" && (
-                <IconButton onClick={()=>{/* flip camera */}} aria-label="Flip camera" sx={{ color:"#fff" }}>
+                <IconButton 
+                  onClick={()=>{
+                    alert('Camera flipped');
+                  }} 
+                  aria-label="Flip camera" 
+                  sx={{ color:"#fff", flexShrink: 0 }}
+                >
                   <FlipCameraAndroidRoundedIcon/>
                 </IconButton>
               )}
 
-              {/* speaker (voice) */}
-              <IconButton onClick={()=>setSpeaker(s=>!s)} aria-label="Speaker" sx={{ color:"#fff" }}>
-                <VolumeUpRoundedIcon/>
+              {/* speaker - Toggle between normal and loud speaker (WhatsApp style) */}
+              <IconButton 
+                onClick={()=>{
+                  setSpeakerMode(prev => prev === 'loud' ? 'normal' : 'loud');
+                }} 
+                aria-label={speakerMode === 'loud' ? 'Switch to normal speaker' : 'Switch to loud speaker'}
+                sx={{ 
+                  color:"#fff", 
+                  flexShrink: 0,
+                  bgcolor: speakerMode === 'loud' ? 'rgba(255,255,255,0.2)' : 'transparent'
+                }}
+              >
+                {speakerMode === 'loud' ? <VolumeUpRoundedIcon/> : <VolumeDownRoundedIcon/>}
               </IconButton>
 
               {/* share (video) */}
               {actualType === "video" && (
-                <IconButton onClick={()=>setSharing(v=>!v)} aria-label="Share screen" sx={{ color:"#fff" }}>
+                <IconButton 
+                  onClick={()=>{
+                    setSharing(v=>!v);
+                  }} 
+                  aria-label={sharing ? "Stop sharing screen" : "Share screen"}
+                  sx={{ 
+                    color:"#fff", 
+                    flexShrink: 0,
+                    bgcolor: sharing ? 'rgba(255,255,255,0.2)' : 'transparent'
+                  }}
+                >
                   <ScreenShareRoundedIcon/>
                 </IconButton>
               )}
 
               {/* captions */}
-              <IconButton onClick={()=>setCaptions(c=>!c)} aria-label="Captions" sx={{ color:"#fff" }}>
+              <IconButton 
+                onClick={()=>{
+                  setCaptions(c=>!c);
+                }} 
+                aria-label={captions ? "Disable captions" : "Enable captions"}
+                sx={{ 
+                  color:"#fff", 
+                  flexShrink: 0,
+                  bgcolor: captions ? 'rgba(255,255,255,0.2)' : 'transparent'
+                }}
+              >
                 <ClosedCaptionRoundedIcon/>
               </IconButton>
 
               {/* open chat */}
-              <IconButton onClick={()=>onOpenChat?.()} aria-label="Chat" sx={{ color:"#fff" }}>
+              <IconButton 
+                onClick={()=>{
+                  onNavigate?.(`/conversation/${encodeURIComponent(actualRemote.name)}`);
+                  onOpenChat?.();
+                }} 
+                aria-label="Open chat" 
+                sx={{ color:"#fff", flexShrink: 0 }}
+              >
                 <ChatBubbleOutlineRoundedIcon/>
               </IconButton>
 
               {/* network quality (static demo) */}
-              <IconButton aria-label="Network quality" sx={{ color:"#fff" }}>
+              <IconButton 
+                aria-label="Network quality: Good"
+                sx={{ color:"#fff", flexShrink: 0 }}
+              >
                 <SignalCellularAltRoundedIcon/>
               </IconButton>
 
-              {/* end call */}
+              {/* end call - Always visible and prominent - MUST end call */}
               <IconButton 
                 onClick={() => {
+                  // End call immediately
+                  endCall(); // End call in global context first
                   setCallState("dialing"); // Reset state
                   setElapsed(0);
-                  onEnd?.();
+                  onEnd?.(); // Call onEnd callback
+                  // Navigate back after a brief delay to ensure state is cleared
+                  setTimeout(() => {
+                    onNavigate?.(-1);
+                  }, 100);
                 }} 
                 aria-label="End call" 
-                sx={{ color:"#fff", bgcolor:"#e53935", "&:hover":{ bgcolor:"#c62828" } }}
+                sx={{ 
+                  color:"#fff", 
+                  bgcolor:"#e53935", 
+                  "&:hover":{ bgcolor:"#c62828" },
+                  "&:active":{ bgcolor:"#b71c1c", transform: 'scale(0.95)' },
+                  width: '3rem',
+                  height: '3rem',
+                  flexShrink: 0,
+                  transition: 'all 0.2s ease'
+                }}
               >
-                <CallEndRoundedIcon/>
+                <CallEndRoundedIcon sx={{ fontSize: 24 }} />
               </IconButton>
-            </div>
+            </Box>
           </Box>
         </Box>
       </Box>

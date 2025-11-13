@@ -12,7 +12,6 @@ import {
   Grid
 } from "@mui/material";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
-import { useTheme } from "../../context/ThemeContext";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
 import TrendingUpRoundedIcon from "@mui/icons-material/TrendingUpRounded";
@@ -27,7 +26,7 @@ import PaymentsRoundedIcon from "@mui/icons-material/PaymentsRounded";
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
 export default function ContextPanelsPack3({ onBack }) {
-  const { actualMode } = useTheme();
+  // const { actualMode } = useTheme();
   const muiTheme = useMuiTheme();
   const tabs = [
     { key:'faith', label:'Faith', icon: <FavoriteBorderRoundedIcon/> },

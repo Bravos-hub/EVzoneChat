@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
-import { useTheme } from "../../context/ThemeContext";
 import {
   AppBar,
   Toolbar,
@@ -32,7 +31,7 @@ const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2
  */
 export default function LTASettings({ onBack }) {
   const muiTheme = useMuiTheme();
-  const { actualMode } = useTheme();
+  // const { actualMode } = useTheme();
   const [tab, setTab] = useState(0);
   const [snack, setSnack] = useState('');
 

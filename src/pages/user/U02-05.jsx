@@ -55,7 +55,6 @@ import ForwardRoundedIcon from "@mui/icons-material/ForwardRounded";
 import StarRoundedIcon from "@mui/icons-material/StarRounded";
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
 import SelectAllRoundedIcon from "@mui/icons-material/SelectAllRounded";
-import ShareRoundedIcon from "@mui/icons-material/ShareRounded";
 import VideoLibraryRoundedIcon from "@mui/icons-material/VideoLibraryRounded";
 import PollRoundedIcon from "@mui/icons-material/PollRounded";
 import ReplyRoundedIcon from "@mui/icons-material/ReplyRounded";
@@ -376,7 +375,7 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
   }, [location, kind]);
 
   // Store messages to forward (from previous conversation)
-  const [messagesToForward, setMessagesToForward] = useState([]);
+  const [messagesToForward] = useState([]);
 
   // Handle forwarded messages when arriving at conversation
   useEffect(() => {
@@ -479,6 +478,7 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
       case 'forward':
         // Forward selected messages - store them and navigate to contact picker
         const msgIds = selected.join(',');
+        // eslint-disable-next-line no-unused-vars
         const msgsToForward = messages.filter(m => selectedMessages.has(m.id));
         // Store messages to forward (in real app, this would be in a global store)
         // For now, we'll pass them via URL params

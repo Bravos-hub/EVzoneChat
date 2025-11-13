@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
-import { useTheme } from "../../context/ThemeContext";
 import {
   AppBar,
   Toolbar,
@@ -21,7 +20,7 @@ import {
 } from "@mui/material";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 
-const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
+// const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
 const MODULES = ["All modules","Marketplace","Rides","School","Medical","Charging","Travel","Investments","Faith","Social","Workspace","Wallet","AI Bot"];
 const CHANNEL_OVERRIDES = [
@@ -36,7 +35,7 @@ const CHANNEL_OVERRIDES = [
  */
 export default function NotificationsPrivacy({ onBack }) {
   const muiTheme = useMuiTheme();
-  const { actualMode } = useTheme();
+  // const { actualMode } = useTheme();
   const [module, setModule] = useState('All modules');
   const [push, setPush] = useState(true);
   const [inapp, setInapp] = useState(true);

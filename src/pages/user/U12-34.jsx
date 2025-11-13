@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from "react";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
-import { useTheme } from "../../context/ThemeContext";
 import {
   AppBar,
   Toolbar,
@@ -27,7 +26,7 @@ import ReportRoundedIcon from "@mui/icons-material/ReportRounded";
 import BlockRoundedIcon from "@mui/icons-material/BlockRounded";
 import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
 
-const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
+// const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
 /**
  * U12-34 — Safety Center
@@ -38,7 +37,7 @@ const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2
  */
 export default function SafetyCenter({ onBack }) {
   const muiTheme = useMuiTheme();
-  const { actualMode } = useTheme();
+  // const { actualMode } = useTheme();
   const [recordConsent, setRecordConsent] = useState(false);
   const [remindSensitive, setRemindSensitive] = useState(true);
   const [module, setModule] = useState('Medical');

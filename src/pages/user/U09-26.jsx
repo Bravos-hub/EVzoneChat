@@ -1,6 +1,5 @@
 import React from "react";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
-import { useTheme } from "../../context/ThemeContext";
 import {
   AppBar,
   Toolbar,
@@ -20,7 +19,7 @@ import ChatRoundedIcon from "@mui/icons-material/ChatRounded";
 import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
 import PlaceRoundedIcon from "@mui/icons-material/PlaceRounded";
 
-const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
+// const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
 /**
  * U09-26 — Contact & Organization Profiles
@@ -29,7 +28,7 @@ const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2
  */
 export default function ContactOrgProfiles({ onBack, person = { name:'Leslie Alexander', role:'Tutor • School', phone:'+256 700 000 111', email:'leslie@example.com', avatar:'https://i.pravatar.cc/120?img=5', contexts:['School','Workspace'] }, org = { name:'EVzone School', logo:'https://i.pravatar.cc/120?img=24', location:'Millennium House, Nsambya Rd 472, Kampala', hours:{ Mon:'08:00–17:00', Tue:'08:00–17:00', Wed:'08:00–17:00', Thu:'08:00–17:00', Fri:'08:00–17:00', Sat:'10:00–14:00', Sun:'Closed' }, channels:['#announcements','Parents Group','Support'] } }) {
   const muiTheme = useMuiTheme();
-  const { actualMode } = useTheme();
+  // const { actualMode } = useTheme();
   return (
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>

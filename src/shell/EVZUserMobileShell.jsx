@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
+import { useCall } from "../context/CallContext";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
 import {
   AppBar,
@@ -29,6 +30,8 @@ import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import GroupAddRoundedIcon from "@mui/icons-material/GroupAddRounded";
 import QrCode2RoundedIcon from "@mui/icons-material/QrCode2Rounded";
 import CallRoundedIcon from "@mui/icons-material/CallRounded";
+import CallEndRoundedIcon from "@mui/icons-material/CallEndRounded";
+import VideocamRoundedIcon from "@mui/icons-material/VideocamRounded";
 import BrushRoundedIcon from "@mui/icons-material/BrushRounded";
 import TranslateRoundedIcon from "@mui/icons-material/TranslateRounded";
 import NotificationsPausedRoundedIcon from "@mui/icons-material/NotificationsPausedRounded";
@@ -79,6 +82,7 @@ function ShellFrame({ children }){
   const navigate = useNavigate();
   const location = useLocation();
   const { actualMode, accent } = useTheme();
+  const { activeCall, isInCall, endCall } = useCall();
   const [menuEl, setMenuEl] = useState(null);
   const openMenu = (e) => setMenuEl(e.currentTarget);
   const closeMenu = () => setMenuEl(null);
@@ -87,7 +91,23 @@ function ShellFrame({ children }){
   // Check if we're on a conversation page
   const isConversationPage = location.pathname.startsWith('/conversation') || location.pathname.startsWith('/new-message');
   
+  // Check if we're on the call page
+  const isOnCallPage = location.pathname.startsWith('/call') && activeCall;
+  
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
+  
+  // Calculate call duration
+  const [callDuration, setCallDuration] = useState(0);
+  useEffect(() => {
+    if (activeCall && activeCall.startTime) {
+      const interval = setInterval(() => {
+        setCallDuration(Math.floor((Date.now() - activeCall.startTime) / 1000));
+      }, 1000);
+      return () => clearInterval(interval);
+    } else {
+      setCallDuration(0);
+    }
+  }, [activeCall]);
   
   // Apply dark mode class to body and update meta theme-color
   useEffect(() => {
@@ -289,6 +309,19 @@ function ShellFrame({ children }){
 
       {/* Launcher — fixed to right edge of the mobile frame (hidden on conversation pages) */}
       {!isConversationPage && <Launcher unread={2}/>}
+
+      {/* Persistent Call Banner - WhatsApp style (shown when call is active and user navigates away) */}
+      {isInCall && !isOnCallPage && activeCall && (
+        <CallBanner 
+          call={activeCall} 
+          duration={callDuration}
+          onTap={() => navigate(`/call?type=${activeCall.type}&contact=${encodeURIComponent(activeCall.contact)}&state=${activeCall.state}`)}
+          onEnd={() => {
+            endCall();
+            navigate(-1);
+          }}
+        />
+      )}
     </Box>
   );
 }
@@ -299,7 +332,7 @@ Bottom Navigation (labels under icons)
 function MobileBottomNav(){
   const value = useTabFromLocation();
   const nav = useNavigate();
-  const { actualMode, accent } = useTheme();
+  const { accent } = useTheme();
   const muiTheme = useMuiTheme();
   
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
@@ -404,6 +437,83 @@ function Launcher({ unread=0 }){
               border: '2px solid #fff'
             }} />
           </Badge>
+        </IconButton>
+      </Box>
+    </Box>
+  );
+}
+
+/* -----------------------------------------------------------
+   Persistent Call Banner (WhatsApp style)
+------------------------------------------------------------ */
+function CallBanner({ call, duration, onTap, onEnd }) {
+  const muiTheme = useMuiTheme();
+  const { actualMode } = useTheme();
+  const formatDuration = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  };
+
+  const getStatusText = () => {
+    switch(call.state) {
+      case 'dialing': return 'Dialing...';
+      case 'ringing': return 'Ringing...';
+      case 'connecting': return 'Connecting...';
+      case 'connected': return call.type === 'video' ? `Video • ${formatDuration(duration)}` : `Voice • ${formatDuration(duration)}`;
+      default: return 'Calling...';
+    }
+  };
+
+  return (
+    <Box
+      onClick={onTap}
+      sx={{
+        position: 'fixed',
+        top: '3.5rem', // Below main header
+        left: 0,
+        right: 0,
+        zIndex: 1200,
+        bgcolor: actualMode === 'dark' ? 'rgba(18,18,18,0.95)' : 'rgba(255,255,255,0.95)',
+        backdropFilter: 'blur(12px)',
+        borderBottom: `1px solid ${muiTheme.palette.divider}`,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease'
+      }}
+    >
+      <Box sx={{ display: 'flex', alignItems: 'center', px: 2, py: 1.5, gap: 2 }}>
+        <Avatar src={call.avatar} sx={{ width: '2.5rem', height: '2.5rem' }} />
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Typography variant="subtitle2" sx={{ color: 'text.primary', fontWeight: 600, fontSize: '0.875rem' }}>
+            {call.contact}
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.25 }}>
+            {call.type === 'video' ? (
+              <VideocamRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+            ) : (
+              <CallRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+            )}
+            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
+              {getStatusText()}
+            </Typography>
+          </Box>
+        </Box>
+        <IconButton
+          size="small"
+          onClick={(e) => {
+            e.stopPropagation();
+            onEnd();
+          }}
+          sx={{
+            bgcolor: '#e53935',
+            color: '#fff',
+            '&:hover': { bgcolor: '#c62828' },
+            width: '2rem',
+            height: '2rem'
+          }}
+        >
+          <CallEndRoundedIcon sx={{ fontSize: 18 }} />
         </IconButton>
       </Box>
     </Box>

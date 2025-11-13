@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
-import { useTheme } from "../../context/ThemeContext";
 import {
   AppBar,
   Toolbar,
@@ -23,7 +22,7 @@ import LinkRoundedIcon from "@mui/icons-material/LinkRounded";
 import EventNoteRoundedIcon from "@mui/icons-material/EventNoteRounded";
 import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
 
-const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
+// const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
 /**
  * U06-18 — Meeting Info & End Options
@@ -31,7 +30,7 @@ const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2
  */
 export default function MeetingInfoEnd({ onBack, info = { title:'Weekly Sync', code:'evz-9k5f-311', link:'https://evzone.app/j/evz-9k5f-311', agenda:'1) Standup\n2) Roadmap\n3) Q&A', participants: 12, policies:['Lobby on','Recording on consent','Admins can monitor'] } }) {
   const muiTheme = useMuiTheme();
-  const { actualMode } = useTheme();
+  // const { actualMode } = useTheme();
   const [snack, setSnack] = useState('');
   const [confirmEnd, setConfirmEnd] = useState(false);
 

@@ -1,6 +1,5 @@
 import React, { useRef, useState, useMemo } from "react";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
-import { useTheme } from "../../context/ThemeContext";
 import {
   AppBar,
   Toolbar,
@@ -33,7 +32,7 @@ const CONTACTS = {
  */
 export default function ProfileSelfPresence({ onBack, initial, location }) {
   const muiTheme = useMuiTheme();
-  const { actualMode } = useTheme();
+  // const { actualMode } = useTheme();
   
   // Check if viewing a contact's profile
   const contactName = useMemo(() => {

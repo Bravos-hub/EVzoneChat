@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from "react";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
-import { useTheme } from "../../context/ThemeContext";
 import {
   AppBar,
   Toolbar,
@@ -27,7 +26,7 @@ const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2
 
 export default function ContextPanelsPack2({ onBack }) {
   const muiTheme = useMuiTheme();
-  const { actualMode } = useTheme();
+  // const { actualMode } = useTheme();
   const tabs = [
     { key:'medical', label:'Medical', icon: <MedicalServicesRoundedIcon/> },
     { key:'charging', label:'Charging', icon: <EvStationRoundedIcon/> },

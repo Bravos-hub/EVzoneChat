@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from "react";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
-import { useTheme } from "../../context/ThemeContext";
 import {
   AppBar,
   Toolbar,
@@ -25,7 +24,7 @@ import ShareRoundedIcon from "@mui/icons-material/ShareRounded";
 import QrCode2RoundedIcon from "@mui/icons-material/QrCode2Rounded";
 import LinkRoundedIcon from "@mui/icons-material/LinkRounded";
 
-const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
+// const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
 /**
  * U08-24 — Invite/Join (Link/QR)
@@ -36,7 +35,7 @@ const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2
  */
 export default function InviteJoinLinkQR({ onBack, info = { name:'Charging Crew — Kampala', code:'evz-crew-kla', link:'https://evzone.app/invite/evz-crew-kla' } }) {
   const muiTheme = useMuiTheme();
-  const { actualMode } = useTheme();
+  // const { actualMode } = useTheme();
   const [snack, setSnack] = useState('');
   const [allowAnyone, setAllowAnyone] = useState(true);
   const [approval, setApproval] = useState(false);

@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from "react";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
-import { useTheme } from "../../context/ThemeContext";
 import {
   AppBar,
   Toolbar,
@@ -46,7 +45,7 @@ const SESSIONS = [
  */
 export default function SecuritySessionsDevices({ onBack }) {
   const muiTheme = useMuiTheme();
-  const { actualMode } = useTheme();
+  // const { actualMode } = useTheme();
   const [snack, setSnack] = useState('');
   const [sessions, setSessions] = useState(SESSIONS);
   const [twoFA, setTwoFA] = useState(false);
