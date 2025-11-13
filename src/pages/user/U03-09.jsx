@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { useTheme as useMuiTheme } from "@mui/material/styles";
 import {
   AppBar,
   Toolbar,
@@ -41,13 +42,15 @@ const THREAD = [
   { id:'t3', who: PEOPLE[1], text:'Hi! Do we still meet at 3 pm?', time:'07:32 PM' },
 ];
 
-function highlight(text, q){
+function highlight(text, q, muiTheme){
   if(!q) return text;
   const parts = text.split(new RegExp(`(${q.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\$&")})`, 'gi'));
-  return parts.map((p,i)=> p.toLowerCase()===q.toLowerCase()? <mark key={i} className="bg-yellow-200 px-0.5 rounded">{p}</mark> : <span key={i}>{p}</span>);
+  const highlightColor = muiTheme?.palette?.mode === 'dark' ? '#ffd700' : '#fef08a';
+  return parts.map((p,i)=> p.toLowerCase()===q.toLowerCase()? <mark key={i} style={{ backgroundColor: highlightColor, padding: '0 2px', borderRadius: '2px' }}>{p}</mark> : <span key={i}>{p}</span>);
 }
 
 export default function SearchGlobalInThread({ onBack, onOpenResult }) {
+  const muiTheme = useMuiTheme();
   const [tab, setTab] = useState(0); // 0 global, 1 in-thread
   const [q, setQ] = useState("");
 
@@ -71,11 +74,11 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
 
-      <Box className="w-full h-full mx-auto bg-white flex flex-col">
-        <AppBar elevation={0} position="static" sx={{ bgcolor:'#fff', color:'#111', borderBottom:`1px solid ${EV.light}` }}>
+      <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.paper' }}>
+        <AppBar elevation={0} position="static" sx={{ bgcolor:'background.paper', color:'text.primary', borderBottom:`1px solid ${muiTheme.palette.divider}` }}>
           <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back"><ArrowBackRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold ml-1">Search</Typography>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary' }}><ArrowBackRoundedIcon /></IconButton>
+            <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>Search</Typography>
           </Toolbar>
         </AppBar>
 
@@ -88,7 +91,18 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
         <Box className="px-3 py-2">
           <TextField
             fullWidth size="small" value={q} onChange={(e)=>setQ(e.target.value)} placeholder="Search people, channels, messages"
-            InputProps={{ startAdornment:(<InputAdornment position="start"><SearchRoundedIcon /></InputAdornment>) }}
+            InputProps={{ 
+              startAdornment:(<InputAdornment position="start"><SearchRoundedIcon sx={{ color: 'text.secondary' }} /></InputAdornment>) 
+            }}
+            sx={{
+              '& .MuiInputBase-input': {
+                color: 'text.primary',
+              },
+              '& .MuiInputBase-input::placeholder': {
+                color: 'text.secondary',
+                opacity: 1,
+              },
+            }}
           />
         </Box>
 
@@ -97,13 +111,21 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
           {tab === 0 && (
             <>
               {/* People */}
-              <div className="px-3 py-2 text-xs text-gray-500">People</div>
+              <div className="px-3 py-2 text-xs" style={{ color: muiTheme.palette.text.secondary }}>People</div>
               <List>
                 {globalResults.people.map((p, idx)=> (
                   <React.Fragment key={p.id}>
-                    <ListItem button onClick={()=>onOpenResult?.({ type:'person', id:p.id })}>
+                    <ListItem 
+                      button 
+                      onClick={()=>onOpenResult?.({ type:'person', id:p.id })}
+                      sx={{
+                        '& .MuiListItemText-primary': {
+                          color: 'text.primary',
+                        },
+                      }}
+                    >
                       <ListItemAvatar><Avatar src={p.avatar} /></ListItemAvatar>
-                      <ListItemText primary={<span className="font-semibold">{highlight(p.name, q)}</span>} />
+                      <ListItemText primary={<span className="font-semibold">{highlight(p.name, q, muiTheme)}</span>} />
                     </ListItem>
                     {idx < globalResults.people.length - 1 && <Divider component="li" />}
                   </React.Fragment>
@@ -111,13 +133,21 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
               </List>
 
               {/* Channels */}
-              <div className="px-3 py-2 text-xs text-gray-500">Channels</div>
+              <div className="px-3 py-2 text-xs" style={{ color: muiTheme.palette.text.secondary }}>Channels</div>
               <List>
                 {globalResults.channels.map((c, idx)=> (
                   <React.Fragment key={c.id}>
-                    <ListItem button onClick={()=>onOpenResult?.({ type:'channel', id:c.id })}>
-                      <ListItemAvatar><Avatar sx={{ bgcolor: EV.light, color:'#111' }}>#</Avatar></ListItemAvatar>
-                      <ListItemText primary={<span className="font-semibold">{highlight(c.name, q)}</span>} />
+                    <ListItem 
+                      button 
+                      onClick={()=>onOpenResult?.({ type:'channel', id:c.id })}
+                      sx={{
+                        '& .MuiListItemText-primary': {
+                          color: 'text.primary',
+                        },
+                      }}
+                    >
+                      <ListItemAvatar><Avatar sx={{ bgcolor: 'background.default', color: 'text.primary' }}>#</Avatar></ListItemAvatar>
+                      <ListItemText primary={<span className="font-semibold">{highlight(c.name, q, muiTheme)}</span>} />
                     </ListItem>
                     {idx < globalResults.channels.length - 1 && <Divider component="li" />}
                   </React.Fragment>
@@ -125,14 +155,25 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
               </List>
 
               {/* Messages */}
-              <div className="px-3 py-2 text-xs text-gray-500">Messages</div>
+              <div className="px-3 py-2 text-xs" style={{ color: muiTheme.palette.text.secondary }}>Messages</div>
               <List>
                 {globalResults.messages.map((m, idx)=> (
                   <React.Fragment key={m.id}>
-                    <ListItem button onClick={()=>onOpenResult?.({ type:'message', id:m.id })}>
+                    <ListItem 
+                      button 
+                      onClick={()=>onOpenResult?.({ type:'message', id:m.id })}
+                      sx={{
+                        '& .MuiListItemText-primary': {
+                          color: 'text.primary',
+                        },
+                        '& .MuiListItemText-secondary': {
+                          color: 'text.secondary',
+                        },
+                      }}
+                    >
                       <ListItemAvatar><Avatar src={m.who.avatar} /></ListItemAvatar>
-                      <ListItemText primary={<span className="font-semibold">{highlight(m.who.name, q)}</span>} secondary={<span className="text-[12px] text-gray-600">{highlight(m.snippet, q)}</span>} />
-                      <span className="text-[11px] text-gray-500 ml-2">{m.time}</span>
+                      <ListItemText primary={<span className="font-semibold">{highlight(m.who.name, q, muiTheme)}</span>} secondary={<span className="text-[12px]">{highlight(m.snippet, q, muiTheme)}</span>} />
+                      <span className="text-[11px] ml-2" style={{ color: muiTheme.palette.text.secondary }}>{m.time}</span>
                     </ListItem>
                     {idx < globalResults.messages.length - 1 && <Divider component="li" />}
                   </React.Fragment>
@@ -145,10 +186,19 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
             <List>
               {threadResults.map((t, idx)=> (
                 <React.Fragment key={t.id}>
-                  <ListItem>
+                  <ListItem
+                    sx={{
+                      '& .MuiListItemText-primary': {
+                        color: 'text.primary',
+                      },
+                      '& .MuiListItemText-secondary': {
+                        color: 'text.secondary',
+                      },
+                    }}
+                  >
                     <ListItemAvatar><Avatar src={t.who.avatar} /></ListItemAvatar>
-                    <ListItemText primary={<span className="font-semibold">{t.who.name}</span>} secondary={<span className="text-[12px] text-gray-600">{highlight(t.text, q)}</span>} />
-                    <span className="text-[11px] text-gray-500 ml-2">{t.time}</span>
+                    <ListItemText primary={<span className="font-semibold">{t.who.name}</span>} secondary={<span className="text-[12px]">{highlight(t.text, q, muiTheme)}</span>} />
+                    <span className="text-[11px] ml-2" style={{ color: muiTheme.palette.text.secondary }}>{t.time}</span>
                   </ListItem>
                   {idx < threadResults.length - 1 && <Divider component="li" />}
                 </React.Fragment>

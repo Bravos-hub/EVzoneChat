@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { useTheme as useMuiTheme } from "@mui/material/styles";
 import {
   AppBar,
   Toolbar,
@@ -28,6 +29,7 @@ const DEMO = [
  * Filter by type and open item via onOpen(item)
  */
 export default function ConversationGallery({ onBack, items = DEMO, onOpen }) {
+  const muiTheme = useMuiTheme();
   const [filter, setFilter] = useState('All');
   const types = ['All','Images','Videos','Audio','Docs'];
 
@@ -44,11 +46,11 @@ export default function ConversationGallery({ onBack, items = DEMO, onOpen }) {
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
 
-      <Box className="w-full h-full mx-auto bg-white flex flex-col">
-        <AppBar elevation={0} position="static" sx={{ bgcolor:'#fff', color:'#111', borderBottom:`1px solid ${EV.light}` }}>
+      <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.paper' }}>
+        <AppBar elevation={0} position="static" sx={{ bgcolor:'background.paper', color:'text.primary', borderBottom:`1px solid ${muiTheme.palette.divider}` }}>
           <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back"><ArrowBackRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold ml-1">Media</Typography>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary' }}><ArrowBackRoundedIcon /></IconButton>
+            <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>Media</Typography>
           </Toolbar>
         </AppBar>
 
@@ -56,8 +58,16 @@ export default function ConversationGallery({ onBack, items = DEMO, onOpen }) {
         <Box className="px-3 py-2">
           <div className="flex gap-2 flex-wrap">
             {types.map(t => (
-              <Chip key={t} label={t} onClick={()=>setFilter(t)}
-                    sx={{ bgcolor: filter===t?EV.green:EV.light, color: filter===t?'#fff':'#111', '&:hover':{ bgcolor: filter===t?'#02b37b':'#e9e9e9' } }} />
+              <Chip 
+                key={t} 
+                label={t} 
+                onClick={()=>setFilter(t)}
+                sx={{ 
+                  bgcolor: filter===t?EV.green:'background.default', 
+                  color: filter===t?'#fff':'text.primary', 
+                  '&:hover':{ bgcolor: filter===t?'#02b37b':'action.hover' } 
+                }} 
+              />
             ))}
           </div>
         </Box>
@@ -67,7 +77,7 @@ export default function ConversationGallery({ onBack, items = DEMO, onOpen }) {
           <Grid container spacing={1.2} className="px-3 pb-3">
             {list.map((it) => (
               <Grid item xs={4} key={it.id}>
-                <Card elevation={0} sx={{ borderRadius: 2, overflow:'hidden', border:`1px solid ${EV.light}` }}>
+                <Card elevation={0} sx={{ borderRadius: 2, overflow:'hidden', border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
                   <CardActionArea onClick={()=>onOpen?.(it)}>
                     <CardMedia component="img" src={it.thumb || it.src} alt="thumb" sx={{ height: '6.125rem', objectFit:'cover' }} />
                     <div className="absolute bottom-1 left-1 inline-flex items-center gap-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded-full">

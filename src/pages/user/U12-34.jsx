@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { useTheme as useMuiTheme } from "@mui/material/styles";
 import {
   AppBar,
   Toolbar,
@@ -25,7 +26,7 @@ import ReportRoundedIcon from "@mui/icons-material/ReportRounded";
 import BlockRoundedIcon from "@mui/icons-material/BlockRounded";
 import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
 
-const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
+// const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
 /**
  * U12-34 — Safety Center
@@ -35,6 +36,8 @@ const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2
  * - Blocked words notice
  */
 export default function SafetyCenter({ onBack }) {
+  const muiTheme = useMuiTheme();
+  // const { actualMode } = useTheme();
   const [recordConsent, setRecordConsent] = useState(false);
   const [remindSensitive, setRemindSensitive] = useState(true);
   const [module, setModule] = useState('Medical');
@@ -55,39 +58,39 @@ export default function SafetyCenter({ onBack }) {
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
 
-      <Box className="w-full h-full mx-auto bg-white flex flex-col">
-        <AppBar elevation={0} position="static" sx={{ bgcolor:'#fff', color:'#111', borderBottom:`1px solid ${EV.light}` }}>
+      <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.default' }}>
+        <AppBar elevation={0} position="static" sx={{ bgcolor: 'background.paper', color: 'text.primary', borderBottom:`1px solid ${muiTheme.palette.divider}` }}>
           <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back"><ArrowBackRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold ml-1">Safety Center</Typography>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary' }}><ArrowBackRoundedIcon /></IconButton>
+            <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>Safety Center</Typography>
           </Toolbar>
         </AppBar>
 
         <Box className="flex-1 p-3 space-y-3 no-scrollbar" sx={{ overflowY:'auto' }}>
           {/* Recording consent */}
-          <Paper elevation={0} sx={{ border:`1px solid ${EV.light}`, borderRadius:2, p:2 }}>
-            <div className="flex items-center gap-2 mb-1"><PrivacyTipRoundedIcon/><span className="font-semibold">Recording consent</span></div>
+          <Paper elevation={0} sx={{ border:`1px solid ${muiTheme.palette.divider}`, borderRadius:2, p:2, bgcolor: 'background.paper' }}>
+            <div className="flex items-center gap-2 mb-1" style={{ color: muiTheme.palette.text.primary }}><PrivacyTipRoundedIcon/><span className="font-semibold">Recording consent</span></div>
             <FormGroup>
-              <FormControlLabel control={<Switch checked={recordConsent} onChange={(e)=>setRecordConsent(e.target.checked)} />} label="I consent to call recording when enabled" />
+              <FormControlLabel control={<Switch checked={recordConsent} onChange={(e)=>setRecordConsent(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary }}>I consent to call recording when enabled</span>} />
             </FormGroup>
             <Alert severity="info" sx={{ mt: 1 }}>When recording is on, a banner is shown to all participants and a tone may play.</Alert>
           </Paper>
 
           {/* Sensitive context reminders */}
-          <Paper elevation={0} sx={{ border:`1px solid ${EV.light}`, borderRadius:2, p:2 }}>
-            <div className="flex items-center gap-2 mb-1"><InfoRoundedIcon/><span className="font-semibold">Sensitive contexts</span></div>
-            <div className="text-sm text-gray-700 mb-2">These modules apply stricter privacy rules and may limit AI features:</div>
+          <Paper elevation={0} sx={{ border:`1px solid ${muiTheme.palette.divider}`, borderRadius:2, p:2, bgcolor: 'background.paper' }}>
+            <div className="flex items-center gap-2 mb-1" style={{ color: muiTheme.palette.text.primary }}><InfoRoundedIcon/><span className="font-semibold">Sensitive contexts</span></div>
+            <div className="text-sm mb-2" style={{ color: muiTheme.palette.text.primary }}>These modules apply stricter privacy rules and may limit AI features:</div>
             <div className="flex gap-2 flex-wrap mb-2">
-              {sensitiveModules.map(m => (<Chip key={m} size="small" label={m} sx={{ bgcolor: EV.light }} />))}
+              {sensitiveModules.map(m => (<Chip key={m} size="small" label={m} sx={{ bgcolor: 'background.default', color: 'text.primary' }} />))}
             </div>
             <FormGroup>
-              <FormControlLabel control={<Switch checked={remindSensitive} onChange={(e)=>setRemindSensitive(e.target.checked)} />} label="Show reminders when I chat in sensitive modules" />
+              <FormControlLabel control={<Switch checked={remindSensitive} onChange={(e)=>setRemindSensitive(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary }}>Show reminders when I chat in sensitive modules</span>} />
             </FormGroup>
           </Paper>
 
           {/* Report abuse */}
-          <Paper elevation={0} sx={{ border:`1px solid ${EV.light}`, borderRadius:2, p:2 }}>
-            <div className="flex items-center gap-2 mb-1"><ReportRoundedIcon/><span className="font-semibold">Report abuse</span></div>
+          <Paper elevation={0} sx={{ border:`1px solid ${muiTheme.palette.divider}`, borderRadius:2, p:2, bgcolor: 'background.paper' }}>
+            <div className="flex items-center gap-2 mb-1" style={{ color: muiTheme.palette.text.primary }}><ReportRoundedIcon/><span className="font-semibold">Report abuse</span></div>
             <div className="grid grid-cols-2 gap-2 mb-2 items-end">
               <FormControl size="small">
                 <InputLabel>Module</InputLabel>
@@ -108,25 +111,25 @@ export default function SafetyCenter({ onBack }) {
             </div>
             <TextField multiline minRows={3} fullWidth placeholder="Describe what happened (no personal data)" value={details} onChange={(e)=>setDetails(e.target.value)} />
             <div className="mt-2 flex justify-end">
-              <Button onClick={submitReport} startIcon={<ReportRoundedIcon/>} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>Submit report</Button>
+              <Button onClick={submitReport} startIcon={<ReportRoundedIcon/>} variant="contained" sx={{ textTransform:'none' }}>Submit report</Button>
             </div>
           </Paper>
 
           {/* Blocked words notice */}
-          <Paper elevation={0} sx={{ border:`1px solid ${EV.light}`, borderRadius:2, p:2 }}>
-            <div className="flex items-center gap-2 mb-1"><BlockRoundedIcon/><span className="font-semibold">Blocked words & contact masking</span></div>
-            <div className="text-sm text-gray-700">Messages may be filtered or masked if they contain these items in certain modules:</div>
+          <Paper elevation={0} sx={{ border:`1px solid ${muiTheme.palette.divider}`, borderRadius:2, p:2, bgcolor: 'background.paper' }}>
+            <div className="flex items-center gap-2 mb-1" style={{ color: muiTheme.palette.text.primary }}><BlockRoundedIcon/><span className="font-semibold">Blocked words & contact masking</span></div>
+            <div className="text-sm" style={{ color: muiTheme.palette.text.primary }}>Messages may be filtered or masked if they contain these items in certain modules:</div>
             <div className="flex gap-2 flex-wrap mt-2">
-              {bannedWords.map(w => (<Chip key={w} size="small" label={w} sx={{ bgcolor: EV.light }} />))}
-              <Chip size="small" label="emails/phones masked in Marketplace" sx={{ bgcolor: EV.light }} />
+              {bannedWords.map(w => (<Chip key={w} size="small" label={w} sx={{ bgcolor: 'background.default', color: 'text.primary' }} />))}
+              <Chip size="small" label="emails/phones masked in Marketplace" sx={{ bgcolor: 'background.default', color: 'text.primary' }} />
             </div>
           </Paper>
         </Box>
 
         <Box className="px-3 pb-3">
           <div className="grid grid-cols-2 gap-2">
-            <Button variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Close</Button>
-            <Button onClick={()=>setSnack('Safety preferences saved')} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>Save</Button>
+            <Button variant="outlined" sx={{ textTransform:'none' }}>Close</Button>
+            <Button onClick={()=>setSnack('Safety preferences saved')} variant="contained" sx={{ textTransform:'none' }}>Save</Button>
           </div>
         </Box>
       </Box>

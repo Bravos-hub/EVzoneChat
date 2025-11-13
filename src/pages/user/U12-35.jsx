@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTheme as useMuiTheme } from "@mui/material/styles";
 import {
   AppBar,
   Toolbar,
@@ -22,6 +23,7 @@ const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2
  * Demo banners and message states for offline/queued, reconnecting, and attachment errors.
  */
 export default function EdgeStatesDemo({ onBack }) {
+  const muiTheme = useMuiTheme();
   const [offline, setOffline] = useState(false);
   const [reconnecting, setReconnecting] = useState(false);
   const [messages, setMessages] = useState([
@@ -43,11 +45,11 @@ export default function EdgeStatesDemo({ onBack }) {
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
 
-      <Box className="w-full h-full mx-auto bg-white flex flex-col">
-        <AppBar elevation={0} position="static" sx={{ bgcolor:'#fff', color:'#111', borderBottom:`1px solid ${EV.light}` }}>
+      <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.paper' }}>
+        <AppBar elevation={0} position="static" sx={{ bgcolor:'background.paper', color:'text.primary', borderBottom:`1px solid ${muiTheme.palette.divider}` }}>
           <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back"><ArrowBackRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold ml-1">Edge states</Typography>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary' }}><ArrowBackRoundedIcon /></IconButton>
+            <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>Edge states</Typography>
           </Toolbar>
         </AppBar>
 
@@ -62,18 +64,18 @@ export default function EdgeStatesDemo({ onBack }) {
         <Box className="flex-1 p-3 no-scrollbar" sx={{ overflowY:'auto' }}>
           <div className="space-y-2">
             {messages.map(m => (
-              <Paper key={m.id} variant="outlined" sx={{ p:1.25, borderColor: EV.light }}>
-                <div className="text-[12px] text-gray-600">{m.who} • {m.at}</div>
-                <div className="text-[14px]">{m.text}</div>
+              <Paper key={m.id} variant="outlined" sx={{ p:1.25, borderColor: 'divider', bgcolor: 'background.paper' }}>
+                <div className="text-[12px]" style={{ color: muiTheme.palette.text.secondary }}>{m.who} • {m.at}</div>
+                <div className="text-[14px]" style={{ color: muiTheme.palette.text.primary }}>{m.text}</div>
                 <div className="mt-1 text-[11px] flex items-center gap-2">
-                  {m.state==='sent' && <Chip size="small" label="Sent" sx={{ bgcolor: EV.light }} />}
-                  {m.state==='uploading' && <Chip size="small" icon={<AttachFileRoundedIcon sx={{ fontSize:14 }} />} label="Uploading…" sx={{ bgcolor: EV.light }} />}
-                  {m.state==='queued' && <Chip size="small" label="Queued (offline)" sx={{ bgcolor: EV.light }} />}
+                  {m.state==='sent' && <Chip size="small" label="Sent" sx={{ bgcolor: 'background.default', color: 'text.primary' }} />}
+                  {m.state==='uploading' && <Chip size="small" icon={<AttachFileRoundedIcon sx={{ fontSize:14 }} />} label="Uploading…" sx={{ bgcolor: 'background.default', color: 'text.primary' }} />}
+                  {m.state==='queued' && <Chip size="small" label="Queued (offline)" sx={{ bgcolor: 'background.default', color: 'text.primary' }} />}
                   {m.state==='error' && (
                     <>
                       <Chip size="small" label="Failed" sx={{ bgcolor: '#fdecea', color:'#b71c1c' }} />
-                      <span className="text-red-700">{m.error}</span>
-                      <Button onClick={()=>retryError(m.id)} size="small" variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Retry</Button>
+                      <span style={{ color: '#b71c1c' }}>{m.error}</span>
+                      <Button onClick={()=>retryError(m.id)} size="small" variant="outlined" sx={{ textTransform:'none' }}>Retry</Button>
                     </>
                   )}
                 </div>

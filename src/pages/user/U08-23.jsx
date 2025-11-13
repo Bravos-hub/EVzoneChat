@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { useTheme as useMuiTheme } from "@mui/material/styles";
 import {
   AppBar,
   Toolbar,
@@ -25,7 +26,7 @@ import ManageAccountsRoundedIcon from "@mui/icons-material/ManageAccountsRounded
 import PersonAddAlt1RoundedIcon from "@mui/icons-material/PersonAddAlt1Rounded";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
 
-const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
+// const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
 const DEMO_MEMBERS = [
   { id:'u1', name:'Leslie Alexander', role:'admin', avatar:'https://i.pravatar.cc/100?img=5' },
@@ -41,6 +42,8 @@ const DEMO_MEMBERS = [
  * - Moderation controls (pre-approval, admin-only, banned words)
  */
 export default function GroupChannelDetailsModeration({ onBack, onInvite }) {
+  const muiTheme = useMuiTheme();
+  // const { actualMode } = useTheme();
   const [snack, setSnack] = useState('');
   const [members, setMembers] = useState(DEMO_MEMBERS);
   const [search, setSearch] = useState('');
@@ -61,75 +64,78 @@ export default function GroupChannelDetailsModeration({ onBack, onInvite }) {
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
 
-      <Box className="w-full h-full mx-auto bg-white flex flex-col">
-        <AppBar elevation={0} position="static" sx={{ bgcolor:'#fff', color:'#111', borderBottom:`1px solid ${EV.light}` }}>
+      <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.default' }}>
+        <AppBar elevation={0} position="static" sx={{ bgcolor: 'background.paper', color: 'text.primary', borderBottom:`1px solid ${muiTheme.palette.divider}` }}>
           <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back"><ArrowBackRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold ml-1">Group details</Typography>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary' }}><ArrowBackRoundedIcon /></IconButton>
+            <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>Group details</Typography>
           </Toolbar>
         </AppBar>
 
         <Box className="p-3 space-y-3 flex-1 no-scrollbar" sx={{ overflowY:'auto' }}>
           {/* header info */}
-          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${EV.light}` }}>
+          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
             <div className="flex items-center gap-2">
-              <Typography variant="subtitle1" className="font-semibold">Charging Crew — Kampala</Typography>
-              <Chip size="small" label="Open" sx={{ bgcolor: EV.light }} />
-              <Chip size="small" label={adminOnly? 'Admin-only' : (preApproval? 'Pre-approval' : 'Auto-approve')} sx={{ bgcolor: EV.light }} />
+              <Typography variant="subtitle1" className="font-semibold" sx={{ color: 'text.primary' }}>Charging Crew — Kampala</Typography>
+              <Chip size="small" label="Open" sx={{ bgcolor: 'background.default', color: 'text.primary' }} />
+              <Chip size="small" label={adminOnly? 'Admin-only' : (preApproval? 'Pre-approval' : 'Auto-approve')} sx={{ bgcolor: 'background.default', color: 'text.primary' }} />
             </div>
-            <div className="text-sm text-gray-700 mt-1">For technicians and riders to coordinate charging tasks around Kampala.</div>
+            <div className="text-sm mt-1" style={{ color: muiTheme.palette.text.primary }}>For technicians and riders to coordinate charging tasks around Kampala.</div>
           </Box>
 
           {/* guidelines */}
-          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${EV.light}` }}>
-            <div className="font-semibold mb-1">Guidelines</div>
-            <div className="text-sm text-gray-700 whitespace-pre-wrap">• Be respectful\n• Stay on topic\n• No personal info or external solicitations</div>
+          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
+            <div className="font-semibold mb-1" style={{ color: muiTheme.palette.text.primary }}>Guidelines</div>
+            <div className="text-sm whitespace-pre-wrap" style={{ color: muiTheme.palette.text.primary }}>• Be respectful\n• Stay on topic\n• No personal info or external solicitations</div>
           </Box>
 
           {/* pinned */}
-          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${EV.light}` }}>
-            <div className="flex items-center gap-2 mb-1"><PushPinRoundedIcon/><span className="font-semibold">Pinned</span></div>
-            <div className="text-sm text-gray-700">Welcome post, Safety checklist, Shift schedule</div>
+          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
+            <div className="flex items-center gap-2 mb-1" style={{ color: muiTheme.palette.text.primary }}><PushPinRoundedIcon/><span className="font-semibold">Pinned</span></div>
+            <div className="text-sm" style={{ color: muiTheme.palette.text.primary }}>Welcome post, Safety checklist, Shift schedule</div>
           </Box>
 
           {/* members */}
-          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${EV.light}` }}>
+          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
             <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2"><ManageAccountsRoundedIcon/><span className="font-semibold">Members</span></div>
-              <Button startIcon={<PersonAddAlt1RoundedIcon/>} onClick={onInvite} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>Invite</Button>
+              <div className="flex items-center gap-2" style={{ color: muiTheme.palette.text.primary }}><ManageAccountsRoundedIcon/><span className="font-semibold">Members</span></div>
+              <Button startIcon={<PersonAddAlt1RoundedIcon/>} onClick={onInvite} variant="contained" sx={{ textTransform:'none' }}>Invite</Button>
             </div>
             <TextField fullWidth size="small" placeholder="Search members" value={search} onChange={(e)=>setSearch(e.target.value)} />
-            <List className="no-scrollbar" sx={{ maxHeight: 260, overflowY:'auto', mt:1 }}>
+            <List className="no-scrollbar" sx={{ maxHeight: 260, overflowY:'auto', mt:1, border: `1px solid ${muiTheme.palette.divider}`, borderRadius: 2, bgcolor: 'background.paper' }}>
               {filtered.map(m => (
                 <ListItem key={m.id} secondaryAction={
                   <div className="flex items-center gap-1">
                     {m.role!=='admin' && (
-                      <Button size="small" onClick={()=>promote(m.id)} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Promote</Button>
+                      <Button size="small" onClick={()=>promote(m.id)} variant="outlined" sx={{ textTransform:'none' }}>Promote</Button>
                     )}
                     {m.role!=='member' && (
-                      <Button size="small" onClick={()=>demote(m.id)} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Demote</Button>
+                      <Button size="small" onClick={()=>demote(m.id)} variant="outlined" sx={{ textTransform:'none' }}>Demote</Button>
                     )}
-                    <Button size="small" onClick={()=>remove(m.id)} startIcon={<DeleteOutlineRoundedIcon/>} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Remove</Button>
+                    <Button size="small" onClick={()=>remove(m.id)} startIcon={<DeleteOutlineRoundedIcon/>} variant="outlined" sx={{ textTransform:'none' }}>Remove</Button>
                   </div>
                 }>
                   <ListItemAvatar><Avatar src={m.avatar} /></ListItemAvatar>
-                  <ListItemText primary={<span className="font-semibold">{m.name}</span>} secondary={m.role} />
+                  <ListItemText 
+                    primary={<span className="font-semibold" style={{ color: muiTheme.palette.text.primary }}>{m.name}</span>} 
+                    secondary={<span style={{ color: muiTheme.palette.text.secondary }}>{m.role}</span>} 
+                  />
                 </ListItem>
               ))}
             </List>
           </Box>
 
           {/* moderation controls */}
-          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${EV.light}` }}>
-            <div className="font-semibold mb-1">Moderation</div>
+          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
+            <div className="font-semibold mb-1" style={{ color: muiTheme.palette.text.primary }}>Moderation</div>
             <FormGroup>
-              <FormControlLabel control={<Switch checked={preApproval} onChange={(e)=>setPreApproval(e.target.checked)} />} label="Require pre‑approval for posts" />
-              <FormControlLabel control={<Switch checked={adminOnly} onChange={(e)=>setAdminOnly(e.target.checked)} />} label="Admins only can post (announcement)" />
+              <FormControlLabel control={<Switch checked={preApproval} onChange={(e)=>setPreApproval(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary }}>Require pre‑approval for posts</span>} />
+              <FormControlLabel control={<Switch checked={adminOnly} onChange={(e)=>setAdminOnly(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary }}>Admins only can post (announcement)</span>} />
             </FormGroup>
             <TextField fullWidth size="small" label="Banned words (comma‑separated)" value={banned} onChange={(e)=>setBanned(e.target.value)} sx={{ mt:1 }} />
             <div className="mt-2 grid grid-cols-2 gap-2">
-              <Button variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }} onClick={()=>{ setPreApproval(false); setAdminOnly(false); setBanned(''); }}>Reset</Button>
-              <Button variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }} onClick={saveModeration}>Save</Button>
+              <Button variant="outlined" sx={{ textTransform:'none' }} onClick={()=>{ setPreApproval(false); setAdminOnly(false); setBanned(''); }}>Reset</Button>
+              <Button variant="contained" sx={{ textTransform:'none' }} onClick={saveModeration}>Save</Button>
             </div>
           </Box>
         </Box>

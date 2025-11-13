@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useTheme as useMuiTheme } from "@mui/material/styles";
 import {
   AppBar,
   Toolbar,
@@ -22,6 +23,7 @@ const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2
  * Quick tests & troubleshooting for mic, camera, notifications
  */
 export default function PermissionHelpers({ onBack }) {
+  const muiTheme = useMuiTheme();
   const [micOK, setMicOK] = useState(false);
   const [camOK, setCamOK] = useState(false);
   const [notifOK, setNotifOK] = useState(false);
@@ -66,11 +68,11 @@ export default function PermissionHelpers({ onBack }) {
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
 
-      <Box className="w-full h-full mx-auto bg-white flex flex-col">
-        <AppBar elevation={0} position="static" sx={{ bgcolor:'#fff', color:'#111', borderBottom:`1px solid ${EV.light}` }}>
+      <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.paper' }}>
+        <AppBar elevation={0} position="static" sx={{ bgcolor:'background.paper', color:'text.primary', borderBottom:`1px solid ${muiTheme.palette.divider}` }}>
           <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back"><ArrowBackRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold ml-1">Permission helpers</Typography>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary' }}><ArrowBackRoundedIcon /></IconButton>
+            <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>Permission helpers</Typography>
           </Toolbar>
         </AppBar>
 
@@ -78,33 +80,33 @@ export default function PermissionHelpers({ onBack }) {
 
         <Box className="flex-1 p-3 space-y-3 no-scrollbar" sx={{ overflowY:'auto' }}>
           {/* Mic */}
-          <Paper elevation={0} sx={{ border:`1px solid ${EV.light}`, borderRadius:2, p:2 }}>
-            <div className="flex items-center gap-2 mb-1"><MicRoundedIcon/><span className="font-semibold">Microphone</span></div>
-            <div className="text-sm text-gray-700 mb-2">Check OS/browser access. If blocked, enable “Microphone” in site settings.</div>
+          <Paper elevation={0} sx={{ border:`1px solid ${muiTheme.palette.divider}`, borderRadius:2, p:2, bgcolor: 'background.paper' }}>
+            <div className="flex items-center gap-2 mb-1" style={{ color: muiTheme.palette.text.primary }}><MicRoundedIcon/><span className="font-semibold">Microphone</span></div>
+            <div className="text-sm mb-2" style={{ color: muiTheme.palette.text.secondary }}>Check OS/browser access. If blocked, enable "Microphone" in site settings.</div>
             <div className="flex gap-2">
-              <Button onClick={testMic} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>Test mic</Button>
+              <Button onClick={testMic} variant="contained" sx={{ textTransform:'none' }}>Test mic</Button>
               {micOK && <Chip size="small" label="OK" sx={{ bgcolor: EV.green, color:'#fff' }} />}
             </div>
           </Paper>
 
           {/* Camera */}
-          <Paper elevation={0} sx={{ border:`1px solid ${EV.light}`, borderRadius:2, p:2 }}>
-            <div className="flex items-center gap-2 mb-1"><VideocamRoundedIcon/><span className="font-semibold">Camera</span></div>
-            <div className="text-sm text-gray-700 mb-2">If the preview is black, another app may be using your camera.</div>
+          <Paper elevation={0} sx={{ border:`1px solid ${muiTheme.palette.divider}`, borderRadius:2, p:2, bgcolor: 'background.paper' }}>
+            <div className="flex items-center gap-2 mb-1" style={{ color: muiTheme.palette.text.primary }}><VideocamRoundedIcon/><span className="font-semibold">Camera</span></div>
+            <div className="text-sm mb-2" style={{ color: muiTheme.palette.text.secondary }}>If the preview is black, another app may be using your camera.</div>
             <div className="flex gap-2 items-center">
-              <Button onClick={testCam} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>Start preview</Button>
-              <Button onClick={stopCam} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Stop</Button>
+              <Button onClick={testCam} variant="contained" sx={{ textTransform:'none' }}>Start preview</Button>
+              <Button onClick={stopCam} variant="outlined" sx={{ textTransform:'none' }}>Stop</Button>
               {camOK && <Chip size="small" label="OK" sx={{ bgcolor: EV.green, color:'#fff' }} />}
             </div>
             <video ref={videoRef} className="w-full rounded-md mt-2" autoPlay playsInline muted />
           </Paper>
 
           {/* Notifications */}
-          <Paper elevation={0} sx={{ border:`1px solid ${EV.light}`, borderRadius:2, p:2 }}>
-            <div className="flex items-center gap-2 mb-1"><NotificationsActiveRoundedIcon/><span className="font-semibold">Notifications</span></div>
-            <div className="text-sm text-gray-700 mb-2">On iOS, allow notifications in Settings → Safari/Browser → Notifications.</div>
+          <Paper elevation={0} sx={{ border:`1px solid ${muiTheme.palette.divider}`, borderRadius:2, p:2, bgcolor: 'background.paper' }}>
+            <div className="flex items-center gap-2 mb-1" style={{ color: muiTheme.palette.text.primary }}><NotificationsActiveRoundedIcon/><span className="font-semibold">Notifications</span></div>
+            <div className="text-sm mb-2" style={{ color: muiTheme.palette.text.secondary }}>On iOS, allow notifications in Settings → Safari/Browser → Notifications.</div>
             <div className="flex gap-2 items-center">
-              <Button onClick={testNotif} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>Request permission</Button>
+              <Button onClick={testNotif} variant="contained" sx={{ textTransform:'none' }}>Request permission</Button>
               {notifOK && <Chip size="small" label="OK" sx={{ bgcolor: EV.green, color:'#fff' }} />}
             </div>
           </Paper>
@@ -112,8 +114,8 @@ export default function PermissionHelpers({ onBack }) {
 
         <Box className="px-3 pb-3">
           <div className="grid grid-cols-2 gap-2">
-            <Button variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Close</Button>
-            <Button variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>Done</Button>
+            <Button variant="outlined" sx={{ textTransform:'none' }}>Close</Button>
+            <Button variant="contained" sx={{ textTransform:'none' }}>Done</Button>
           </div>
         </Box>
       </Box>

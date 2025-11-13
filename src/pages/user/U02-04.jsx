@@ -1,4 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
+import { useTheme as useMuiTheme } from "@mui/material/styles";
+import { useLocation } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -32,8 +34,11 @@ const PEOPLE = [
 ];
 
 export default function NewMessagePicker({ onClose, onStart }) {
+  const muiTheme = useMuiTheme();
+  const location = useLocation();
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState([]); // ids
+  const [forwardingMessages, setForwardingMessages] = useState(null);
 
   const filtered = useMemo(() => {
     const s = query.trim().toLowerCase();
@@ -45,14 +50,34 @@ export default function NewMessagePicker({ onClose, onStart }) {
     setSelected((prev) => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   };
 
+  // Check if we're forwarding messages
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const forwardParam = params.get('forward');
+    if (forwardParam) {
+      setForwardingMessages(forwardParam.split(','));
+    }
+  }, [location.search]);
+
   const chips = selected.map(id => PEOPLE.find(p => p.id === id)).filter(Boolean);
+
+  const handleStart = () => {
+    if (selected.length === 0) return;
+    
+    // If forwarding messages, pass them along
+    if (forwardingMessages) {
+      onStart?.(selected, forwardingMessages);
+    } else {
+      onStart?.(selected);
+    }
+  };
 
   return (
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
 
-      <Box className="w-full h-full mx-auto bg-white flex flex-col">
-        <AppBar elevation={0} position="static" sx={{ bgcolor:'#fff', color:'#111', borderBottom:`1px solid ${EV.light}` }}>
+      <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.paper' }}>
+        <AppBar elevation={0} position="static" sx={{ bgcolor: 'background.paper', color: 'text.primary', borderBottom: `1px solid ${muiTheme.palette.divider}` }}>
           <Toolbar className="!min-h-[56px]">
             <IconButton onClick={onClose} aria-label="Close"><CloseRoundedIcon /></IconButton>
             <Typography variant="h6" className="font-bold ml-1">New Message</Typography>
@@ -61,15 +86,26 @@ export default function NewMessagePicker({ onClose, onStart }) {
 
         {/* To: chips + search */}
         <Box className="px-3 pt-3">
-          <div className="text-xs text-gray-600 mb-1">To:</div>
+          <div className="text-xs mb-1" style={{ color: muiTheme.palette.text.secondary }}>To:</div>
           <div className="flex gap-2 flex-wrap mb-2">
             {chips.map((c) => (
-              <Chip key={c.id} avatar={<Avatar src={c.avatar} />} label={c.name} onDelete={() => toggle(c.id)} sx={{ bgcolor: EV.light }} />
+              <Chip key={c.id} avatar={<Avatar src={c.avatar} />} label={c.name} onDelete={() => toggle(c.id)} sx={{ bgcolor: 'background.default', color: 'text.primary' }} />
             ))}
           </div>
           <TextField
             fullWidth size="small" value={query} onChange={(e)=>setQuery(e.target.value)} placeholder="Search people & groups"
-            InputProps={{ startAdornment:(<InputAdornment position="start"><SearchRoundedIcon /></InputAdornment>) }}
+            InputProps={{ 
+              startAdornment:(<InputAdornment position="start"><SearchRoundedIcon sx={{ color: 'text.secondary' }} /></InputAdornment>) 
+            }}
+            sx={{
+              '& .MuiInputBase-input': {
+                color: 'text.primary',
+              },
+              '& .MuiInputBase-input::placeholder': {
+                color: 'text.secondary',
+                opacity: 1,
+              },
+            }}
           />
         </Box>
 
@@ -78,7 +114,18 @@ export default function NewMessagePicker({ onClose, onStart }) {
           <List>
             {filtered.map((p, idx) => (
               <React.Fragment key={p.id}>
-                <ListItem button onClick={()=>toggle(p.id)}>
+                <ListItem 
+                  button 
+                  onClick={()=>toggle(p.id)}
+                  sx={{
+                    '& .MuiListItemText-primary': {
+                      color: 'text.primary',
+                    },
+                    '& .MuiListItemText-secondary': {
+                      color: 'text.secondary',
+                    },
+                  }}
+                >
                   <ListItemAvatar><Avatar src={p.avatar} /></ListItemAvatar>
                   <ListItemText primary={<span className="font-semibold">{p.name}</span>} secondary={p.role} />
                   <Checkbox edge="end" checked={selected.includes(p.id)} sx={{ color: EV.orange, '&.Mui-checked': { color: EV.orange } }} />
@@ -91,8 +138,15 @@ export default function NewMessagePicker({ onClose, onStart }) {
 
         {/* action bar */}
         <Box className="p-3">
-          <Button fullWidth disabled={selected.length===0} onClick={()=>onStart?.(selected)} variant="contained" size="large" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover': { bgcolor: '#e06f00' } }}>
-            Start chat{selected.length>0?` (${selected.length})`:''}
+          <Button 
+            fullWidth 
+            disabled={selected.length===0} 
+            onClick={handleStart} 
+            variant="contained" 
+            size="large" 
+            sx={{ textTransform:'none' }}
+          >
+            {forwardingMessages ? 'Forward' : 'Start chat'}{selected.length>0?` (${selected.length})`:''}
           </Button>
         </Box>
       </Box>

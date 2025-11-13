@@ -8,10 +8,47 @@
 
 html, body, #root { 
   height: 100%; 
-  background: #f2f2f2; 
   margin: 0;
   padding: 0;
   overflow-x: hidden;
+  transition: background-color 0.3s ease;
+}
+
+/* Light mode default */
+body {
+  background: #f2f2f2;
+  color: #111;
+}
+
+/* Dark mode */
+body.dark-mode {
+  background: #121212;
+  color: #fff;
+}
+
+/* Call dialing animation */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+.call-pulse {
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.call-pulse-delayed {
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation-delay: 0.5s;
 }
 
 /* Responsive mobile-first design - fully responsive to all mobile device sizes */

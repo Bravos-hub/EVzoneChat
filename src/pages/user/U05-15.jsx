@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTheme as useMuiTheme } from "@mui/material/styles";
 import {
   AppBar,
   Toolbar,
@@ -26,7 +27,7 @@ import TimelapseRoundedIcon from "@mui/icons-material/TimelapseRounded";
 import ShuffleRoundedIcon from "@mui/icons-material/ShuffleRounded";
 import CampaignRoundedIcon from "@mui/icons-material/CampaignRounded";
 
-const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
+// const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
 const INITIAL_PARTICIPANTS = [
   { id:'u1', name:'Leslie Alexander', avatar:'https://i.pravatar.cc/100?img=5', room:null },
@@ -37,6 +38,7 @@ const INITIAL_PARTICIPANTS = [
 ];
 
 export default function BreakoutRoomsManager({ onBack }) {
+  const muiTheme = useMuiTheme();
   const [rooms, setRooms] = useState([{ id:'r1', name:'Room 1', open:false }, { id:'r2', name:'Room 2', open:false }]);
   const [people, setPeople] = useState(INITIAL_PARTICIPANTS);
   const [timerMin, setTimerMin] = useState(10);
@@ -78,11 +80,11 @@ export default function BreakoutRoomsManager({ onBack }) {
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
 
-      <Box className="w-full h-full mx-auto bg-white flex flex-col">
-        <AppBar elevation={0} position="static" sx={{ bgcolor:'#fff', color:'#111', borderBottom:`1px solid ${EV.light}` }}>
+      <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.paper' }}>
+        <AppBar elevation={0} position="static" sx={{ bgcolor:'background.paper', color:'text.primary', borderBottom:`1px solid ${muiTheme.palette.divider}` }}>
           <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back"><ArrowBackRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold ml-1">Breakout Rooms</Typography>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary' }}><ArrowBackRoundedIcon /></IconButton>
+            <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>Breakout Rooms</Typography>
           </Toolbar>
         </AppBar>
 
@@ -91,10 +93,10 @@ export default function BreakoutRoomsManager({ onBack }) {
         <Box className="p-3 space-y-3">
           {/* room controls */}
           <div className="grid grid-cols-3 gap-2">
-            <Button startIcon={<GroupAddRoundedIcon/>} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }} onClick={()=>setRooms(rs => [...rs, { id:`r${rs.length+1}`, name:`Room ${rs.length+1}`, open:false }])}>Add room</Button>
-            <Button startIcon={<ShuffleRoundedIcon/>} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }} onClick={randomize}>Randomize</Button>
+            <Button startIcon={<GroupAddRoundedIcon/>} variant="outlined" sx={{ textTransform:'none' }} onClick={()=>setRooms(rs => [...rs, { id:`r${rs.length+1}`, name:`Room ${rs.length+1}`, open:false }])}>Add room</Button>
+            <Button startIcon={<ShuffleRoundedIcon/>} variant="outlined" sx={{ textTransform:'none' }} onClick={randomize}>Randomize</Button>
             {!rooms.some(r=>r.open) ? (
-              <Button variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }} onClick={openAll}>Open all</Button>
+              <Button variant="contained" sx={{ textTransform:'none' }} onClick={openAll}>Open all</Button>
             ) : (
               <Button variant="contained" sx={{ bgcolor:'#e53935', textTransform:'none', '&:hover':{ bgcolor:'#c62828' } }} onClick={closeAll}>Close all</Button>
             )}
@@ -104,29 +106,50 @@ export default function BreakoutRoomsManager({ onBack }) {
 
           {/* timer + broadcast */}
           <div className="grid grid-cols-3 gap-2 items-end">
-            <TextField label="Timer (min)" type="number" size="small" value={timerMin} onChange={(e)=>setTimerMin(parseInt(e.target.value||'0',10))} />
+            <TextField 
+              label="Timer (min)" 
+              type="number" 
+              size="small" 
+              value={timerMin} 
+              onChange={(e)=>setTimerMin(parseInt(e.target.value||'0',10))}
+              sx={{
+                '& .MuiInputBase-input': {
+                  color: 'text.primary',
+                },
+              }}
+            />
             {!remaining ? (
-              <Button startIcon={<TimelapseRoundedIcon/>} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }} onClick={startTimer}>Start</Button>
+              <Button startIcon={<TimelapseRoundedIcon/>} variant="outlined" sx={{ textTransform:'none' }} onClick={startTimer}>Start</Button>
             ) : (
-              <Button startIcon={<TimelapseRoundedIcon/>} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }} onClick={stopTimer}>Stop</Button>
+              <Button startIcon={<TimelapseRoundedIcon/>} variant="outlined" sx={{ textTransform:'none' }} onClick={stopTimer}>Stop</Button>
             )}
-            <div className="text-right text-sm text-gray-600">{remaining != null ? `${String(Math.floor(remaining/60)).padStart(2,'0')}:${String(remaining%60).padStart(2,'0')}` : '—:—'}</div>
+            <div className="text-right text-sm" style={{ color: muiTheme.palette.text.secondary }}>{remaining != null ? `${String(Math.floor(remaining/60)).padStart(2,'0')}:${String(remaining%60).padStart(2,'0')}` : '—:—'}</div>
           </div>
 
           <div className="grid grid-cols-3 gap-2 items-end">
-            <TextField label="Broadcast message" size="small" value={broadcast} onChange={(e)=>setBroadcast(e.target.value)} />
+            <TextField 
+              label="Broadcast message" 
+              size="small" 
+              value={broadcast} 
+              onChange={(e)=>setBroadcast(e.target.value)}
+              sx={{
+                '& .MuiInputBase-input': {
+                  color: 'text.primary',
+                },
+              }}
+            />
             <div />
-            <Button startIcon={<CampaignRoundedIcon/>} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }} onClick={sendBroadcast}>Broadcast</Button>
+            <Button startIcon={<CampaignRoundedIcon/>} variant="contained" sx={{ textTransform:'none' }} onClick={sendBroadcast}>Broadcast</Button>
           </div>
 
           <Divider />
 
           {/* Unassigned */}
           <div className="flex items-center justify-between">
-            <Typography variant="subtitle2" className="font-semibold">Unassigned</Typography>
-            <Chip size="small" label={groups.unassigned.length} sx={{ bgcolor: EV.light }} />
+            <Typography variant="subtitle2" className="font-semibold" sx={{ color: 'text.primary' }}>Unassigned</Typography>
+            <Chip size="small" label={groups.unassigned.length} sx={{ bgcolor: 'background.default', color: 'text.primary' }} />
           </div>
-          <List className="no-scrollbar" sx={{ maxHeight: 160, overflowY:'auto', border:`1px solid ${EV.light}`, borderRadius: 2 }}>
+          <List className="no-scrollbar" sx={{ maxHeight: 160, overflowY:'auto', border:`1px solid ${muiTheme.palette.divider}`, borderRadius: 2, bgcolor: 'background.paper' }}>
             {groups.unassigned.map(p => (
               <ListItem key={p.id} secondaryAction={
                 <FormControl size="small" sx={{ minWidth: 110 }}>
@@ -147,20 +170,31 @@ export default function BreakoutRoomsManager({ onBack }) {
           {rooms.map(r => (
             <Box key={r.id} className="mt-2">
               <div className="flex items-center justify-between">
-                <Typography variant="subtitle2" className="font-semibold">{r.name} {r.open ? '• Open' : '• Closed'}</Typography>
-                <Chip size="small" label={(groups.byRoom[r.id] || []).length} sx={{ bgcolor: EV.light }} />
+                <Typography variant="subtitle2" className="font-semibold" sx={{ color: 'text.primary' }}>{r.name} {r.open ? '• Open' : '• Closed'}</Typography>
+                <Chip size="small" label={(groups.byRoom[r.id] || []).length} sx={{ bgcolor: 'background.default', color: 'text.primary' }} />
               </div>
-              <List className="no-scrollbar" sx={{ maxHeight: 160, overflowY:'auto', border:`1px solid ${EV.light}`, borderRadius: 2 }}>
+              <List className="no-scrollbar" sx={{ maxHeight: 160, overflowY:'auto', border:`1px solid ${muiTheme.palette.divider}`, borderRadius: 2, bgcolor: 'background.paper' }}>
                 {(groups.byRoom[r.id] || []).map(p => (
-                  <ListItem key={p.id} secondaryAction={
-                    <FormControl size="small" sx={{ minWidth: 110 }}>
-                      <InputLabel>Move to</InputLabel>
-                      <Select label="Move to" value={p.room} onChange={(e)=>move(p.id, e.target.value)}>
-                        {rooms.map(rr => (<MenuItem key={rr.id} value={rr.id}>{rr.name}</MenuItem>))}
-                        <MenuItem value="">Unassigned</MenuItem>
-                      </Select>
-                    </FormControl>
-                  }>
+                  <ListItem 
+                    key={p.id} 
+                    secondaryAction={
+                      <FormControl size="small" sx={{ minWidth: 110 }}>
+                        <InputLabel>Move to</InputLabel>
+                        <Select label="Move to" value={p.room} onChange={(e)=>move(p.id, e.target.value)}>
+                          {rooms.map(rr => (<MenuItem key={rr.id} value={rr.id}>{rr.name}</MenuItem>))}
+                          <MenuItem value="">Unassigned</MenuItem>
+                        </Select>
+                      </FormControl>
+                    }
+                    sx={{
+                      '& .MuiListItemText-primary': {
+                        color: 'text.primary',
+                      },
+                      '& .MuiListItemText-secondary': {
+                        color: 'text.secondary',
+                      },
+                    }}
+                  >
                     <ListItemAvatar><Avatar src={p.avatar} /></ListItemAvatar>
                     <ListItemText primary={<span className="font-semibold">{p.name}</span>} secondary={`In ${r.name}`} />
                   </ListItem>

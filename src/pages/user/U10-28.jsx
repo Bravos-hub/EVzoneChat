@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { useTheme as useMuiTheme } from "@mui/material/styles";
 import {
   AppBar,
   Toolbar,
@@ -43,6 +44,8 @@ const SESSIONS = [
  * U10-28 — Security (Sessions & Devices + 2FA)
  */
 export default function SecuritySessionsDevices({ onBack }) {
+  const muiTheme = useMuiTheme();
+  // const { actualMode } = useTheme();
   const [snack, setSnack] = useState('');
   const [sessions, setSessions] = useState(SESSIONS);
   const [twoFA, setTwoFA] = useState(false);
@@ -59,17 +62,17 @@ export default function SecuritySessionsDevices({ onBack }) {
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
 
-      <Box className="w-full h-full mx-auto bg-white flex flex-col">
-        <AppBar elevation={0} position="static" sx={{ bgcolor:'#fff', color:'#111', borderBottom:`1px solid ${EV.light}` }}>
+      <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.default' }}>
+        <AppBar elevation={0} position="static" sx={{ bgcolor:'background.paper', color:'text.primary', borderBottom:`1px solid ${muiTheme.palette.divider}` }}>
           <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back"><ArrowBackRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold ml-1">Security</Typography>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary' }}><ArrowBackRoundedIcon /></IconButton>
+            <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>Security</Typography>
           </Toolbar>
         </AppBar>
 
         <Box className="flex-1 p-3 no-scrollbar" sx={{ overflowY:'auto' }}>
           {/* Sessions */}
-          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${EV.light}` }}>
+          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
             <div className="flex items-center gap-2 mb-1"><DevicesOtherRoundedIcon/><span className="font-semibold">Sessions & devices</span></div>
             <List className="no-scrollbar" sx={{ maxHeight: 260, overflowY:'auto' }}>
               {sessions.map(s => (
@@ -91,10 +94,10 @@ export default function SecuritySessionsDevices({ onBack }) {
           </Box>
 
           {/* 2FA */}
-          <Box className="rounded-2xl p-3 mt-3" sx={{ border:`1px solid ${EV.light}` }}>
-            <div className="flex items-center gap-2 mb-1"><SecurityRoundedIcon/><span className="font-semibold">Two‑factor authentication (2FA)</span></div>
+          <Box className="rounded-2xl p-3 mt-3" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
+            <div className="flex items-center gap-2 mb-1"><SecurityRoundedIcon sx={{ color: 'text.primary' }}/><span className="font-semibold" style={{ color: muiTheme.palette.text.primary }}>Two‑factor authentication (2FA)</span></div>
             <FormGroup>
-              <FormControlLabel control={<Switch checked={twoFA} onChange={(e)=>setTwoFA(e.target.checked)} />} label="Enable 2FA (authenticator app)" />
+              <FormControlLabel control={<Switch checked={twoFA} onChange={(e)=>setTwoFA(e.target.checked)} />} label="Enable 2FA (authenticator app)" sx={{ color: 'text.primary' }} />
             </FormGroup>
             <div className="mt-2 flex gap-2">
               <Button disabled={!twoFA} startIcon={<QrCode2RoundedIcon/>} onClick={()=>setQrOpen(true)} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>Setup</Button>
@@ -113,11 +116,11 @@ export default function SecuritySessionsDevices({ onBack }) {
       </Box>
 
       {/* QR dialog */}
-      <Dialog open={qrOpen} onClose={()=>setQrOpen(false)} fullWidth maxWidth="xs">
-        <DialogTitle>Scan this QR in your authenticator app</DialogTitle>
-        <DialogContent dividers>
+      <Dialog open={qrOpen} onClose={()=>setQrOpen(false)} fullWidth maxWidth="xs" PaperProps={{ sx: { bgcolor: 'background.paper' } }}>
+        <DialogTitle sx={{ color: 'text.primary' }}>Scan this QR in your authenticator app</DialogTitle>
+        <DialogContent dividers sx={{ bgcolor: 'background.paper' }}>
           <Box className="grid place-items-center p-2"><img src={qrUrl} alt="2FA QR" width={220} height={220} /></Box>
-          <Typography variant="body2" className="text-gray-700">Secret key: <strong>{secret}</strong></Typography>
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>Secret key: <strong style={{ color: 'text.primary' }}>{secret}</strong></Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={()=>setQrOpen(false)} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>Done</Button>
@@ -125,17 +128,17 @@ export default function SecuritySessionsDevices({ onBack }) {
       </Dialog>
 
       {/* Backup codes dialog */}
-      <Dialog open={codesOpen} onClose={()=>setCodesOpen(false)} fullWidth maxWidth="xs">
-        <DialogTitle>Backup codes</DialogTitle>
-        <DialogContent dividers>
-          <Typography variant="body2" className="mb-1 text-gray-700">Store these one‑time codes in a safe place:</Typography>
+      <Dialog open={codesOpen} onClose={()=>setCodesOpen(false)} fullWidth maxWidth="xs" PaperProps={{ sx: { bgcolor: 'background.paper' } }}>
+        <DialogTitle sx={{ color: 'text.primary' }}>Backup codes</DialogTitle>
+        <DialogContent dividers sx={{ bgcolor: 'background.paper' }}>
+          <Typography variant="body2" className="mb-1" sx={{ color: 'text.secondary' }}>Store these one‑time codes in a safe place:</Typography>
           <Grid container spacing={1}>
             {Array.from({length:8}).map((_,i)=> (
-              <Grid item xs={6} key={i}><Box className="font-mono text-sm p-1 rounded-md" sx={{ bgcolor: EV.light }}>{Math.random().toString(36).slice(2,8).toUpperCase()}</Box></Grid>
+              <Grid item xs={6} key={i}><Box className="font-mono text-sm p-1 rounded-md" sx={{ bgcolor: 'background.default', color: 'text.primary' }}>{Math.random().toString(36).slice(2,8).toUpperCase()}</Box></Grid>
             ))}
           </Grid>
-          <Divider className="my-2" />
-          <TextField fullWidth size="small" label="Type CONFIRM to regenerate" value={codeConfirm} onChange={(e)=>setCodeConfirm(e.target.value)} />
+          <Divider className="my-2" sx={{ borderColor: muiTheme.palette.divider }} />
+          <TextField fullWidth size="small" label="Type CONFIRM to regenerate" value={codeConfirm} onChange={(e)=>setCodeConfirm(e.target.value)} sx={{ '& .MuiInputBase-input': { color: 'text.primary' } }} />
         </DialogContent>
         <DialogActions>
           <Button onClick={()=>setCodesOpen(false)} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Close</Button>
