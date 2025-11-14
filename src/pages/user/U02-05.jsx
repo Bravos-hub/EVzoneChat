@@ -1382,8 +1382,8 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
                   size="small" 
                   sx={{ color: 'text.secondary' }}
                   onClick={()=>{
-                    // Navigate to meeting page
-                    onNavigate?.(`/group-call?contact=${encodeURIComponent(title)}&type=meeting`);
+                    // Navigate to meeting booking page to create a new meeting
+                    onNavigate?.('/meetings/book');
                   }}
                 >
                   <MeetingRoomRoundedIcon fontSize="small"/>
