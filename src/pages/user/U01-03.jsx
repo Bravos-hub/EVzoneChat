@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useTheme as useMuiTheme } from "@mui/material/styles";
+import React, { useMemo, useRef, useState } from "react";
+import { useTheme } from "../../context/ThemeContext";
 import {
   AppBar,
   Toolbar,
@@ -9,7 +9,6 @@ import {
   Badge,
   TextField,
   InputAdornment,
-  Chip,
   List,
   ListItem,
   ListItemAvatar,
@@ -17,20 +16,27 @@ import {
   ListItemText,
   Divider,
   Paper,
+  Tabs,
+  Tab,
   Button
 } from "@mui/material";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded";
-import AddCommentRoundedIcon from "@mui/icons-material/AddCommentRounded";
+import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
+import NotificationsRoundedIcon from "@mui/icons-material/NotificationsRounded";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
-// demo data
+// demo data - matching design
 const DEMO = [
-  { id: 'c1', name: 'Etty Duke', avatar: 'https://i.pravatar.cc/100?img=1', module: 'Rides', last: 'I am near the pickup now', time: '10:30 AM', unread: 2, typing: true },
-  { id: 'c2', name: 'Leslie Alexander', avatar: 'https://i.pravatar.cc/100?img=5', module: 'School', last: "Newton's laws PDF attached", time: 'Yesterday', unread: 0, typing: false },
-  { id: 'c3', name: 'EVzone Support', avatar: 'https://i.pravatar.cc/100?img=8', module: 'Marketplace', last: 'Invoice sent. Please confirm.', time: 'Tue', unread: 1, typing: false },
-  { id: 'c4', name: 'Dr. Cohen', avatar: 'https://i.pravatar.cc/100?img=12', module: 'Medical', last: 'See you at 3 pm via video', time: 'Mon', unread: 0, typing: false },
+  { id: 'c1', name: 'Etty Duke', avatar: 'https://i.pravatar.cc/100?img=1', module: 'Rides', last: 'I am near the pickup now', time: '09:30 PM', unread: 0, typing: true },
+  { id: 'c2', name: 'Zev Sharp', avatar: 'https://i.pravatar.cc/100?img=2', module: 'Rides', last: 'Thanks for the ride', time: '10:30 AM', unread: 2, typing: false },
+  { id: 'c3', name: 'EVrides', avatar: 'https://i.pravatar.cc/100?img=3', module: 'Rides', last: 'Your ride has been confirmed', time: 'Yesterday', unread: 1, typing: false },
+  { id: 'c4', name: 'Zalmen Knox', avatar: 'https://i.pravatar.cc/100?img=4', module: 'Rides', last: 'On my way', time: 'Monday', unread: 0, typing: false },
+  { id: 'c5', name: 'Benjamin Peck', avatar: 'https://i.pravatar.cc/100?img=6', module: 'Rides', last: 'See you soon', time: 'June 20', unread: 0, typing: false },
+  { id: 'c6', name: 'Bessie Cooper', avatar: 'https://i.pravatar.cc/100?img=7', module: 'Other', last: 'Meeting scheduled', time: 'June 14', unread: 0, typing: false },
+  { id: 'c7', name: 'Guy Hawkins', avatar: 'https://i.pravatar.cc/100?img=9', module: 'Other', last: 'Payment received', time: 'May 07', unread: 0, typing: false },
+  { id: 'c8', name: 'Leslie Alexander', avatar: 'https://i.pravatar.cc/100?img=5', module: 'Other', last: "Newton's laws PDF attached", time: 'Yesterday', unread: 0, typing: false },
 ];
 
 const LIVE_DEMO = [
@@ -39,54 +45,39 @@ const LIVE_DEMO = [
   { id: 'tour_88', module: 'Travel', title: 'Evening Old Town Tour', subtitle: 'Live Q&A ongoing', host: 'Ada Guide', startedAt: '3m', cta: 'Join' },
 ];
 
-const MODULES = ["All","Rides","Marketplace","School","Medical","Charging","Travel","Investments","Faith","Social","Workspace","Wallet","AI Bot"];
-
 /**
- * U01-03 Unified Inbox
- * Includes: Live Now carousel (no visible scrollbars), wrapped module chips (no horizontal scroll), search, conversation list.
+ * U01-03 Unified Inbox - Messages List
+ * Design Structure (from PowerPoint):
+ * 1. Top Header (Theme Color): Back arrow, "Lessons" title, Notification bell
+ * 2. Live Ongoing Section (Dark Grey): Shows active session card
+ * 3. Message Drawer (White Rounded Panel): Contains Messages title, icons, tabs, and chat list
  */
-export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, onRefresh, onNew, onLiveOpen, onModuleChange }) {
-  const muiTheme = useMuiTheme();
+export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, onRefresh, onNew, onLiveOpen, onModuleChange, onBack }) {
+  const { accent, isDark } = useTheme();
   const [q, setQ] = useState("");
-  const [module, setModule] = useState("All");
+  const [tab, setTab] = useState(0); // 0 = Evzone Rides, 1 = Other
+  const [showSearch, setShowSearch] = useState(false);
+  const searchInputRef = useRef(null);
+  
+  // Get theme accent color
+  const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
 
-  // filter logic
+  // Calculate total unread count
+  const totalUnread = useMemo(() => {
+    return items.reduce((sum, item) => sum + (item.unread || 0), 0);
+  }, [items]);
+
+  // filter logic - filter by tab (Evzone Rides = Rides module, Other = everything else)
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
     return items.filter((it) => {
       const matchQ = !s || [it.name, it.module, it.last].join(" ").toLowerCase().includes(s);
-      const matchM = module === 'All' || it.module === module;
-      return matchQ && matchM;
+      // Tab 0 = Evzone Rides (only Rides module), Tab 1 = Other (everything except Rides)
+      const matchTab = tab === 0 ? it.module === 'Rides' : it.module !== 'Rides';
+      return matchQ && matchTab;
     });
-  }, [q, items, module]);
+  }, [q, items, tab]);
 
-  // carousel helpers
-  const wrapRef = useRef(null);
-  const [idx, setIdx] = useState(0);
-  const slideW = '72vw'; // responsive width
-
-  // eslint-disable-next-line no-unused-vars
-  const scrollTo = (i) => {
-    const el = wrapRef.current; if (!el) return;
-    const clamped = Math.max(0, Math.min(i, lives.length - 1));
-    const slideWidth = el.offsetWidth * 0.72; // 72% of container width
-    el.scrollTo({ left: clamped * (slideWidth + 12), behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    const el = wrapRef.current; if (!el) return;
-    const onScroll = () => { 
-      const slideWidth = el.offsetWidth * 0.72; // 72% of container width
-      const i = Math.round(el.scrollLeft / (slideWidth + 12)); 
-      setIdx(i); 
-    };
-    el.addEventListener('scroll', onScroll, { passive: true });
-    return () => el.removeEventListener('scroll', onScroll);
-  }, []);
-
-  const Dot = ({ active }) => (
-    <span className={`inline-block h-1.5 w-5 rounded-full ${active ? 'opacity-100' : 'opacity-40'}`} style={{ background: EV.green }} />
-  );
 
   return (
     <>
@@ -99,51 +90,329 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
         bgcolor: 'background.default', 
         height: '100%', 
         display: 'flex', 
-        flexDirection: 'column'
+        flexDirection: 'column',
+        position: 'relative'
       }}>
-        {/* Header */}
+        {/* 1. Top Header - Parent Section (Theme Color Background) */}
         <AppBar 
           elevation={0} 
           position="static" 
           sx={{ 
-            bgcolor: 'background.paper', 
-            color: 'text.primary', 
-            borderBottom: `1px solid ${muiTheme.palette.divider}`,
-            boxShadow: muiTheme.palette.mode === 'dark' ? '0 1px 3px rgba(0,0,0,0.3)' : '0 1px 3px rgba(0,0,0,0.05)'
+            bgcolor: accentColor, 
+            color: '#fff',
+            boxShadow: 'none'
           }}
         >
           <Toolbar className="!min-h-[56px] !px-3">
+            <IconButton 
+              aria-label="Back" 
+              onClick={onBack}
+              sx={{ color: '#fff', mr: 1 }}
+            >
+              <ArrowBackRoundedIcon />
+            </IconButton>
             <Typography 
               variant="h6" 
               sx={{ 
                 fontSize: '18px',
                 fontWeight: 700,
-                color: 'text.primary'
+                color: '#fff',
+                flexGrow: 1
               }}
             >
-              Messages
+              Lessons
             </Typography>
-            <Box sx={{ flexGrow: 1 }} />
             <IconButton 
-              aria-label="Refresh" 
-              onClick={onRefresh}
-              sx={{ color: 'text.secondary', mr: 0.5 }}
+              aria-label="Notifications" 
+              sx={{ color: '#fff' }}
             >
-              <RefreshRoundedIcon />
-            </IconButton>
-            <IconButton 
-              aria-label="New message" 
-              onClick={onNew}
-              sx={{ color: 'text.secondary' }}
+              <Badge 
+                variant="dot" 
+                sx={{
+                  '& .MuiBadge-dot': {
+                    backgroundColor: '#ff4444',
+                    width: 8,
+                    height: 8,
+                    right: 4,
+                    top: 4
+                  }
+                }}
             >
-              <AddCommentRoundedIcon />
+                <NotificationsRoundedIcon />
+              </Badge>
             </IconButton>
           </Toolbar>
         </AppBar>
 
-        {/* Search */}
-        <Box sx={{ p: 2, pb: 2.5 }}>
+        {/* 2. Live Ongoing Section (Dark Grey Background) - Swipeable Carousel */}
+        <Box 
+          sx={{ 
+            bgcolor: isDark ? '#2a2a2a' : '#4a4a4a',
+            color: '#fff',
+            px: 2,
+            py: 1.5
+          }}
+        >
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              fontSize: '12px',
+              fontWeight: 600,
+              color: '#fff',
+              mb: 1.5,
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}
+          >
+            Live ongoing
+          </Typography>
+          {lives && lives.length > 0 ? (
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 1.5,
+                overflowX: 'auto',
+                overflowY: 'hidden',
+                pb: 1,
+                scrollSnapType: 'x mandatory',
+                '&::-webkit-scrollbar': {
+                  display: 'none'
+                },
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                WebkitOverflowScrolling: 'touch'
+              }}
+            >
+              {lives.map((live, index) => (
+                <Paper
+                  key={live.id}
+                  onClick={() => onLiveOpen?.(live)}
+                  elevation={0}
+                  sx={{ 
+                    bgcolor: 'rgba(255, 255, 255, 0.1)',
+                    borderRadius: 2,
+                    p: 2,
+                    cursor: 'pointer',
+                    minWidth: '85%',
+                    maxWidth: '85%',
+                    flexShrink: 0,
+                    scrollSnapAlign: 'start',
+                    '&:hover': {
+                      bgcolor: 'rgba(255, 255, 255, 0.15)'
+                    },
+                    '&:active': {
+                      bgcolor: 'rgba(255, 255, 255, 0.2)'
+                    }
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
+                    <Avatar 
+                      src={live.host === 'Leslie Alexander' ? 'https://i.pravatar.cc/100?img=5' : live.host === 'John Driver' ? 'https://i.pravatar.cc/100?img=1' : 'https://i.pravatar.cc/100?img=3'} 
+                      sx={{ width: 40, height: 40 }}
+                    />
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Typography 
+                        variant="body2" 
+                        sx={{ 
+                          fontWeight: 600, 
+                          color: '#fff',
+                          fontSize: '14px',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        {live.host}
+                      </Typography>
+                      <Typography 
+                        variant="caption" 
+                        sx={{ 
+                          color: 'rgba(255, 255, 255, 0.8)',
+                          fontSize: '12px',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                          display: 'block'
+                        }}
+                      >
+                        {live.title}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Typography 
+                    variant="body2" 
+                    sx={{ 
+                      color: 'rgba(255, 255, 255, 0.9)',
+                      fontSize: '13px',
+                      fontWeight: 500,
+                      mb: 1,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {live.subtitle}
+                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 1.5 }}>
+                    <Typography 
+                      variant="caption" 
+                      sx={{ 
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        fontSize: '11px'
+                      }}
+                    >
+                      Started {live.startedAt} ago
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onLiveOpen?.(live);
+                      }}
+                      sx={{
+                        bgcolor: accentColor,
+                        color: '#fff',
+                        textTransform: 'none',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        px: 2,
+                        py: 0.5,
+                        minWidth: 'auto',
+                        '&:hover': {
+                          bgcolor: accent === 'orange' ? '#e06f00' : accent === 'green' ? '#02b37b' : '#8f8f8f'
+                        }
+                      }}
+                    >
+                      {live.cta || 'Join'}
+                    </Button>
+                  </Box>
+                </Paper>
+              ))}
+            </Box>
+          ) : (
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: 'rgba(255, 255, 255, 0.6)',
+                fontSize: '13px',
+                textAlign: 'center',
+                py: 2
+              }}
+            >
+              No live sessions at the moment
+            </Typography>
+          )}
+        </Box>
+
+        {/* 3. Message Drawer (White Rounded Panel) - Overlaps Live Ongoing */}
+        <Paper
+          elevation={0}
+          sx={{
+            flex: 1,
+            bgcolor: 'background.paper',
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+            mt: -2, // Overlap more with Live Ongoing section to create layered effect
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            position: 'relative',
+            zIndex: 1,
+            boxShadow: isDark ? '0 -2px 8px rgba(0,0,0,0.2)' : '0 -2px 8px rgba(0,0,0,0.1)'
+          }}
+        >
+          {/* Drawer Header */}
+          <Box sx={{ px: 2, pt: 2, pb: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    fontSize: '18px',
+                    fontWeight: 700,
+                    color: 'text.primary'
+                  }}
+                >
+                  Messages
+                </Typography>
+                {totalUnread > 0 && (
+                  <Badge 
+                    badgeContent={totalUnread} 
+                    sx={{
+                      '& .MuiBadge-badge': {
+                        backgroundColor: accentColor,
+                        color: '#fff',
+                        fontSize: '11px',
+                        minWidth: '20px',
+                        height: '20px',
+                        padding: '0 6px'
+                      }
+                    }}
+                  />
+                )}
+              </Box>
+              <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                <IconButton 
+                  aria-label="Refresh" 
+                  onClick={onRefresh}
+                  size="small"
+                  sx={{ color: 'text.secondary' }}
+                >
+                  <RefreshRoundedIcon fontSize="small" />
+                </IconButton>
+                <IconButton 
+                  aria-label="Search" 
+                  onClick={() => {
+                    setShowSearch(!showSearch);
+                    if (!showSearch) {
+                      setTimeout(() => searchInputRef.current?.focus(), 100);
+                    } else {
+                      setQ('');
+                    }
+                  }}
+                  size="small"
+                  sx={{ color: showSearch ? accentColor : 'text.secondary' }}
+                >
+                  <SearchRoundedIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            </Box>
+
+            {/* Tabs: Evzone Rides and Other - Inside Drawer */}
+            <Tabs 
+              value={tab} 
+              onChange={(e, v) => setTab(v)} 
+              textColor="inherit"
+              TabIndicatorProps={{ 
+                style: { background: accentColor } 
+              }}
+              sx={{ 
+                minHeight: 40,
+                '& .MuiTab-root': {
+                  color: 'text.secondary',
+                  fontWeight: 500,
+                  textTransform: 'none',
+                  fontSize: '14px',
+                  minHeight: 40,
+                  px: 2,
+                  '&.Mui-selected': {
+                    color: accentColor,
+                    fontWeight: 600
+                  }
+                }
+              }}
+            >
+              <Tab label="Evzone Rides" />
+              <Tab label="Other" />
+            </Tabs>
+          </Box>
+
+          {/* Search - shown when search icon is clicked - Inside Drawer */}
+          {showSearch && (
+            <Box sx={{ px: 2, pb: 1.5 }}>
             <TextField
+                inputRef={searchInputRef}
               fullWidth 
               size="small" 
               value={q} 
@@ -158,7 +427,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                   },
                   '&.Mui-focused': {
                     bgcolor: 'background.paper',
-                    boxShadow: '0 0 0 2px rgba(3, 205, 140, 0.1)'
+                      boxShadow: `0 0 0 2px ${accentColor}33`
                   },
                   '& .MuiInputBase-input': {
                     color: 'text.primary',
@@ -177,80 +446,91 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                 ) 
               }}
             />
-        </Box>
-
-        {/* Live Now Carousel (no visible scrollbars, pure mobile swipe — no arrows) */}
-        {lives && lives.length > 0 && (
-          <Box className="px-3 pb-2 relative">
-            <div
-              ref={wrapRef}
-              className="flex gap-3 pr-3 no-scrollbar"
-              style={{ overflowX:'auto', scrollSnapType:'x mandatory', WebkitOverflowScrolling:'touch' }}
-            >
-              {lives.map((s) => (
-                <Paper
-                  key={s.id}
-                  onClick={()=>onLiveOpen?.(s)}
-                  elevation={0}
-                  className="shrink-0 rounded-2xl p-3"
-                  sx={{ 
-                    width: slideW, 
-                    minWidth: '85vw', 
-                    scrollSnapAlign:'start', 
-                    border: `1px solid ${muiTheme.palette.divider}`,
-                    bgcolor: 'background.paper'
-                  }}
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <Chip size="small" label="LIVE" sx={{ bgcolor: EV.orange, color:'#fff', height:22, borderRadius:1 }} />
-                    <Chip size="small" label={s.module} sx={{ bgcolor: 'background.default', color: 'text.primary' }} />
-                    <span className="text-xs ml-auto" style={{ color: muiTheme.palette.text.secondary }}>{s.startedAt}</span>
-                  </div>
-                  <div className="text-sm font-semibold truncate" style={{ color: muiTheme.palette.text.primary }}>{s.title}</div>
-                  <div className="text-xs truncate" style={{ color: muiTheme.palette.text.secondary }}>{s.subtitle}</div>
-                  <div className="text-[11px] mt-1" style={{ color: muiTheme.palette.text.secondary }}>Host: {s.host}</div>
-                  <Button variant="contained" size="small" sx={{ mt: 1.5, textTransform:'none' }}>{s.cta || 'Open'}</Button>
-                </Paper>
-              ))}
-            </div>
-            <Box className="flex items-center justify-center gap-1 mt-2">
-              {lives.map((_, i)=>(<Dot key={i} active={i===idx} />))}
-            </Box>
           </Box>
         )}
 
-        {/* Module chips (wrapped, no horizontal scroll) */}
-        <Box className="px-3 pt-1 pb-2">
-          <div className="flex gap-2 flex-wrap">
-            {MODULES.map((m)=> (
-              <Chip
-                key={m}
-                label={m}
-                onClick={()=>{ setModule(m); onModuleChange?.(m); }}
-                sx={{
-                  bgcolor: module===m?EV.green:'background.default',
-                  color: module===m?'#fff':'text.primary',
-                  '&:hover':{ bgcolor: module===m?'#02b37b':'action.hover' }
-                }}
-              />
-            ))}
-          </div>
-        </Box>
-
-        {/* Conversation list */}
+          {/* Conversation list - Inside Drawer */}
         <Box className="flex-1" sx={{ overflowY:'auto', '&::-webkit-scrollbar':{ display:'none' }, scrollbarWidth:'none', msOverflowStyle:'none' }}>
           <List>
             {filtered.map((c, idx) => (
               <React.Fragment key={c.id}>
                 <ListItem button onClick={() => onOpen?.(c)} alignItems="flex-start">
                   <ListItemAvatar>
-                    <Badge color="success" invisible={!c.unread} badgeContent={c.unread} overlap="circular">
+                    <Badge 
+                      invisible={!c.unread} 
+                      badgeContent={c.unread} 
+                      overlap="circular"
+                      sx={{
+                        '& .MuiBadge-badge': {
+                          backgroundColor: accentColor,
+                          color: '#fff'
+                        }
+                      }}
+                    >
                       <Avatar src={c.avatar || `https://i.pravatar.cc/100?u=${c.id}`} sx={{ bgcolor: 'background.default', color: 'text.primary' }} />
                     </Badge>
                   </ListItemAvatar>
                   <ListItemText
-                    primary={<div className="flex items-center gap-2"><span className="font-semibold truncate" style={{ color: muiTheme.palette.text.primary }}>{c.name}</span><Chip size="small" label={c.module} sx={{ bgcolor: 'background.default', color: 'text.primary' }} /><span className="text-xs ml-auto" style={{ color: muiTheme.palette.text.secondary }}>{c.time}</span></div>}
-                    secondary={<div className="flex items-center gap-2 mt-1">{c.typing ? (<span className="text-[12px]" style={{ color: EV.green }}>typing…</span>) : (<span className="text-[12px] truncate" style={{ color: muiTheme.palette.text.secondary }}>{c.last}</span>)}</div>}
+                    primary={
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+                        <Typography 
+                          variant="body2" 
+                          sx={{ 
+                            fontWeight: 600, 
+                            color: 'text.primary',
+                            fontSize: '15px',
+                            flex: 1,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
+                          }}
+                        >
+                          {c.name}
+                        </Typography>
+                        <Typography 
+                          variant="caption" 
+                          sx={{ 
+                            color: 'text.secondary',
+                            fontSize: '12px',
+                            flexShrink: 0,
+                            ml: 1
+                          }}
+                        >
+                          {c.time}
+                        </Typography>
+                      </Box>
+                    }
+                    secondary={
+                      <Box sx={{ mt: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+                        {c.typing ? (
+                          <Typography 
+                            variant="caption" 
+                            sx={{ 
+                              color: accentColor,
+                              fontSize: '12px',
+                              fontWeight: 500
+                            }}
+                          >
+                            {c.name} typing…
+                          </Typography>
+                        ) : (
+                          <Typography 
+                            variant="caption" 
+                            sx={{ 
+                              color: 'text.secondary',
+                              fontSize: '12px',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              flex: 1
+                            }}
+                          >
+                            {c.last}
+                          </Typography>
+                        )}
+                      </Box>
+                    }
+                    sx={{ m: 0 }}
                   />
                 </ListItem>
                 {idx < filtered.length - 1 && <Divider component="li" />}
@@ -259,8 +539,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
             {filtered.length === 0 && (<Box className="px-4 py-10 text-center" sx={{ color: 'text.secondary' }}>No conversations match your search.</Box>)}
           </List>
         </Box>
-
-        <Box className="h-3" />
+        </Paper>
       </Box>
     </>
   );

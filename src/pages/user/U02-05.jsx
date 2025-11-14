@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
 import { useTheme } from "../../context/ThemeContext";
+import AudioPlayer from "../../components/AudioPlayer";
 import {
   AppBar,
   Toolbar,
@@ -33,7 +34,6 @@ import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import MicRoundedIcon from "@mui/icons-material/MicRounded";
 import StopRoundedIcon from "@mui/icons-material/StopRounded";
 import CameraAltRoundedIcon from "@mui/icons-material/CameraAltRounded";
-import AttachFileRoundedIcon from "@mui/icons-material/AttachFileRounded";
 import InsertEmoticonRoundedIcon from "@mui/icons-material/InsertEmoticonRounded";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import NotificationsOffRoundedIcon from "@mui/icons-material/NotificationsOffRounded";
@@ -47,7 +47,6 @@ import LocationOnRoundedIcon from "@mui/icons-material/LocationOnRounded";
 import ContactsRoundedIcon from "@mui/icons-material/ContactsRounded";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import ImageRoundedIcon from "@mui/icons-material/ImageRounded";
-import MusicNoteRoundedIcon from "@mui/icons-material/MusicNoteRounded";
 import DoneAllRoundedIcon from "@mui/icons-material/DoneAllRounded";
 import PushPinRoundedIcon from "@mui/icons-material/PushPinRounded";
 import ContentCopyRoundedIcon from "@mui/icons-material/ContentCopyRounded";
@@ -55,8 +54,6 @@ import ForwardRoundedIcon from "@mui/icons-material/ForwardRounded";
 import StarRoundedIcon from "@mui/icons-material/StarRounded";
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
 import SelectAllRoundedIcon from "@mui/icons-material/SelectAllRounded";
-import VideoLibraryRoundedIcon from "@mui/icons-material/VideoLibraryRounded";
-import PollRoundedIcon from "@mui/icons-material/PollRounded";
 import ReplyRoundedIcon from "@mui/icons-material/ReplyRounded";
 import TranslateRoundedIcon from "@mui/icons-material/TranslateRounded";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
@@ -73,7 +70,7 @@ const DEMO = [
 
 function Bubble({ msg, onQuote, onAction, scrollTo, onSelect, isSelected }){
   const muiTheme = useMuiTheme();
-  const { isDark } = useTheme();
+  const { isDark, accent } = useTheme();
   const [menuEl, setMenuEl] = useState(null);
   const [reactEl, setReactEl] = useState(null);
   const [reactFullEl, setReactFullEl] = useState(null);
@@ -82,15 +79,18 @@ function Bubble({ msg, onQuote, onAction, scrollTo, onSelect, isSelected }){
   const [starred, setStarred] = useState(false);
   const [recalled, setRecalled] = useState(false);
   const [reactions, setReactions] = useState([]);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef(null);
   const start = useRef({ x:0, y:0, active:false, moved:false });
   const longPressTimer = useRef(null);
 
+  // Get theme accent color
+  const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
+
   const isMine = msg.mine;
-  const bg = isMine ? lighten(EV.green,0.18) : muiTheme.palette.background.paper;
-  const br = isMine ? `1px solid ${lighten(EV.green,0.28)}` : `1px solid ${muiTheme.palette.divider}`;
-  const tx = isMine ? (isDark ? '#a8f5d4' : '#0b3d2f') : muiTheme.palette.text.primary;
+  // Outgoing messages: Dark background (accent color) with white text (per design spec)
+  // Incoming messages: Light background with dark text (per design spec)
+  const bg = isMine ? accentColor : (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)');
+  const br = isMine ? `1px solid ${accentColor}` : `1px solid ${muiTheme.palette.divider}`;
+  const tx = isMine ? '#fff' : muiTheme.palette.text.primary; // White text for outgoing, dark text for incoming
   const isVoiceMessage = msg.audioUrl || msg.text?.includes('🎤');
   const selected = isSelected || false;
 
@@ -150,8 +150,8 @@ function Bubble({ msg, onQuote, onAction, scrollTo, onSelect, isSelected }){
             sx={{ 
               p:1.25, 
               px:1.5, 
-              bgcolor: selected ? lighten(EV.orange, 0.25) : bg, 
-              border: selected ? `2px solid ${EV.orange}` : br, 
+              bgcolor: selected ? (isMine ? lighten(accentColor, 0.3) : lighten(accentColor, 0.25)) : bg, 
+              border: selected ? `2px solid ${accentColor}` : br, 
               borderRadius:2,
               cursor: 'pointer'
             }}
@@ -159,51 +159,47 @@ function Bubble({ msg, onQuote, onAction, scrollTo, onSelect, isSelected }){
             {!recalled ? (
               <>
                 {msg.forwarded && (
-                  <Box sx={{ borderLeft:`3px solid ${EV.orange}`, pl:1, mb:0.5, color: 'text.secondary' }} className="text-[11.5px]">
+                  <Box sx={{ borderLeft:`3px solid ${accentColor}`, pl:1, mb:0.5, color: 'text.secondary' }} className="text-[11.5px]">
                     Forwarded from {msg.originalAuthor || 'Unknown'}
                   </Box>
                 )}
                 {msg.replyTo && (
-                  <Box role="button" onClick={()=>scrollTo?.(msg.replyTo.id)} sx={{ borderLeft:`3px solid ${EV.orange}`, pl:1, mb:0.5, cursor:'pointer', color: 'text.secondary' }} className="text-[11.5px] truncate">
+                  <Box role="button" onClick={()=>scrollTo?.(msg.replyTo.id)} sx={{ borderLeft:`3px solid ${accentColor}`, pl:1, mb:0.5, cursor:'pointer', color: 'text.secondary' }} className="text-[11.5px] truncate">
                     Replying to: {msg.replyTo.text.slice(0,64)}{msg.replyTo.text.length>64?'…':''}
                   </Box>
                 )}
                 {isVoiceMessage && msg.audioUrl ? (
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
-                    <IconButton 
-                      size="small" 
+                  <AudioPlayer
+                    audioUrl={msg.audioUrl}
+                    text={msg.text}
+                    accentColor={accentColor}
+                    textColor={tx}
+                    isMine={isMine}
+                  />
+                ) : msg.imageUrl ? (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                    <Box
+                      component="img"
+                      src={msg.imageUrl}
+                      alt={msg.fileName || 'Captured photo'}
+                      sx={{
+                        maxWidth: '100%',
+                        maxHeight: '300px',
+                        borderRadius: 1,
+                        objectFit: 'contain',
+                        cursor: 'pointer',
+                        '&:hover': {
+                          opacity: 0.9,
+                        },
+                      }}
                       onClick={() => {
-                        if (audioRef.current) {
-                          if (isPlaying) {
-                            audioRef.current.pause();
-                            setIsPlaying(false);
-                          } else {
-                            audioRef.current.play();
-                            setIsPlaying(true);
-                          }
-                        }
+                        // Open image in new tab/window for full view
+                        window.open(msg.imageUrl, '_blank');
                       }}
-                      sx={{ 
-                        bgcolor: EV.orange, 
-                        color: '#fff',
-                        '&:hover': { bgcolor: '#e06f00' },
-                        width: '2rem',
-                        height: '2rem'
-                      }}
-                    >
-                      {isPlaying ? <StopRoundedIcon sx={{ fontSize: 18 }} /> : <MicRoundedIcon sx={{ fontSize: 18 }} />}
-                    </IconButton>
-                    <audio 
-                      ref={audioRef}
-                      src={msg.audioUrl}
-                      onEnded={() => setIsPlaying(false)}
-                      onPause={() => setIsPlaying(false)}
-                      style={{ display: 'none' }}
                     />
-                    <Box sx={{ flex: 1 }}>
-                      <div className="text-[12px] font-semibold" style={{ color: tx }}>{msg.text}</div>
-                      <div className="text-[10px] mt-0.5" style={{ color: muiTheme.palette.text.secondary }}>Tap to play</div>
-                    </Box>
+                    <Typography variant="caption" sx={{ fontSize: '11px', color: muiTheme.palette.text.secondary }}>
+                      {msg.text}
+                    </Typography>
                   </Box>
                 ) : (
                   <div className="text-[13.5px] whitespace-pre-wrap" style={{ color:tx }}>{msg.text}</div>
@@ -211,7 +207,7 @@ function Bubble({ msg, onQuote, onAction, scrollTo, onSelect, isSelected }){
                 {translated && <div className="text-[12px] mt-1" style={{ color: muiTheme.palette.text.secondary }}>{translated}</div>}
                 <div className="flex items-center gap-1 mt-1 justify-end">
                   <span className="text-[11px]" style={{ color: muiTheme.palette.text.secondary }}>{msg.time}</span>
-                  {isMine && (<DoneAllRoundedIcon sx={{ fontSize:14, color: msg.read? EV.green : EV.grey }} />)}
+                  {isMine && (<DoneAllRoundedIcon sx={{ fontSize:14, color: msg.read? accentColor : EV.grey }} />)}
                 </div>
               </>
             ) : (
@@ -251,7 +247,7 @@ function Bubble({ msg, onQuote, onAction, scrollTo, onSelect, isSelected }){
           <ListItemText primary="Forward" />
         </MenuItem>
         <MenuItem onClick={()=>{ setStarred(!starred); onAction?.(starred? 'unstar':'star', msg); setMenuEl(null); }}>
-          <ListItemIcon><StarRoundedIcon fontSize="small" sx={{ color: starred ? EV.orange : 'inherit' }}/></ListItemIcon>
+          <ListItemIcon><StarRoundedIcon fontSize="small" sx={{ color: starred ? accentColor : 'inherit' }}/></ListItemIcon>
           <ListItemText primary={starred ? 'Unstar' : 'Star'} />
         </MenuItem>
         {isMine && !recalled && (
@@ -320,7 +316,7 @@ function Bubble({ msg, onQuote, onAction, scrollTo, onSelect, isSelected }){
           {['👍','❤️','😂','😮','😢','🙏','🔥','🎉','💯','👏'].map(em => (
             <Button key={em} onClick={()=>{ setReactions(p=>[...p, em]); setReactEl(null); }} sx={{ minWidth:32, minHeight:32, fontSize:18, '&:hover': { bgcolor: 'action.hover' } }}>{em}</Button>
           ))}
-          <Button onClick={(e)=>setReactFullEl(e.currentTarget)} sx={{ minWidth:32, minHeight:32, fontSize:18, color:EV.orange }}>+</Button>
+          <Button onClick={(e)=>setReactFullEl(e.currentTarget)} sx={{ minWidth:32, minHeight:32, fontSize:18, color:accentColor }}>+</Button>
         </Box>
       </Popover>
       <Popover 
@@ -349,7 +345,10 @@ function Bubble({ msg, onQuote, onAction, scrollTo, onSelect, isSelected }){
 
 export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='Marketplace', onNavigate, location }){
   const muiTheme = useMuiTheme();
-  const { isDark } = useTheme();
+  const { isDark, accent } = useTheme();
+  
+  // Get theme accent color
+  const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
   const [messages, setMessages] = useState(DEMO);
   const [replyTo, setReplyTo] = useState(null);
   const [draft, setDraft] = useState('');
@@ -377,10 +376,13 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
   // Store messages to forward (from previous conversation)
   const [messagesToForward] = useState([]);
 
-  // Handle forwarded messages when arriving at conversation
+  // Handle forwarded messages and shared contacts when arriving at conversation
   useEffect(() => {
     const params = new URLSearchParams(location?.search || '');
     const forwardParam = params.get('forward');
+    const sharedContactParam = params.get('sharedContact');
+    
+    // Handle forwarded messages
     if (forwardParam && messagesToForward.length === 0) {
       // Get message IDs to forward
       const msgIds = forwardParam.split(',');
@@ -412,6 +414,39 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
       const newSearch = newParams.toString();
       onNavigate?.(`${location.pathname}${newSearch ? '?' + newSearch : ''}`, { replace: true });
     }
+    
+    // Handle shared contact
+    if (sharedContactParam) {
+      try {
+        const contactData = JSON.parse(decodeURIComponent(sharedContactParam));
+        const ts = new Date();
+        const contactText = `👤 ${contactData.name}${contactData.role ? `\n${contactData.role}` : ''}`;
+        const newMsg = {
+          id: 'contact-' + Date.now(),
+          author: { id: 'me', name: 'You', avatar: 'https://i.pravatar.cc/100?img=2' },
+          text: contactText,
+          time: ts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          mine: true,
+          read: false,
+          contact: contactData
+        };
+        setMessages(prev => [...prev, newMsg]);
+        
+        // Scroll to bottom after sharing contact
+        requestAnimationFrame(() => {
+          const el = listRef.current;
+          if (el) el.scrollTop = el.scrollHeight;
+        });
+        
+        // Clear the sharedContact parameter from URL after handling
+        const newParams = new URLSearchParams(params);
+        newParams.delete('sharedContact');
+        const newSearch = newParams.toString();
+        onNavigate?.(`${location.pathname}${newSearch ? '?' + newSearch : ''}`, { replace: true });
+      } catch (error) {
+        console.error('Error parsing shared contact:', error);
+      }
+    }
   }, [location, onNavigate, messagesToForward.length]);
 
   // Update kind if it's a group chat
@@ -423,8 +458,49 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
   const openHeaderMenu = (e)=> setMenuEl(e.currentTarget);
   const closeHeaderMenu = ()=> setMenuEl(null);
 
-  const title = useMemo(()=> chatKind==='group'? 'Group Chat' : (chatKind==='channel'? '#announcements' : 'Leslie Alexander'), [chatKind]);
-  const avatar = useMemo(()=> chatKind==='1:1'? 'https://i.pravatar.cc/100?img=5' : 'https://i.pravatar.cc/100?img=15', [chatKind]);
+  // Get contact name from URL path or params
+  const contactNameFromUrl = useMemo(() => {
+    if (location?.pathname) {
+      const pathParts = location.pathname.split('/');
+      const conversationId = pathParts[pathParts.length - 1];
+      if (conversationId && conversationId !== 'new') {
+        // Decode the contact name from URL (e.g., "leslie-alexander" -> "Leslie Alexander")
+        return conversationId
+          .split('-')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+      }
+    }
+    return null;
+  }, [location]);
+
+  // Get module from URL params (for live sessions)
+  const moduleFromUrl = useMemo(() => {
+    const params = new URLSearchParams(location?.search || '');
+    return params.get('module') || null;
+  }, [location]);
+
+  // Update moduleLabel if provided via URL
+  const effectiveModuleLabel = useMemo(() => {
+    return moduleFromUrl || moduleLabel;
+  }, [moduleFromUrl, moduleLabel]);
+
+  const title = useMemo(()=> {
+    if (chatKind === 'group') return 'Group Chat';
+    if (chatKind === 'channel') return '#announcements';
+    return contactNameFromUrl || 'Leslie Alexander';
+  }, [chatKind, contactNameFromUrl]);
+  
+  const avatar = useMemo(()=> {
+    if (chatKind !== '1:1') return 'https://i.pravatar.cc/100?img=15';
+    // Use avatar based on contact name
+    if (contactNameFromUrl === 'Leslie Alexander') return 'https://i.pravatar.cc/100?img=5';
+    if (contactNameFromUrl === 'Etty Duke') return 'https://i.pravatar.cc/100?img=1';
+    if (contactNameFromUrl === 'John Driver') return 'https://i.pravatar.cc/100?img=1';
+    if (contactNameFromUrl === 'Ada Guide') return 'https://i.pravatar.cc/100?img=1';
+    return 'https://i.pravatar.cc/100?img=5'; // default
+  }, [chatKind, contactNameFromUrl]);
+  
   const meta = useMemo(()=> chatKind==='channel'? 'Announcement channel' : (chatKind==='group'? 'Group' : 'Online'), [chatKind]);
 
   useEffect(()=>{ const el=listRef.current; if(el) el.scrollTop = el.scrollHeight; }, [draft, messages.length]);
@@ -521,7 +597,7 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
   };
 
   // Attachment handlers
-  const handleAttachOption = (option) => {
+  const handleAttachOption = async (option) => {
     setAttachEl(null);
     switch(option) {
       case 'photos':
@@ -531,7 +607,34 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
         videoInputRef.current?.click();
         break;
       case 'camera':
-        cameraInputRef.current?.click();
+        // Open camera on mobile - force camera to open instead of gallery
+        if (cameraInputRef.current) {
+          // Reset the input value to allow re-selecting the same file
+          cameraInputRef.current.value = '';
+          
+          // Remove all attributes first to reset state
+          cameraInputRef.current.removeAttribute('capture');
+          cameraInputRef.current.removeAttribute('accept');
+          
+          // Set accept first, then capture
+          // Using just 'capture' (boolean) works better on some devices
+          // Some browsers need 'capture' without value, others need 'capture="environment"'
+          cameraInputRef.current.setAttribute('accept', 'image/*');
+          
+          // Try setting capture as boolean attribute (works on more devices)
+          cameraInputRef.current.setAttribute('capture', '');
+          
+          // Force click after ensuring attributes are set
+          requestAnimationFrame(() => {
+            if (cameraInputRef.current) {
+              // Ensure capture is set - try both methods for compatibility
+              if (!cameraInputRef.current.hasAttribute('capture')) {
+                cameraInputRef.current.setAttribute('capture', '');
+              }
+              cameraInputRef.current.click();
+            }
+          });
+        }
         break;
       case 'document':
         fileInputRef.current?.click();
@@ -540,10 +643,43 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
         audioInputRef.current?.click();
         break;
       case 'location':
-        alert('Location sharing - Coming soon');
+        // Get user's current location
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const { latitude, longitude } = position.coords;
+              // Create a location message
+              const ts = new Date();
+              const newMsg = {
+                id: 'm' + Date.now(),
+                author: { id: 'me', name: 'You', avatar: 'https://i.pravatar.cc/100?img=2' },
+                text: `📍 Location: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
+                time: ts.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                mine: true,
+                read: false,
+                location: { latitude, longitude },
+                locationUrl: `https://www.google.com/maps?q=${latitude},${longitude}`
+              };
+              setMessages(prev => [...prev, newMsg]);
+              requestAnimationFrame(() => {
+                const el = listRef.current;
+                if (el) el.scrollTop = el.scrollHeight;
+              });
+            },
+            (error) => {
+              alert('Unable to get location. Please enable location permissions.');
+              console.error('Geolocation error:', error);
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+          );
+        } else {
+          alert('Geolocation is not supported by your browser.');
+        }
         break;
       case 'contact':
-        alert('Contact sharing - Coming soon');
+        // Open contacts picker - navigate to new message screen for contact selection
+        // Pass current conversation path so we can return and share the contact
+        onNavigate?.(`/new-message?shareContact=true&returnTo=${encodeURIComponent(location?.pathname || '/inbox')}`);
         break;
       case 'poll':
         alert('Poll creation - Coming soon');
@@ -558,39 +694,65 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
   const audioChunksRef = useRef([]);
   const streamRef = useRef(null);
 
-  const startRecording = async () => {
+  const startRecording = async (e) => {
+    // Prevent default to avoid conflicts
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    // Don't start if already recording
+    if (isRecording) return;
+    
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
-      const mediaRecorder = new MediaRecorder(stream);
+      
+      // Try to use mimeType that's supported
+      let options = {};
+      if (MediaRecorder.isTypeSupported('audio/webm')) {
+        options = { mimeType: 'audio/webm' };
+      } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+        options = { mimeType: 'audio/mp4' };
+      } else if (MediaRecorder.isTypeSupported('audio/ogg')) {
+        options = { mimeType: 'audio/ogg' };
+      }
+      
+      const mediaRecorder = new MediaRecorder(stream, options);
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
       mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
+        if (event.data && event.data.size > 0) {
           audioChunksRef.current.push(event.data);
         }
       };
 
       mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        const audioUrl = URL.createObjectURL(audioBlob);
-        const duration = recordingTime;
+        // Only create message if we have audio chunks and recording time > 0
+        if (audioChunksRef.current.length > 0 && recordingTime > 0) {
+          const audioBlob = new Blob(audioChunksRef.current, { type: audioChunksRef.current[0].type || 'audio/webm' });
+          const audioUrl = URL.createObjectURL(audioBlob);
+          const duration = recordingTime;
+          
+          // Create voice message
+          const ts = new Date();
+          const newMsg = { 
+            id:'m'+Date.now(), 
+            author:{ id:'me', name:'You', avatar:'https://i.pravatar.cc/100?img=2' }, 
+            text: `🎤 Voice message (${Math.floor(duration/60)}:${String(duration%60).padStart(2,'0')})`, 
+            time: ts.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }), 
+            mine:true, 
+            read:false,
+            audioUrl,
+            audioBlob
+          };
+          setMessages(prev=> [...prev, newMsg]);
+          requestAnimationFrame(()=>{ const el=listRef.current; if(el) el.scrollTop = el.scrollHeight; });
+        }
         
-        // Create voice message
-        const ts = new Date();
-        const newMsg = { 
-          id:'m'+Date.now(), 
-          author:{ id:'me', name:'You', avatar:'https://i.pravatar.cc/100?img=2' }, 
-          text: `🎤 Voice message (${Math.floor(duration/60)}:${String(duration%60).padStart(2,'0')})`, 
-          time: ts.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }), 
-          mine:true, 
-          read:false,
-          audioUrl,
-          audioBlob
-        };
-        setMessages(prev=> [...prev, newMsg]);
-        requestAnimationFrame(()=>{ const el=listRef.current; if(el) el.scrollTop = el.scrollHeight; });
+        // Clean up
+        audioChunksRef.current = [];
         
         // Stop all tracks
         if (streamRef.current) {
@@ -599,7 +761,13 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
         }
       };
 
-      mediaRecorder.start();
+      mediaRecorder.onerror = (event) => {
+        console.error('MediaRecorder error:', event);
+        stopRecording();
+      };
+
+      // Start recording with timeslice for better chunk handling
+      mediaRecorder.start(100);
       setIsRecording(true);
       setRecordingTime(0);
       recordingIntervalRef.current = setInterval(() => {
@@ -608,12 +776,26 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
     } catch (error) {
       console.error('Error accessing microphone:', error);
       alert('Microphone access denied. Please enable microphone permissions.');
+      setIsRecording(false);
     }
   };
 
-  const stopRecording = () => {
+  const stopRecording = (e) => {
+    // Prevent default
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    // Only stop if actually recording
+    if (!isRecording) return;
+    
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-      mediaRecorderRef.current.stop();
+      try {
+        mediaRecorderRef.current.stop();
+      } catch (error) {
+        console.error('Error stopping recorder:', error);
+      }
     }
     setIsRecording(false);
     if(recordingIntervalRef.current) {
@@ -668,6 +850,8 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
   const handleCameraCapture = (e) => {
     const file = e.target.files?.[0];
     if(file) {
+      // Create a preview URL for the captured image
+      const imageUrl = URL.createObjectURL(file);
       const ts = new Date();
       const newMsg = { 
         id:'m'+Date.now(), 
@@ -675,11 +859,15 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
         text: `📷 Photo`, 
         time: ts.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }), 
         mine:true, 
-        read:false 
+        read:false,
+        imageUrl,
+        imageFile: file,
+        fileName: file.name
       };
       setMessages(prev=> [...prev, newMsg]);
       requestAnimationFrame(()=>{ const el=listRef.current; if(el) el.scrollTop = el.scrollHeight; });
     }
+    // Reset input to allow capturing again
     e.target.value = '';
   };
 
@@ -788,12 +976,12 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
                 <Box sx={{ display:'flex', alignItems:'center', gap:0.75, minWidth:0, mt: 0.25 }}>
                   <Chip 
                     size="small" 
-                    label={moduleLabel} 
+                    label={effectiveModuleLabel} 
                     sx={{ 
-                      borderColor: EV.green, 
-                      color:'#0f5132', 
-                      bgcolor: lighten(EV.green,0.12), 
-                      border:`1px solid ${lighten(EV.green,0.28)}`,
+                      borderColor: accentColor, 
+                      color: accent === 'green' ? '#0f5132' : accent === 'orange' ? '#5d2c00' : '#424242', 
+                      bgcolor: lighten(accentColor,0.12), 
+                      border:`1px solid ${lighten(accentColor,0.28)}`,
                       height: 20,
                       fontSize: '10px',
                       fontWeight: 600
@@ -1001,31 +1189,41 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
             </Box>
           )}
           <Box className="flex items-end gap-1.5">
-            {/* Emoji picker button */}
-            <IconButton 
-              aria-label="Emoji" 
-              onClick={(e)=>setEmojiEl(emojiEl ? null : e.currentTarget)}
-              sx={{ color: emojiEl ? EV.orange : 'text.secondary' }}
-            >
-              <InsertEmoticonRoundedIcon/>
-            </IconButton>
-            
-            {/* Attachment menu button (WhatsApp-style + icon) */}
+            {/* Attachment menu button (+ icon) - First, as per design */}
             <IconButton 
               aria-label="Attach" 
               onClick={(e)=>setAttachEl(attachEl ? null : e.currentTarget)}
-              sx={{ color: attachEl ? EV.orange : 'text.secondary' }}
+              sx={{ 
+                bgcolor: attachEl ? accentColor : 'transparent',
+                color: attachEl ? '#fff' : accentColor,
+                border: `1px solid ${accentColor}`,
+                width: 40,
+                height: 40,
+                '&:hover': {
+                  bgcolor: attachEl ? accentColor : lighten(accentColor, 0.1),
+                  color: attachEl ? '#fff' : accentColor
+                }
+              }}
             >
-              {attachEl ? <AddRoundedIcon sx={{ transform: 'rotate(45deg)' }} /> : <AttachFileRoundedIcon/>}
+              {attachEl ? <AddRoundedIcon sx={{ transform: 'rotate(45deg)', fontSize: 20 }} /> : <AddRoundedIcon sx={{ fontSize: 20 }} />}
             </IconButton>
             
             {/* Hidden file inputs */}
             <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept=".pdf,.doc,.docx,.txt" onChange={handleFileSelect} />
             <input type="file" ref={imageInputRef} style={{ display: 'none' }} accept="image/*" multiple onChange={handleImageSelect} />
             <input type="file" ref={videoInputRef} style={{ display: 'none' }} accept="video/*" multiple onChange={handleImageSelect} />
-            <input type="file" ref={cameraInputRef} style={{ display: 'none' }} accept="image/*" capture="environment" onChange={handleCameraCapture} />
+            {/* Camera input - will open camera on mobile when clicked */}
+            <input 
+              type="file" 
+              ref={cameraInputRef} 
+              style={{ display: 'none' }} 
+              accept="image/*" 
+              capture
+              onChange={handleCameraCapture}
+            />
             <input type="file" ref={audioInputRef} style={{ display: 'none' }} accept="audio/*" onChange={handleFileSelect} />
             
+            {/* Text input field - Second, as per design */}
             <TextField
               fullWidth 
               size="small" 
@@ -1038,7 +1236,12 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
               minRows={1} 
               maxRows={6}
               disabled={isRecording}
-              InputProps={{ sx:{ bgcolor: 'background.paper' } }}
+              InputProps={{ 
+                sx:{ 
+                  bgcolor: 'background.paper',
+                  borderRadius: 2
+                } 
+              }}
               sx={{
                 '& .MuiInputBase-input': {
                   color: 'text.primary',
@@ -1050,18 +1253,52 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
               }}
             />
             
+            {/* Emoji picker button - Third, as per design */}
+            <IconButton 
+              aria-label="Emoji" 
+              onClick={(e)=>setEmojiEl(emojiEl ? null : e.currentTarget)}
+              sx={{ color: emojiEl ? accentColor : 'text.secondary' }}
+            >
+              <InsertEmoticonRoundedIcon/>
+            </IconButton>
+            
+            {/* Microphone/Send button - Fourth, as per design */}
             {draft.trim().length>0 ? (
-              <IconButton aria-label="Send" sx={{ color: EV.orange }} onClick={send}>
+              <IconButton aria-label="Send" sx={{ color: accentColor }} onClick={send}>
                 <SendRoundedIcon/>
               </IconButton>
             ) : (
               <IconButton 
                 aria-label="Record" 
-                sx={{ color: isRecording ? '#e53935' : EV.orange }}
-                onMouseDown={startRecording}
-                onMouseUp={stopRecording}
-                onTouchStart={startRecording}
-                onTouchEnd={stopRecording}
+                sx={{ color: isRecording ? '#e53935' : accentColor }}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  startRecording(e);
+                }}
+                onMouseUp={(e) => {
+                  e.preventDefault();
+                  stopRecording(e);
+                }}
+                onMouseLeave={(e) => {
+                  if (isRecording) {
+                    e.preventDefault();
+                    stopRecording(e);
+                  }
+                }}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  startRecording(e);
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  stopRecording(e);
+                }}
+                onTouchCancel={(e) => {
+                  if (isRecording) {
+                    e.preventDefault();
+                    stopRecording(e);
+                  }
+                }}
               >
                 {isRecording ? <StopRoundedIcon/> : <MicRoundedIcon/>}
               </IconButton>
@@ -1069,7 +1306,7 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
           </Box>
         </Box>
 
-        {/* WhatsApp-style Attachment Menu */}
+        {/* Attachment Menu - Vertical list as per design */}
         <Popover
           open={Boolean(attachEl)}
           anchorEl={attachEl}
@@ -1078,47 +1315,49 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
           transformOrigin={{ vertical: 'bottom', horizontal: 'left' }}
           PaperProps={{ 
             sx:{ 
-              borderRadius: 3, 
-              p: 1.5, 
+              borderRadius: 2, 
+              p: 1, 
               minWidth: 200,
               bgcolor: 'background.paper',
               boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.5)' : '0 4px 20px rgba(0,0,0,0.15)'
             } 
           }}
         >
-          <Box className="grid grid-cols-3 gap-3">
+          <List sx={{ p: 0 }}>
             {[
-              { icon: <ImageRoundedIcon sx={{ fontSize: 28 }} />, label: 'Photos', action: 'photos' },
-              { icon: <VideoLibraryRoundedIcon sx={{ fontSize: 28 }} />, label: 'Videos', action: 'videos' },
-              { icon: <CameraAltRoundedIcon sx={{ fontSize: 28 }} />, label: 'Camera', action: 'camera' },
-              { icon: <DescriptionRoundedIcon sx={{ fontSize: 28 }} />, label: 'Document', action: 'document' },
-              { icon: <ContactsRoundedIcon sx={{ fontSize: 28 }} />, label: 'Contact', action: 'contact' },
-              { icon: <PollRoundedIcon sx={{ fontSize: 28 }} />, label: 'Poll', action: 'poll' },
-              { icon: <LocationOnRoundedIcon sx={{ fontSize: 28 }} />, label: 'Location', action: 'location' },
-              { icon: <MusicNoteRoundedIcon sx={{ fontSize: 28 }} />, label: 'Audio', action: 'audio' },
+              { icon: <CameraAltRoundedIcon />, label: 'Camera', action: 'camera' },
+              { icon: <DescriptionRoundedIcon />, label: 'Document', action: 'document' },
+              { icon: <ImageRoundedIcon />, label: 'Photos & Videos', action: 'photos' },
+              { icon: <LocationOnRoundedIcon />, label: 'Location', action: 'location' },
+              { icon: <ContactsRoundedIcon />, label: 'Contact', action: 'contact' },
             ].map((item) => (
-              <Box
+              <MenuItem
                 key={item.action}
-                onClick={()=>handleAttachOption(item.action)}
+                onClick={()=>{
+                  handleAttachOption(item.action);
+                  setAttachEl(null);
+                }}
                 sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: 0.5,
-                  p: 1.5,
-                  borderRadius: 2,
-                  cursor: 'pointer',
-                  '&:hover': { bgcolor: 'action.hover' },
-                  transition: 'background-color 0.2s'
+                  py: 1.5,
+                  px: 2,
+                  gap: 2,
+                  borderRadius: 1,
+                  '&:hover': { bgcolor: 'action.hover' }
                 }}
               >
-                <Box sx={{ color: EV.green }}>{item.icon}</Box>
-                <Typography variant="caption" sx={{ fontSize: '11px', textAlign: 'center', color: 'text.secondary' }}>
-                  {item.label}
-                </Typography>
-              </Box>
+                <ListItemIcon sx={{ minWidth: 40, color: accentColor }}>
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText 
+                  primary={item.label}
+                  primaryTypographyProps={{
+                    fontSize: '14px',
+                    color: 'text.primary'
+                  }}
+                />
+              </MenuItem>
             ))}
-          </Box>
+          </List>
         </Popover>
 
         {/* Emoji Picker */}
