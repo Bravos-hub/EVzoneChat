@@ -534,7 +534,7 @@ function CallBanner({ call, duration, onTap, onEnd }) {
 /* -----------------------------------------------------------
    Component wrapper with navigation props
 ------------------------------------------------------------ */
-function RouteWrapper({ Component, ...props }) {
+function RouteWrapper({ Component, registry, ...props }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { endCall } = useCall();
@@ -594,10 +594,13 @@ function RouteWrapper({ Component, ...props }) {
   if (!Component) return <Screen title="Page not found" />;
   
   // Check if component accepts these props by trying to render with them
-  return <Component {...navProps} {...props} />;
+  // Pass registry to meeting components that need it (like U-M7)
+  return <Component {...navProps} {...props} registry={registry} />;
 }
 
-export default function MobileUserShell({ registry = {} }){
+export default function MobileUserShell({ registry: externalRegistry = {} }){
+  // Use internal registry if external one is not provided
+  const registry = externalRegistry;
   // Get components from registry
   const Inbox = getComponent(registry, 'U01-03', () => <Screen title="Messages"/>);
   const Search = getComponent(registry, 'U03-09', () => <Screen title="Search"/>);
@@ -616,6 +619,14 @@ export default function MobileUserShell({ registry = {} }){
   const NewMessage = getComponent(registry, 'U02-04', () => <Screen title="New Message"/>);
   const Conversation = getComponent(registry, 'U02-05', () => <Screen title="Conversation"/>);
   const Help = getComponent(registry, 'U12-34', () => <Screen title="Help Center"/>);
+  // Meeting components
+  const MeetingBooking = getComponent(registry, 'U-M1', () => <Screen title="Book Meeting"/>);
+  const MyMeetings = getComponent(registry, 'U-M2', () => <Screen title="My Meetings"/>);
+  const MeetingDetails = getComponent(registry, 'U-M3', () => <Screen title="Meeting Details"/>);
+  const PublicBooking = getComponent(registry, 'U-M4', () => <Screen title="Book Time"/>);
+  const MeetingConfirmation = getComponent(registry, 'U-M5', () => <Screen title="Meeting Confirmed"/>);
+  const MyAvailability = getComponent(registry, 'U-M6', () => <Screen title="My Availability"/>);
+  const LiveMeeting = getComponent(registry, 'U-M7', () => <Screen title="Live Meeting"/>);
 
   return (
     <BrowserRouter>
@@ -639,6 +650,14 @@ export default function MobileUserShell({ registry = {} }){
           <Route path="/safety" element={<RouteWrapper Component={Safety} />} />
           <Route path="/profile" element={<RouteWrapper Component={Profile} />} />
           <Route path="/help" element={<RouteWrapper Component={Help} />} />
+          {/* Meeting routes */}
+          <Route path="/meetings/book" element={<RouteWrapper Component={MeetingBooking} registry={registry} />} />
+          <Route path="/meetings" element={<RouteWrapper Component={MyMeetings} registry={registry} />} />
+          <Route path="/meetings/:id" element={<RouteWrapper Component={MeetingDetails} registry={registry} />} />
+          <Route path="/meetings/book/:slug" element={<RouteWrapper Component={PublicBooking} registry={registry} />} />
+          <Route path="/meetings/confirm/:id" element={<RouteWrapper Component={MeetingConfirmation} registry={registry} />} />
+          <Route path="/meetings/availability" element={<RouteWrapper Component={MyAvailability} registry={registry} />} />
+          <Route path="/meetings/live/:id" element={<RouteWrapper Component={LiveMeeting} registry={registry} />} />
           {/* Conversation routes */}
           <Route path="/new-message" element={<RouteWrapper Component={NewMessage} />} />
           <Route path="/conversation/:id" element={<RouteWrapper Component={Conversation} />} />

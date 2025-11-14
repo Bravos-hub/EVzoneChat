@@ -33,6 +33,14 @@ import U11_33 from '../pages/user/U11-33.jsx';
 import U12_34 from '../pages/user/U12-34.jsx';
 import U12_35 from '../pages/user/U12-35.jsx';
 import U12_36 from '../pages/user/U12-36.jsx';
+// Meeting components
+import U_M1 from '../meetings/u_m_1_meeting_booking_online_1_1_group_v_3_calendly_style_js.jsx';
+import U_M2 from '../meetings/u_m_2_my_meetings_list_upcoming_past_requests_mobile_react_mui_tailwind_js.jsx';
+import U_M3 from '../meetings/u_m_3_meeting_booking_details_host_view_mobile_react_mui_tailwind_js.jsx';
+import U_M4 from '../meetings/u_m_4_public_booking_page_guest_view_mobile_react_mui_tailwind_js.jsx';
+import U_M5 from '../meetings/u_m_5_meeting_confirmation_join_host_guest_mobile_react_mui_tailwind_js.jsx';
+import U_M6 from '../meetings/u_m_6_my_availability_working_hours_mobile_react_mui_tailwind_js.jsx';
+import U_M7 from '../meetings/u_m_7_live_meeting_shell_wraps_1_1_group_call_screens_mobile_react_mui_tailwind_js.jsx';
 
 const registry = {
   'U01-02': U01_02,
@@ -69,7 +77,15 @@ const registry = {
   'U11-33': U11_33,
   'U12-34': U12_34,
   'U12-35': U12_35,
-  'U12-36': U12_36
+  'U12-36': U12_36,
+  // Meeting components
+  'U-M1': U_M1,
+  'U-M2': U_M2,
+  'U-M3': U_M3,
+  'U-M4': U_M4,
+  'U-M5': U_M5,
+  'U-M6': U_M6,
+  'U-M7': U_M7
 };
 
 export default registry;

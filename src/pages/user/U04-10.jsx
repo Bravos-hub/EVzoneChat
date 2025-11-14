@@ -269,12 +269,12 @@ export default function OneToOneCall({
                 <IconButton onClick={()=>onNavigate?.('/group-call?type=conference')} aria-label="New conference" sx={{ color: accentColor }}>
                   <GroupsRoundedIcon />
                 </IconButton>
-                <IconButton onClick={()=>onNavigate?.('/group-call?type=meeting')} aria-label="New meeting" sx={{ color: accentColor }}>
+                <IconButton onClick={()=>onNavigate?.('/meetings/book')} aria-label="New meeting" sx={{ color: accentColor }}>
                   <MeetingRoomRoundedIcon />
                 </IconButton>
                 <IconButton onClick={()=>onNavigate?.('/call?type=voice&state=dialing')} aria-label="New voice call" sx={{ color: accentColor }}>
-                  <CallRoundedIcon />
-                </IconButton>
+                <CallRoundedIcon />
+              </IconButton>
               </Box>
             </Toolbar>
           </AppBar>
@@ -386,16 +386,16 @@ export default function OneToOneCall({
           </MenuItem>
           {/* Only show "View participants" for group/conference calls, not 1:1 calls */}
           {actualType === 'video' && (
-            <MenuItem onClick={()=>{ 
-              setMenuEl(null); 
+          <MenuItem onClick={()=>{ 
+            setMenuEl(null); 
               // For 1:1 calls, this could show call info instead
               // For now, only navigate to group call if it's actually a group call
               // In a real app, you'd check if call has multiple participants
               alert('This is a one-to-one call. View participants is only available for group calls.');
-            }}>
-              <ListItemIcon><PeopleAltRoundedIcon fontSize="small" sx={{ color: 'text.primary' }}/></ListItemIcon>
-              <ListItemText primary="View participants" />
-            </MenuItem>
+          }}>
+            <ListItemIcon><PeopleAltRoundedIcon fontSize="small" sx={{ color: 'text.primary' }}/></ListItemIcon>
+            <ListItemText primary="View participants" />
+          </MenuItem>
           )}
           <MenuItem onClick={()=>{ 
             setMenuEl(null); 
@@ -781,7 +781,7 @@ export default function OneToOneCall({
                   onEnd?.();
                   
                   // Navigate back immediately
-                  onNavigate?.(-1);
+                    onNavigate?.(-1);
                 }} 
                 aria-label="End call" 
                 sx={{ 
