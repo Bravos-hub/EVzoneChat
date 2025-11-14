@@ -337,10 +337,8 @@ Bottom Navigation (labels under icons)
 function MobileBottomNav(){
   const value = useTabFromLocation();
   const nav = useNavigate();
-  const { accent } = useTheme();
+  const { accentColor } = useTheme();
   const muiTheme = useMuiTheme();
-  
-  const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
   
   return (
     <BottomNavigation
@@ -391,6 +389,13 @@ function MobileBottomNav(){
 ------------------------------------------------------------ */
 function Launcher({ unread=0 }){
   const navigate = useNavigate();
+  const { accentColor } = useTheme();
+  
+  // Calculate hover color based on accent
+  const hoverColor = accentColor === EV.green ? '#02b37b' : accentColor === EV.orange ? '#e06f00' : '#8f8f8f';
+  const shadowColor = accentColor === EV.green ? 'rgba(3, 205, 140, 0.4)' : accentColor === EV.orange ? 'rgba(247, 127, 0, 0.4)' : 'rgba(166, 166, 166, 0.4)';
+  const shadowColorHover = accentColor === EV.green ? 'rgba(3, 205, 140, 0.5)' : accentColor === EV.orange ? 'rgba(247, 127, 0, 0.5)' : 'rgba(166, 166, 166, 0.5)';
+  
   return (
     <Box sx={{
       position: 'fixed',
@@ -417,12 +422,12 @@ function Launcher({ unread=0 }){
             bottom: 0,
             width: '3.5rem',
             height: '3.5rem',
-            bgcolor: EV.orange,
+            bgcolor: accentColor,
             color: '#fff',
-            boxShadow: '0 4px 16px rgba(247, 127, 0, 0.4)',
+            boxShadow: `0 4px 16px ${shadowColor}`,
             '&:hover': {
-              bgcolor: '#e06f00',
-              boxShadow: '0 6px 20px rgba(247, 127, 0, 0.5)',
+              bgcolor: hoverColor,
+              boxShadow: `0 6px 20px ${shadowColorHover}`,
               transform: 'scale(1.05)'
             },
             transition: 'all 0.2s ease',

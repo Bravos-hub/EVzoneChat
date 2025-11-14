@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
+import { useTheme } from "../../context/ThemeContext";
 import {
   AppBar,
   Toolbar,
@@ -34,6 +35,7 @@ const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2
  */
 export default function OnboardingPermissionsFinal({ onClose, onContinue, requireSensitiveConsent = true }) {
   const muiTheme = useMuiTheme();
+  const { accentColor } = useTheme();
   const [mic, setMic] = useState(false);
   const [cam, setCam] = useState(false);
   const [notif, setNotif] = useState(false);
@@ -191,7 +193,7 @@ export default function OnboardingPermissionsFinal({ onClose, onContinue, requir
                   },
                 }}
               >
-                <Checkbox sx={{ color: EV.orange, '&.Mui-checked': { color: EV.orange } }} checked={recordingConsent} onChange={(e)=>setRecordingConsent(e.target.checked)} />
+                <Checkbox sx={{ color: accentColor, '&.Mui-checked': { color: accentColor } }} checked={recordingConsent} onChange={(e)=>setRecordingConsent(e.target.checked)} />
                 <ListItemText primary={<span className="font-semibold">I consent to call recording when enabled</span>} secondary="A banner is shown to all participants during recording. Stored securely per EVzone policy." />
               </ListItem>
               <Divider />
