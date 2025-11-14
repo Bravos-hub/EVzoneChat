@@ -1283,37 +1283,44 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
               boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.04)'
             }}
           >
-            <Toolbar className="!min-h-[56px] !px-3" sx={{ position: 'relative' }}>
+            <Toolbar className="!min-h-[56px]" sx={{ position: 'relative', px: { xs: 1.5, sm: 3 } }}>
               <IconButton 
                 aria-label="Back" 
                 onClick={onBack}
-                sx={{ mr: 1, color: 'text.primary' }}
+                sx={{ 
+                  mr: { xs: 0.75, sm: 1 }, 
+                  color: 'text.primary',
+                  padding: { xs: '6px', sm: '8px' }
+                }}
               >
                 <ArrowBackRoundedIcon/>
               </IconButton>
               <Avatar 
                 src={avatar} 
                 sx={{ 
-                  width: '2.25rem', 
-                  height: '2.25rem', 
-                  mr: 1.5,
+                  width: { xs: '2rem', sm: '2.25rem' }, 
+                  height: { xs: '2rem', sm: '2.25rem' }, 
+                  mr: { xs: 1, sm: 1.5 },
                   boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                 }} 
               />
-              <Box sx={{ minWidth: 0, flexGrow: 1, pr: 12 }}>
+              <Box sx={{ minWidth: 0, flexGrow: 1, pr: { xs: 8, sm: 10, md: 12 }, overflow: 'hidden' }}>
                 <Typography 
                   variant="subtitle1" 
                   sx={{ 
                     whiteSpace:'nowrap',
-                    fontSize: '15px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    fontSize: { xs: '14px', sm: '15px' },
                     fontWeight: 600,
                     lineHeight: 1.2,
-                    color: 'text.primary'
+                    color: 'text.primary',
+                    maxWidth: '100%'
                   }}
                 >
                   {title}
                 </Typography>
-                <Box sx={{ display:'flex', alignItems:'center', gap:0.75, minWidth:0, mt: 0.25 }}>
+                <Box sx={{ display:'flex', alignItems:'center', gap:{ xs: 0.5, sm: 0.75 }, minWidth:0, mt: 0.25, flexWrap: 'wrap' }}>
                   {/* Module pill - always show */}
                   <Chip 
                     size="small" 
@@ -1323,8 +1330,8 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
                       color: accent === 'green' ? '#0f5132' : accent === 'orange' ? '#5d2c00' : '#424242', 
                       bgcolor: lighten(accentColor,0.12), 
                       border:`1px solid ${lighten(accentColor,0.28)}`,
-                      height: 20,
-                      fontSize: '10px',
+                      height: { xs: 18, sm: 20 },
+                      fontSize: { xs: '9px', sm: '10px' },
                       fontWeight: 600
                     }} 
                   />
@@ -1333,7 +1340,7 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
                     <Typography 
                       variant="caption" 
                       sx={{ 
-                        fontSize: '12px',
+                        fontSize: { xs: '11px', sm: '12px' },
                         color: accentColor,
                         fontWeight: 500
                       }}
@@ -1345,7 +1352,7 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
                     <Typography 
                       variant="caption" 
                       sx={{ 
-                        fontSize: '11px',
+                        fontSize: { xs: '10px', sm: '11px' },
                         color: muiTheme.palette.text.secondary
                       }}
                     >
@@ -1354,12 +1361,37 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
                   )}
                 </Box>
               </Box>
-              <Box sx={{ position:'absolute', top: 8, right: 4, display:'flex', gap: 0.5 }}>
+              <Box sx={{ 
+                position:'absolute', 
+                top: 8, 
+                right: { xs: 2, sm: 4 }, 
+                display:'flex', 
+                gap: { xs: 0.25, sm: 0.5 },
+                alignItems: 'center'
+              }}>
+                <IconButton 
+                  aria-label="Voice call" 
+                  title="Voice call"
+                  size="small" 
+                  sx={{ 
+                    color: 'text.secondary',
+                    padding: { xs: '6px', sm: '8px' }
+                  }}
+                  onClick={()=>{
+                    // Navigate to call page with voice type and contact name
+                    onNavigate?.(`/call?type=voice&contact=${encodeURIComponent(title)}&state=dialing`);
+                  }}
+                >
+                  <CallRoundedIcon fontSize="small"/>
+                </IconButton>
                 <IconButton 
                   aria-label="Video call" 
                   title="Video call"
                   size="small" 
-                  sx={{ color: 'text.secondary' }}
+                  sx={{ 
+                    color: 'text.secondary',
+                    padding: { xs: '6px', sm: '8px' }
+                  }}
                   onClick={()=>{
                     // Navigate to call page with video type and contact name
                     onNavigate?.(`/call?type=video&contact=${encodeURIComponent(title)}&state=dialing`);
@@ -1368,42 +1400,14 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
                   <VideocamRoundedIcon fontSize="small"/>
                 </IconButton>
                 <IconButton 
-                  aria-label="Conference call" 
-                  title="Conference call"
+                  aria-label="More" 
+                  onClick={openHeaderMenu} 
                   size="small" 
-                  sx={{ color: 'text.secondary' }}
-                  onClick={()=>{
-                    // Navigate to conference call page
-                    onNavigate?.(`/group-call?contact=${encodeURIComponent(title)}&type=conference`);
+                  sx={{ 
+                    color: 'text.secondary',
+                    padding: { xs: '6px', sm: '8px' }
                   }}
                 >
-                  <GroupsRoundedIcon fontSize="small"/>
-                </IconButton>
-                <IconButton 
-                  aria-label="Schedule meeting" 
-                  title="Schedule meeting"
-                  size="small" 
-                  sx={{ color: 'text.secondary' }}
-                  onClick={()=>{
-                    // Navigate to meeting booking page to create a new meeting
-                    onNavigate?.('/meetings/book');
-                  }}
-                >
-                  <EventAvailableRoundedIcon fontSize="small"/>
-                </IconButton>
-                <IconButton 
-                  aria-label="Voice call" 
-                  title="Voice call"
-                  size="small" 
-                  sx={{ color: 'text.secondary' }}
-                  onClick={()=>{
-                    // Navigate to call page with voice type and contact name
-                    onNavigate?.(`/call?type=voice&contact=${encodeURIComponent(title)}&state=dialing`);
-                  }}
-                >
-                  <CallRoundedIcon fontSize="small"/>
-                </IconButton>
-                <IconButton aria-label="More" onClick={openHeaderMenu} size="small" sx={{ color: 'text.secondary' }}>
                   <MoreVertRoundedIcon fontSize="small"/>
                 </IconButton>
               </Box>
@@ -1485,6 +1489,22 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
             <ListItemIcon><InfoOutlinedIcon fontSize="small"/></ListItemIcon>
             <ListItemText primary={chatKind === 'group' ? "View group info" : "View contact info"} />
           </MenuItem>
+          <MenuItem onClick={()=>{ 
+            closeHeaderMenu(); 
+            // Navigate to conference call page
+            onNavigate?.(`/group-call?contact=${encodeURIComponent(title)}&type=conference`);
+          }}>
+            <ListItemIcon><GroupsRoundedIcon fontSize="small"/></ListItemIcon>
+            <ListItemText primary="Conference call" />
+          </MenuItem>
+          <MenuItem onClick={()=>{ 
+            closeHeaderMenu(); 
+            // Navigate to meeting booking page to create a new meeting
+            onNavigate?.('/meetings/book');
+          }}>
+            <ListItemIcon><EventAvailableRoundedIcon fontSize="small"/></ListItemIcon>
+            <ListItemText primary="Schedule meeting" />
+          </MenuItem>
           <MenuItem onClick={()=>{ closeHeaderMenu(); setMuted(!muted); alert(muted ? 'Notifications enabled' : 'Notifications muted'); }}>
             <ListItemIcon><NotificationsOffRoundedIcon fontSize="small"/></ListItemIcon>
             <ListItemText primary={muted ? "Unmute notifications" : "Mute notifications"} />
@@ -1526,7 +1546,7 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
             overflowY:'auto', 
             pt: '7rem', // shell header + conversation header
             pb: '11.25rem', // Space for composer + bottom nav + padding
-            px: 3,
+            px: { xs: 2, sm: 3 },
             minHeight: 0,
             display: 'flex',
             flexDirection: 'column',
@@ -1570,8 +1590,8 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
           sx={{ 
             borderTop: `1px solid ${muiTheme.palette.divider}`,
             bgcolor: 'background.paper',
-            px: 2,
-            py: 1.5,
+            px: { xs: 1.5, sm: 2 },
+            py: { xs: 1, sm: 1.5 },
             position: 'fixed',
             bottom: '5.5rem', // Above bottom nav
             left: 0,
@@ -1587,7 +1607,7 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
               <div className="text-[11.5px]" style={{ color: muiTheme.palette.text.secondary }}>Replying to: {replyTo.text.slice(0,72)}{replyTo.text.length>72?'…':''}</div>
             </Box>
           )}
-          <Box className="flex items-end gap-1.5">
+          <Box className="flex items-end gap-1.5" sx={{ gap: { xs: 1, sm: 1.5 } }}>
             {/* Attachment menu button (+ icon) - First, as per design */}
             <IconButton 
               aria-label="Attach" 
@@ -1596,15 +1616,16 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
                 bgcolor: attachEl ? accentColor : 'transparent',
                 color: attachEl ? '#fff' : accentColor,
                 border: `1px solid ${accentColor}`,
-                width: 40,
-                height: 40,
+                width: { xs: 36, sm: 40 },
+                height: { xs: 36, sm: 40 },
+                minWidth: { xs: 36, sm: 40 },
                 '&:hover': {
                   bgcolor: attachEl ? accentColor : lighten(accentColor, 0.1),
                   color: attachEl ? '#fff' : accentColor
                 }
               }}
             >
-              {attachEl ? <AddRoundedIcon sx={{ transform: 'rotate(45deg)', fontSize: 20 }} /> : <AddRoundedIcon sx={{ fontSize: 20 }} />}
+              {attachEl ? <AddRoundedIcon sx={{ transform: 'rotate(45deg)', fontSize: { xs: 18, sm: 20 } }} /> : <AddRoundedIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />}
             </IconButton>
             
             {/* Hidden file inputs */}
@@ -1662,9 +1683,12 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
             <IconButton 
               aria-label="Emoji" 
               onClick={(e)=>setEmojiEl(emojiEl ? null : e.currentTarget)}
-              sx={{ color: emojiEl ? accentColor : 'text.secondary' }}
+              sx={{ 
+                color: emojiEl ? accentColor : 'text.secondary',
+                padding: { xs: '6px', sm: '8px' }
+              }}
             >
-              <InsertEmoticonRoundedIcon/>
+              <InsertEmoticonRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }}/>
             </IconButton>
             
             {/* Recording Controls - Show when recording */}
@@ -1754,16 +1778,26 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
               <>
                 {/* Microphone/Send button - Fourth, as per design */}
                 {draft.trim().length>0 ? (
-                  <IconButton aria-label="Send" sx={{ color: accentColor }} onClick={send}>
-                    <SendRoundedIcon/>
+                  <IconButton 
+                    aria-label="Send" 
+                    sx={{ 
+                      color: accentColor,
+                      padding: { xs: '6px', sm: '8px' }
+                    }} 
+                    onClick={send}
+                  >
+                    <SendRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }}/>
                   </IconButton>
                 ) : (
                   <IconButton 
                     aria-label="Record" 
                     onClick={startRecording}
-                    sx={{ color: accentColor }}
+                    sx={{ 
+                      color: accentColor,
+                      padding: { xs: '6px', sm: '8px' }
+                    }}
                   >
-                    <MicRoundedIcon/>
+                    <MicRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }}/>
                   </IconButton>
                 )}
               </>
