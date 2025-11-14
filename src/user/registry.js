@@ -7,7 +7,7 @@ import U03_07 from '../pages/user/U03-07.jsx';
 import U03_08 from '../pages/user/U03-08.jsx';
 import U03_09 from '../pages/user/U03-09.jsx';
 import U04_10 from '../pages/user/U04-10.jsx';
-import U04_11 from '../pages/user/U04-11.jsx';
+import U04_11 from '../pages/user/u_04_11_group_call_participants_pro_final_mobile_react_mui_tailwind.jsx';
 import U04_12 from '../pages/user/U04-12.jsx';
 import U05_13 from '../pages/user/U05-13.jsx';
 import U05_14 from '../pages/user/U05-14.jsx';

@@ -323,7 +323,7 @@ function ShellFrame({ children }){
           onTap={() => navigate(`/call?type=${activeCall.type}&contact=${encodeURIComponent(activeCall.contact)}&state=${activeCall.state}`)}
           onEnd={() => {
             endCall();
-            navigate(-1);
+            // Don't navigate away, just end the call
           }}
         />
       )}
@@ -513,6 +513,7 @@ function CallBanner({ call, duration, onTap, onEnd }) {
           size="small"
           onClick={(e) => {
             e.stopPropagation();
+            // Just end the call, don't navigate away
             onEnd();
           }}
           sx={{
@@ -536,18 +537,25 @@ function CallBanner({ call, duration, onTap, onEnd }) {
 function RouteWrapper({ Component, ...props }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { endCall } = useCall();
   
   // Provide comprehensive navigation props to components that need them
   const navProps = {
     onBack: () => navigate(-1),
     onClose: () => navigate(-1),
     onNavigate: navigate,
+    onEnd: () => {
+      endCall();
+      navigate(-1);
+    },
     location,
     // Navigation handlers for common actions
     onOpen: (item) => {
       // Navigate to conversation or detail view
       if (item?.id) {
-        navigate(`/conversation/${item.id}`);
+        // Include module in URL if available
+        const moduleParam = item?.module ? `?module=${encodeURIComponent(item.module)}` : '';
+        navigate(`/conversation/${item.id}${moduleParam}`);
       }
     },
     onNew: () => navigate('/new-message'),
@@ -594,6 +602,7 @@ export default function MobileUserShell({ registry = {} }){
   const Inbox = getComponent(registry, 'U01-03', () => <Screen title="Messages"/>);
   const Search = getComponent(registry, 'U03-09', () => <Screen title="Search"/>);
   const Call = getComponent(registry, 'U04-10', () => <Screen title="Calls"/>);
+  const GroupCallParticipants = getComponent(registry, 'U04-11', () => <Screen title="Group Call Participants"/>);
   const Media = getComponent(registry, 'U03-08', () => <Screen title="Media"/>);
   const Settings = getComponent(registry, 'U10-29', () => <Screen title="Settings"/>);
   const Security = getComponent(registry, 'U10-28', () => <Screen title="Security"/>);
@@ -616,6 +625,8 @@ export default function MobileUserShell({ registry = {} }){
           <Route path="/inbox" element={<RouteWrapper Component={Inbox} />} />
           <Route path="/search" element={<RouteWrapper Component={Search} />} />
           <Route path="/call" element={<RouteWrapper Component={Call} />} />
+          <Route path="/group-call" element={<RouteWrapper Component={GroupCallParticipants} />} />
+          <Route path="/call/participants" element={<RouteWrapper Component={GroupCallParticipants} />} />
           <Route path="/media" element={<RouteWrapper Component={Media} />} />
           <Route path="/settings" element={<RouteWrapper Component={Settings} />} />
           <Route path="/security" element={<RouteWrapper Component={Security} />} />

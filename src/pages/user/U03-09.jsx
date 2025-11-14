@@ -33,6 +33,10 @@ const CHANNELS = [
   { id:'c1', name:'#announcements' },
   { id:'c2', name:'#charging-crew' },
 ];
+const GROUPS = [
+  { id:'g1', name:'Team Alpha', avatar:'https://i.pravatar.cc/100?img=15', members: 12 },
+  { id:'g2', name:'Project Beta', avatar:'https://i.pravatar.cc/100?img=16', members: 8 },
+];
 const MESSAGES = [
   { id:'m1', who: PEOPLE[1], snippet:'Meet at 3 pm — bringing the PDF.', time:'Yesterday' },
   { id:'m2', who: PEOPLE[0], snippet:'Invoice sent. Please confirm.', time:'Tue' },
@@ -58,10 +62,11 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
 
   const globalResults = useMemo(()=>{
     const s = q.trim().toLowerCase();
-    if(!s) return { people: PEOPLE, channels: CHANNELS, messages: MESSAGES };
+    if(!s) return { people: PEOPLE, channels: CHANNELS, groups: GROUPS, messages: MESSAGES };
     return {
       people: PEOPLE.filter(p => p.name.toLowerCase().includes(s)),
       channels: CHANNELS.filter(c => c.name.toLowerCase().includes(s)),
+      groups: GROUPS.filter(g => g.name.toLowerCase().includes(s)),
       messages: MESSAGES.filter(m => m.snippet.toLowerCase().includes(s)),
     };
   }, [q]);
@@ -92,7 +97,7 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
         {/* Search input */}
         <Box className="px-3 py-2">
           <TextField
-            fullWidth size="small" value={q} onChange={(e)=>setQ(e.target.value)} placeholder="Search people, channels, messages"
+            fullWidth size="small" value={q} onChange={(e)=>setQ(e.target.value)} placeholder="Search people, channels, groups, messages"
             InputProps={{ 
               startAdornment:(<InputAdornment position="start"><SearchRoundedIcon sx={{ color: 'text.secondary' }} /></InputAdornment>) 
             }}
@@ -156,6 +161,34 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
                 ))}
               </List>
 
+              {/* Groups */}
+              <div className="px-3 py-2 text-xs" style={{ color: muiTheme.palette.text.secondary }}>Groups</div>
+              <List>
+                {globalResults.groups.map((g, idx)=> (
+                  <React.Fragment key={g.id}>
+                    <ListItem 
+                      button 
+                      onClick={()=>onOpenResult?.({ type:'group', id:g.id })}
+                      sx={{
+                        '& .MuiListItemText-primary': {
+                          color: 'text.primary',
+                        },
+                        '& .MuiListItemText-secondary': {
+                          color: 'text.secondary',
+                        },
+                      }}
+                    >
+                      <ListItemAvatar><Avatar src={g.avatar} /></ListItemAvatar>
+                      <ListItemText 
+                        primary={<span className="font-semibold">{highlight(g.name, q, muiTheme)}</span>} 
+                        secondary={<span className="text-[12px]">{g.members} members</span>}
+                      />
+                    </ListItem>
+                    {idx < globalResults.groups.length - 1 && <Divider component="li" />}
+                  </React.Fragment>
+                ))}
+              </List>
+
               {/* Messages */}
               <div className="px-3 py-2 text-xs" style={{ color: muiTheme.palette.text.secondary }}>Messages</div>
               <List>
@@ -213,7 +246,7 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
         {tab===0 && (
           <Box className="px-3 pb-3 pt-2">
             <div className="flex gap-2 flex-wrap">
-              {['people','channels','messages'].map(k => (
+              {['people','channels','groups','messages'].map(k => (
                 <Chip key={k} label={`Filter: ${k}`} sx={{ border:`1px solid ${accentColor}`, color: accentColor }} variant="outlined" />
               ))}
               <Button variant="contained" sx={{ bgcolor: accentColor, textTransform:'none', '&:hover':{ bgcolor: accentColor, opacity: 0.9 } }}>Apply</Button>

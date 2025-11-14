@@ -21,6 +21,8 @@ import CallRoundedIcon from "@mui/icons-material/CallRounded";
 import ChatBubbleOutlineRoundedIcon from "@mui/icons-material/ChatBubbleOutlineRounded";
 import ClosedCaptionRoundedIcon from "@mui/icons-material/ClosedCaptionRounded";
 import SignalCellularAltRoundedIcon from "@mui/icons-material/SignalCellularAltRounded";
+import PeopleAltRoundedIcon from "@mui/icons-material/PeopleAltRounded";
+import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
@@ -76,6 +78,7 @@ export default function OneToOneCall({
     { id: 'c2', name: 'Etty Duke', avatar: 'https://i.pravatar.cc/100?img=1', type: 'voice', time: 'Yesterday', duration: '5:10', status: 'completed', missed: false },
     { id: 'c3', name: 'Dr. Cohen', avatar: 'https://i.pravatar.cc/100?img=12', type: 'video', time: 'Mon', duration: '—', status: 'missed', missed: true },
     { id: 'c4', name: 'EVzone Support', avatar: 'https://i.pravatar.cc/100?img=8', type: 'voice', time: 'Last week', duration: '8:45', status: 'completed', missed: false },
+    { id: 'c5', name: 'Team Meeting', avatar: 'https://i.pravatar.cc/100?img=15', type: 'conference', time: 'Today', duration: '32:15', status: 'completed', missed: false },
   ];
 
   // All hooks must be called before any conditional returns
@@ -276,7 +279,13 @@ export default function OneToOneCall({
                       }
                       secondary={
                         <div className="flex items-center gap-2 mt-0.5">
-                          {call.type === 'video' ? <VideocamRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} /> : <CallRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />}
+                          {call.type === 'video' ? (
+                            <VideocamRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                          ) : call.type === 'conference' ? (
+                            <GroupsRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                          ) : (
+                            <CallRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                          )}
                           <span className="text-[12px]" style={{ color: muiTheme.palette.text.secondary }}>{call.duration}</span>
                         </div>
                       }
@@ -351,6 +360,14 @@ export default function OneToOneCall({
           }}>
             <ListItemIcon><ClosedCaptionRoundedIcon fontSize="small" sx={{ color: 'text.primary' }}/></ListItemIcon>
             <ListItemText primary={captions? "Disable captions" : "Enable captions"} />
+          </MenuItem>
+          <MenuItem onClick={()=>{ 
+            setMenuEl(null); 
+            // Navigate to group call participants (for group calls)
+            onNavigate?.('/group-call');
+          }}>
+            <ListItemIcon><PeopleAltRoundedIcon fontSize="small" sx={{ color: 'text.primary' }}/></ListItemIcon>
+            <ListItemText primary="View participants" />
           </MenuItem>
           <MenuItem onClick={()=>{ 
             setMenuEl(null); 
