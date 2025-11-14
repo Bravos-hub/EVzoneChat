@@ -21,6 +21,8 @@ import CallRoundedIcon from "@mui/icons-material/CallRounded";
 import ChatBubbleOutlineRoundedIcon from "@mui/icons-material/ChatBubbleOutlineRounded";
 import ClosedCaptionRoundedIcon from "@mui/icons-material/ClosedCaptionRounded";
 import SignalCellularAltRoundedIcon from "@mui/icons-material/SignalCellularAltRounded";
+import PeopleAltRoundedIcon from "@mui/icons-material/PeopleAltRounded";
+import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
@@ -61,6 +63,12 @@ export default function OneToOneCall({
     return params.get('state') || state;
   }, [location, state]);
 
+  // Check if this is a live session call
+  const isLiveSession = useMemo(() => {
+    const params = new URLSearchParams(location?.search || '');
+    return params.get('live') !== null;
+  }, [location]);
+
   const actualType = callType === 'voice' ? 'voice' : 'video';
   const actualRemote = { ...remote, name: contactName };
 
@@ -76,6 +84,7 @@ export default function OneToOneCall({
     { id: 'c2', name: 'Etty Duke', avatar: 'https://i.pravatar.cc/100?img=1', type: 'voice', time: 'Yesterday', duration: '5:10', status: 'completed', missed: false },
     { id: 'c3', name: 'Dr. Cohen', avatar: 'https://i.pravatar.cc/100?img=12', type: 'video', time: 'Mon', duration: '—', status: 'missed', missed: true },
     { id: 'c4', name: 'EVzone Support', avatar: 'https://i.pravatar.cc/100?img=8', type: 'voice', time: 'Last week', duration: '8:45', status: 'completed', missed: false },
+    { id: 'c5', name: 'Team Meeting', avatar: 'https://i.pravatar.cc/100?img=15', type: 'conference', time: 'Today', duration: '32:15', status: 'completed', missed: false },
   ];
 
   // All hooks must be called before any conditional returns
@@ -95,6 +104,7 @@ export default function OneToOneCall({
   // Call state management - auto-transition through dialing states
   const [callState, setCallState] = useState(callStateFromUrl);
   const [elapsed, setElapsed] = useState(0);
+  const [isEnding, setIsEnding] = useState(false);
   
   // Update state when URL changes
   useEffect(() => {
@@ -276,7 +286,13 @@ export default function OneToOneCall({
                       }
                       secondary={
                         <div className="flex items-center gap-2 mt-0.5">
-                          {call.type === 'video' ? <VideocamRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} /> : <CallRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />}
+                          {call.type === 'video' ? (
+                            <VideocamRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                          ) : call.type === 'conference' ? (
+                            <GroupsRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                          ) : (
+                            <CallRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                          )}
                           <span className="text-[12px]" style={{ color: muiTheme.palette.text.secondary }}>{call.duration}</span>
                         </div>
                       }
@@ -352,6 +368,19 @@ export default function OneToOneCall({
             <ListItemIcon><ClosedCaptionRoundedIcon fontSize="small" sx={{ color: 'text.primary' }}/></ListItemIcon>
             <ListItemText primary={captions? "Disable captions" : "Enable captions"} />
           </MenuItem>
+          {/* Only show "View participants" for group/conference calls, not 1:1 calls */}
+          {actualType === 'video' && (
+            <MenuItem onClick={()=>{ 
+              setMenuEl(null); 
+              // For 1:1 calls, this could show call info instead
+              // For now, only navigate to group call if it's actually a group call
+              // In a real app, you'd check if call has multiple participants
+              alert('This is a one-to-one call. View participants is only available for group calls.');
+            }}>
+              <ListItemIcon><PeopleAltRoundedIcon fontSize="small" sx={{ color: 'text.primary' }}/></ListItemIcon>
+              <ListItemText primary="View participants" />
+            </MenuItem>
+          )}
           <MenuItem onClick={()=>{ 
             setMenuEl(null); 
             // Navigate to conversation with this contact
@@ -714,15 +743,29 @@ export default function OneToOneCall({
               {/* end call - Always visible and prominent - MUST end call */}
               <IconButton 
                 onClick={() => {
-                  // End call immediately
-                  endCall(); // End call in global context first
-                  setCallState("dialing"); // Reset state
+                  if (isEnding) return; // Prevent double-click
+                  setIsEnding(true);
+                  
+                  // End call immediately - clear all state
+                  endCall(); // End call in global context first - this clears activeCall
+                  setCallState(null); // Clear call state
                   setElapsed(0);
-                  onEnd?.(); // Call onEnd callback
-                  // Navigate back after a brief delay to ensure state is cleared
-                  setTimeout(() => {
-                    onNavigate?.(-1);
-                  }, 100);
+                  setMuted(false);
+                  setCamOn(false);
+                  setSharing(false);
+                  setCaptions(false);
+                  
+                  // If this was a live session, notify that it ended
+                  if (isLiveSession) {
+                    // In a real app, you'd send a signal to end the live session
+                    console.log('Live session ended');
+                  }
+                  
+                  // Call onEnd callback
+                  onEnd?.();
+                  
+                  // Navigate back immediately
+                  onNavigate?.(-1);
                 }} 
                 aria-label="End call" 
                 sx={{ 

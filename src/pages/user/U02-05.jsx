@@ -69,7 +69,7 @@ const DEMO = [
   { id: 'm3', author: { id:'u2', name:'Leslie Alexander', avatar:'https://i.pravatar.cc/100?img=5' }, text: 'Perfect. Also, can you check the PDF I shared?', time: '07:34 PM', mine: false, read: false }
 ];
 
-function Bubble({ msg, onQuote, onAction, scrollTo, onSelect, isSelected }){
+function Bubble({ msg, onQuote, onAction, scrollTo, onSelect, isSelected, isSelectionMode }){
   const muiTheme = useMuiTheme();
   const { isDark, accent } = useTheme();
   const [menuEl, setMenuEl] = useState(null);
@@ -146,7 +146,18 @@ function Bubble({ msg, onQuote, onAction, scrollTo, onSelect, isSelected }){
             <Paper 
             elevation={0} 
             onContextMenu={(e)=>{e.preventDefault(); setMenuEl(e.currentTarget);}} 
-            onClick={(e)=>{ if(selected) { onSelect?.(msg.id, false); } else { setMenuEl(e.currentTarget); } }}
+            onClick={(e)=>{
+              // If in selection mode, toggle selection on click
+              if (isSelectionMode) {
+                onSelect?.(msg.id, !selected);
+              } else if (selected) {
+                // If message is selected but not in selection mode, deselect it
+                onSelect?.(msg.id, false);
+              } else {
+                // Normal click - show menu
+                setMenuEl(e.currentTarget);
+              }
+            }}
             onTouchStart={onTouchStart} 
             onTouchMove={onTouchMove} 
             onTouchEnd={onTouchEnd} 
@@ -404,7 +415,7 @@ function Bubble({ msg, onQuote, onAction, scrollTo, onSelect, isSelected }){
   );
 }
 
-export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='Marketplace', onNavigate, location }){
+export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='E-Commerce', onNavigate, location }){
   const muiTheme = useMuiTheme();
   const { isDark, accent } = useTheme();
   
@@ -572,7 +583,27 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
   
   const meta = useMemo(()=> chatKind==='channel'? 'Announcement channel' : (chatKind==='group'? 'Group' : 'Online'), [chatKind]);
 
-  useEffect(()=>{ const el=listRef.current; if(el) el.scrollTop = el.scrollHeight; }, [draft, messages.length]);
+  // Scroll to top on initial load and when conversation changes
+  useEffect(() => {
+    const el = listRef.current;
+    if (el) {
+      // Scroll to top so user sees the beginning of the conversation
+      el.scrollTop = 0;
+    }
+  }, [location?.pathname]); // Re-scroll to top when conversation changes
+  
+  // Only scroll to bottom when sending a new message (when draft is cleared after sending)
+  useEffect(()=>{ 
+    if (draft === '' && messages.length > 0) {
+      // Only scroll to bottom if we just sent a message (draft cleared)
+      const el=listRef.current; 
+      if(el) {
+        setTimeout(() => {
+          el.scrollTop = el.scrollHeight;
+        }, 100);
+      }
+    }
+  }, [draft, messages.length]);
 
   const scrollToMsg = (id)=>{
     const el = document.getElementById(`msg-${id}`);
@@ -1281,6 +1312,20 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
                   {title}
                 </Typography>
                 <Box sx={{ display:'flex', alignItems:'center', gap:0.75, minWidth:0, mt: 0.25 }}>
+                  {/* Module pill - always show */}
+                  <Chip 
+                    size="small" 
+                    label={effectiveModuleLabel} 
+                    sx={{ 
+                      borderColor: accentColor, 
+                      color: accent === 'green' ? '#0f5132' : accent === 'orange' ? '#5d2c00' : '#424242', 
+                      bgcolor: lighten(accentColor,0.12), 
+                      border:`1px solid ${lighten(accentColor,0.28)}`,
+                      height: 20,
+                      fontSize: '10px',
+                      fontWeight: 600
+                    }} 
+                  />
                   {/* Online status indicator - green "Online" text */}
                   {!isGroupChat && (
                     <Typography 
@@ -1295,30 +1340,15 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
                     </Typography>
                   )}
                   {isGroupChat && (
-                    <>
-                      <Chip 
-                        size="small" 
-                        label={effectiveModuleLabel} 
-                        sx={{ 
-                          borderColor: accentColor, 
-                          color: accent === 'green' ? '#0f5132' : accent === 'orange' ? '#5d2c00' : '#424242', 
-                          bgcolor: lighten(accentColor,0.12), 
-                          border:`1px solid ${lighten(accentColor,0.28)}`,
-                          height: 20,
-                          fontSize: '10px',
-                          fontWeight: 600
-                        }} 
-                      />
-                      <Typography 
-                        variant="caption" 
-                        sx={{ 
-                          fontSize: '11px',
-                          color: muiTheme.palette.text.secondary
-                        }}
-                      >
-                        {meta}
-                      </Typography>
-                    </>
+                    <Typography 
+                      variant="caption" 
+                      sx={{ 
+                        fontSize: '11px',
+                        color: muiTheme.palette.text.secondary
+                      }}
+                    >
+                      {meta}
+                    </Typography>
                   )}
                 </Box>
               </Box>
@@ -1501,6 +1531,7 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
                 scrollTo={scrollToMsg}
                 onSelect={handleSelectMessage}
                 isSelected={selectedMessages.has(m.id)}
+                isSelectionMode={selectedMessages.size > 0}
               />
             ))}
           </div>

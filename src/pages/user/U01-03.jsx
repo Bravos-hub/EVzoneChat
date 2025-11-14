@@ -19,7 +19,10 @@ import {
   Paper,
   Tabs,
   Tab,
-  Button
+  Button,
+  Chip,
+  Menu,
+  MenuItem
 } from "@mui/material";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded";
@@ -49,7 +52,7 @@ const LIVE_DEMO = [
 /**
  * U01-03 Unified Inbox - Messages List
  * Design Structure (from PowerPoint):
- * 1. Top Header (Theme Color): Back arrow, "Lessons" title, Notification bell
+ * 1. Top Header (Theme Color): Back arrow, "Inbox" title, Notification bell
  * 2. Live Ongoing Section (Dark Grey): Shows active session card
  * 3. Message Drawer (White Rounded Panel): Contains Messages title, icons, tabs, and chat list
  */
@@ -57,7 +60,9 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
   const { accent, isDark } = useTheme();
   const navigate = useNavigate();
   const [q, setQ] = useState("");
-  const [tab, setTab] = useState(0); // 0 = Evzone Rides, 1 = Other
+  const [tab, setTab] = useState(0); // 0 = E-Commerce, 1 = Other
+  const [selectedModule, setSelectedModule] = useState('E-Commerce');
+  const [moduleMenuEl, setModuleMenuEl] = useState(null);
   const [showSearch, setShowSearch] = useState(false);
   const searchInputRef = useRef(null);
   
@@ -69,16 +74,19 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
     return items.reduce((sum, item) => sum + (item.unread || 0), 0);
   }, [items]);
 
-  // filter logic - filter by tab (Evzone Rides = Rides module, Other = everything else)
+  // Available modules
+  const MODULES = ['E-Commerce', 'EV Charging', 'Rides & Logistics', 'School & E-Learning', 'Medical & Health Care', 'Travel & Tourism', 'Green Investments', 'Faith Hub', 'Social Networking', 'Virtual Workspace', 'Wallet & Payments', 'AI Chatbot'];
+  
+  // filter logic - filter by tab (E-Commerce = selected module, Other = everything else)
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
     return items.filter((it) => {
       const matchQ = !s || [it.name, it.module, it.last].join(" ").toLowerCase().includes(s);
-      // Tab 0 = Evzone Rides (only Rides module), Tab 1 = Other (everything except Rides)
-      const matchTab = tab === 0 ? it.module === 'Rides' : it.module !== 'Rides';
+      // Tab 0 = Selected module (E-Commerce by default), Tab 1 = Other (everything except selected module)
+      const matchTab = tab === 0 ? it.module === selectedModule : it.module !== selectedModule;
       return matchQ && matchTab;
     });
-  }, [q, items, tab]);
+  }, [q, items, tab, selectedModule]);
 
 
   return (
@@ -122,7 +130,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                 flexGrow: 1
               }}
             >
-              Lessons
+              Inbox
             </Typography>
             <IconButton 
               aria-label="Notifications" 
@@ -167,7 +175,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
               letterSpacing: '0.5px'
             }}
           >
-            Live ongoing
+            ONGOING EVENTS
           </Typography>
           {lives && lives.length > 0 ? (
             <Box
@@ -214,19 +222,34 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                       sx={{ width: 40, height: 40 }}
                     />
                     <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Typography 
-                        variant="body2" 
-                        sx={{ 
-                          fontWeight: 600, 
-                          color: '#fff',
-                          fontSize: '14px',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap'
-                        }}
-                      >
-                        {live.host}
-                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                        <Typography 
+                          variant="body2" 
+                          sx={{ 
+                            fontWeight: 600, 
+                            color: '#fff',
+                            fontSize: '14px',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            flex: 1
+                          }}
+                        >
+                          {live.host}
+                        </Typography>
+                        <Chip 
+                          size="small" 
+                          label={live.module || 'E-Commerce'} 
+                          sx={{ 
+                            height: 18,
+                            fontSize: '9px',
+                            fontWeight: 600,
+                            bgcolor: 'rgba(255, 255, 255, 0.2)',
+                            color: '#fff',
+                            border: '1px solid rgba(255, 255, 255, 0.3)'
+                          }} 
+                        />
+                      </Box>
                       <Typography 
                         variant="caption" 
                         sx={{ 
@@ -382,33 +405,108 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
               </Box>
             </Box>
 
-            {/* Tabs: Evzone Rides and Other - Inside Drawer */}
-            <Tabs 
-              value={tab} 
-              onChange={(e, v) => setTab(v)} 
-              textColor="inherit"
-              TabIndicatorProps={{ 
-                style: { background: accentColor } 
-              }}
-              sx={{ 
-                minHeight: 40,
-                '& .MuiTab-root': {
-                  color: 'text.secondary',
-                  fontWeight: 500,
-                  textTransform: 'none',
-                  fontSize: '14px',
+            {/* Tabs: E-Commerce and Other - Inside Drawer */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Tabs 
+                value={tab} 
+                onChange={(e, v) => {
+                  if (v === 1) {
+                    // When clicking "Other" tab, switch to it AND show module selection menu
+                    setTab(1);
+                    setModuleMenuEl(e.currentTarget);
+                  } else {
+                    setTab(v);
+                  }
+                }} 
+                textColor="inherit"
+                TabIndicatorProps={{ 
+                  style: { background: accentColor } 
+                }}
+                sx={{ 
                   minHeight: 40,
-                  px: 2,
-                  '&.Mui-selected': {
-                    color: accentColor,
-                    fontWeight: 600
+                  flex: 1,
+                  '& .MuiTab-root': {
+                    color: 'text.secondary',
+                    fontWeight: 500,
+                    textTransform: 'none',
+                    fontSize: '14px',
+                    minHeight: 40,
+                    px: 2,
+                    '&.Mui-selected': {
+                      color: accentColor,
+                      fontWeight: 600
+                    }
+                  }
+                }}
+              >
+                <Tab label={selectedModule} onClick={(e) => {
+                  if (tab === 0) {
+                    e.stopPropagation();
+                    setModuleMenuEl(e.currentTarget);
+                  }
+                }} />
+                <Tab label="Other" />
+              </Tabs>
+            </Box>
+            
+            {/* Module Selection Menu */}
+            <Menu
+              anchorEl={moduleMenuEl}
+              open={Boolean(moduleMenuEl)}
+              onClose={() => setModuleMenuEl(null)}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+              PaperProps={{
+                sx: {
+                  width: '90vw',
+                  maxWidth: 'calc(100vw - 1rem)',
+                  borderRadius: 2,
+                  py: 0.5,
+                  bgcolor: 'background.paper',
+                  '& .MuiMenuItem-root': {
+                    color: 'text.primary',
                   }
                 }
               }}
             >
-              <Tab label="Evzone Rides" />
-              <Tab label="Other" />
-            </Tabs>
+              {MODULES.filter(m => m !== selectedModule).map((module) => (
+                <MenuItem
+                  key={module}
+                  onClick={() => {
+                    // When selecting a new module from "Other" menu:
+                    // 1. The selected module becomes the new active tab
+                    // 2. Switch to tab 0 to show the selected module's conversations
+                    setSelectedModule(module);
+                    setTab(0); // Switch to the first tab (selected module tab)
+                    setModuleMenuEl(null);
+                  }}
+                >
+                  {module}
+                </MenuItem>
+              ))}
+              {/* Always show E-Commerce in the menu if it's not the selected module */}
+              {selectedModule !== 'E-Commerce' && (
+                <MenuItem
+                  onClick={() => {
+                    setSelectedModule('E-Commerce');
+                    setTab(0); // Switch to the first tab
+                    setModuleMenuEl(null);
+                  }}
+                >
+                  E-Commerce
+                </MenuItem>
+              )}
+              {/* Option to view "Other" tab (all conversations not matching selected module) */}
+              <MenuItem
+                onClick={() => {
+                  // Switch to "Other" tab to show all conversations except selected module
+                  setTab(1);
+                  setModuleMenuEl(null);
+                }}
+              >
+                View All Other Conversations
+              </MenuItem>
+            </Menu>
           </Box>
 
           {/* Search - shown when search icon is clicked - Inside Drawer */}
