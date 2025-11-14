@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
 import { useTheme } from "../context/ThemeContext";
 import {
@@ -60,6 +60,14 @@ export default function MyAvailabilityWorkingHours({ onBack, onNavigate }) {
   const { accent, isDark } = useTheme();
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
   const [modules, setModules] = useState(DEFAULT_MODULES);
+  
+  // Set document title
+  useEffect(() => {
+    document.title = "My Availability - EVzone Chat";
+    return () => {
+      document.title = "EVzone Chat";
+    };
+  }, []);
 
   const updateModule = (id, patch) => {
     setModules((prev) => prev.map((m) => (m.id === id ? { ...m, ...patch } : m)));
@@ -78,7 +86,7 @@ export default function MyAvailabilityWorkingHours({ onBack, onNavigate }) {
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none`}</style>
 
-      <Box sx={{ width: '100%', height: '100%', bgcolor: 'background.default', maxWidth: '100vw', overflowX: 'hidden' }}>
+      <Box sx={{ width: '100%', height: '100%', bgcolor: 'background.default', overflowX: 'hidden', margin: 0, padding: 0 }}>
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
           {/* Header */}
           <AppBar elevation={0} position="fixed" sx={{ bgcolor: accentColor, color: "#fff", width: '100%', zIndex: 1100 }}>
@@ -115,12 +123,26 @@ export default function MyAvailabilityWorkingHours({ onBack, onNavigate }) {
               flex: 1, 
               overflowY: "auto", 
               pt: { xs: "56px", md: "64px" }, 
-              pb: { xs: 10, md: 12 }, 
+              pb: { xs: 8, md: 10 }, 
               px: { xs: 1.5, sm: 2, md: 3, lg: 4 },
               width: '100%'
             }}
           >
-            <Typography variant="caption" className="text-gray-600 mt-3 mb-2 block">
+            {/* Page Title */}
+            <Typography 
+              variant="h5" 
+              sx={{ 
+                fontWeight: 600, 
+                mt: 2, 
+                mb: 1, 
+                color: 'text.primary',
+                fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' }
+              }}
+            >
+              My Availability
+            </Typography>
+            
+            <Typography variant="caption" className="text-gray-600 mt-1 mb-2 block">
               These settings power your meeting booking defaults, so you don&apos;t have to re-enter times every time.
             </Typography>
 

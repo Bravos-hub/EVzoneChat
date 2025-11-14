@@ -24,7 +24,7 @@ import SignalCellularAltRoundedIcon from "@mui/icons-material/SignalCellularAltR
 import PeopleAltRoundedIcon from "@mui/icons-material/PeopleAltRounded";
 import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
 import VideoCallRoundedIcon from "@mui/icons-material/VideoCallRounded";
-import MeetingRoomRoundedIcon from "@mui/icons-material/MeetingRoomRounded";
+import EventAvailableRoundedIcon from "@mui/icons-material/EventAvailableRounded";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
@@ -263,18 +263,46 @@ export default function OneToOneCall({
               <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>Calls</Typography>
               <Box sx={{ flexGrow: 1 }} />
               <Box sx={{ display: 'flex', gap: 0.5 }}>
-                <IconButton onClick={()=>onNavigate?.('/call?type=video&state=dialing')} aria-label="New video call" sx={{ color: accentColor }}>
+                <IconButton 
+                  onClick={()=>onNavigate?.('/call?type=video&state=dialing')} 
+                  aria-label="New video call" 
+                  title="New video call"
+                  sx={{ color: accentColor }}
+                >
                   <VideoCallRoundedIcon />
                 </IconButton>
-                <IconButton onClick={()=>onNavigate?.('/group-call?type=conference')} aria-label="New conference" sx={{ color: accentColor }}>
+                <IconButton 
+                  onClick={()=>onNavigate?.('/group-call?type=conference')} 
+                  aria-label="New conference" 
+                  title="New conference"
+                  sx={{ color: accentColor }}
+                >
                   <GroupsRoundedIcon />
                 </IconButton>
-                <IconButton onClick={()=>onNavigate?.('/meetings/book')} aria-label="New meeting" sx={{ color: accentColor }}>
-                  <MeetingRoomRoundedIcon />
+                <IconButton 
+                  onClick={()=>onNavigate?.('/meetings/book')} 
+                  aria-label="Schedule meeting" 
+                  title="Schedule meeting"
+                  sx={{ color: accentColor }}
+                >
+                  <EventAvailableRoundedIcon />
                 </IconButton>
-                <IconButton onClick={()=>onNavigate?.('/call?type=voice&state=dialing')} aria-label="New voice call" sx={{ color: accentColor }}>
-                <CallRoundedIcon />
-              </IconButton>
+                <IconButton 
+                  onClick={()=>onNavigate?.('/meetings')} 
+                  aria-label="My meetings" 
+                  title="My meetings"
+                  sx={{ color: accentColor }}
+                >
+                  <EventAvailableRoundedIcon sx={{ fontSize: '0.9em', opacity: 0.8 }} />
+                </IconButton>
+                <IconButton 
+                  onClick={()=>onNavigate?.('/call?type=voice&state=dialing')} 
+                  aria-label="New voice call" 
+                  title="New voice call"
+                  sx={{ color: accentColor }}
+                >
+                  <CallRoundedIcon />
+                </IconButton>
               </Box>
             </Toolbar>
           </AppBar>
@@ -305,7 +333,7 @@ export default function OneToOneCall({
                           ) : call.type === 'conference' ? (
                             <GroupsRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
                           ) : call.type === 'meeting' ? (
-                            <MeetingRoomRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                            <EventAvailableRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
                           ) : (
                             <CallRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
                           )}

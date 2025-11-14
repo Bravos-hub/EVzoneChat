@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
 import { useTheme } from "../context/ThemeContext";
 import {
@@ -188,6 +188,14 @@ export default function MyMeetingsList({ onBack, onNavigate }) {
   const { accent, isDark } = useTheme();
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
   const [tab, setTab] = useState("upcoming");
+  
+  // Set document title
+  useEffect(() => {
+    document.title = "My Meetings - EVzone Chat";
+    return () => {
+      document.title = "EVzone Chat";
+    };
+  }, []);
 
   const data = useMemo(() => {
     if (tab === "past") return DEMO.past;
@@ -199,7 +207,7 @@ export default function MyMeetingsList({ onBack, onNavigate }) {
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none`}</style>
 
-      <Box sx={{ width: '100%', height: '100%', bgcolor: 'background.default', maxWidth: '100vw', overflowX: 'hidden' }}>
+      <Box sx={{ width: '100%', height: '100%', bgcolor: 'background.default', overflowX: 'hidden', margin: 0, padding: 0 }}>
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
           {/* Header */}
           <AppBar elevation={0} position="fixed" sx={{ bgcolor: accentColor, color: "#fff", width: '100%', zIndex: 1100 }}>
@@ -260,6 +268,20 @@ export default function MyMeetingsList({ onBack, onNavigate }) {
             overflowY: "auto",
             width: '100%'
           }}>
+            {/* Page Title */}
+            <Typography 
+              variant="h5" 
+              sx={{ 
+                fontWeight: 600, 
+                mt: 1.5, 
+                mb: 1, 
+                color: 'text.primary',
+                fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' }
+              }}
+            >
+              My Meetings
+            </Typography>
+            
             {data.length === 0 ? (
               <Box className="h-full flex items-center justify-center">
                 <Typography variant="body2" sx={{ color: EV.grey }}>

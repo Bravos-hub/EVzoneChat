@@ -30,7 +30,7 @@ import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import VideocamRoundedIcon from "@mui/icons-material/VideocamRounded";
 import CallRoundedIcon from "@mui/icons-material/CallRounded";
 import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
-import MeetingRoomRoundedIcon from "@mui/icons-material/MeetingRoomRounded";
+import EventAvailableRoundedIcon from "@mui/icons-material/EventAvailableRounded";
 import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import MicRoundedIcon from "@mui/icons-material/MicRounded";
@@ -1357,6 +1357,7 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
               <Box sx={{ position:'absolute', top: 8, right: 4, display:'flex', gap: 0.5 }}>
                 <IconButton 
                   aria-label="Video call" 
+                  title="Video call"
                   size="small" 
                   sx={{ color: 'text.secondary' }}
                   onClick={()=>{
@@ -1368,6 +1369,7 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
                 </IconButton>
                 <IconButton 
                   aria-label="Conference call" 
+                  title="Conference call"
                   size="small" 
                   sx={{ color: 'text.secondary' }}
                   onClick={()=>{
@@ -1378,7 +1380,8 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
                   <GroupsRoundedIcon fontSize="small"/>
                 </IconButton>
                 <IconButton 
-                  aria-label="Meeting" 
+                  aria-label="Schedule meeting" 
+                  title="Schedule meeting"
                   size="small" 
                   sx={{ color: 'text.secondary' }}
                   onClick={()=>{
@@ -1386,10 +1389,11 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
                     onNavigate?.('/meetings/book');
                   }}
                 >
-                  <MeetingRoomRoundedIcon fontSize="small"/>
+                  <EventAvailableRoundedIcon fontSize="small"/>
                 </IconButton>
                 <IconButton 
                   aria-label="Voice call" 
+                  title="Voice call"
                   size="small" 
                   sx={{ color: 'text.secondary' }}
                   onClick={()=>{
