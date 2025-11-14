@@ -411,8 +411,8 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                 value={tab} 
                 onChange={(e, v) => {
                   if (v === 1) {
-                    // When clicking "Other" tab, show module selection menu
-                    setTab(v);
+                    // When clicking "Other" tab, switch to it AND show module selection menu
+                    setTab(1);
                     setModuleMenuEl(e.currentTarget);
                   } else {
                     setTab(v);
@@ -473,12 +473,11 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                 <MenuItem
                   key={module}
                   onClick={() => {
-                    // When selecting a new module:
+                    // When selecting a new module from "Other" menu:
                     // 1. The selected module becomes the new active tab
-                    // 2. E-Commerce is added back to the list if it was the previous selection
-                    // 3. The previous selected module is added back to the list
+                    // 2. Switch to tab 0 to show the selected module's conversations
                     setSelectedModule(module);
-                    setTab(0); // Switch back to the first tab (selected module tab)
+                    setTab(0); // Switch to the first tab (selected module tab)
                     setModuleMenuEl(null);
                   }}
                 >
@@ -490,13 +489,23 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                 <MenuItem
                   onClick={() => {
                     setSelectedModule('E-Commerce');
-                    setTab(0); // Switch back to the first tab
+                    setTab(0); // Switch to the first tab
                     setModuleMenuEl(null);
                   }}
                 >
                   E-Commerce
                 </MenuItem>
               )}
+              {/* Option to view "Other" tab (all conversations not matching selected module) */}
+              <MenuItem
+                onClick={() => {
+                  // Switch to "Other" tab to show all conversations except selected module
+                  setTab(1);
+                  setModuleMenuEl(null);
+                }}
+              >
+                View All Other Conversations
+              </MenuItem>
             </Menu>
           </Box>
 
