@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
 import { useTheme } from "../context/ThemeContext";
 import {
@@ -67,6 +67,14 @@ export default function PublicBookingPage({ onBack, onNavigate }) {
   const { accent, isDark } = useTheme();
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
   const { title, module, host, duration, mode, location, availability } = DEMO_BOOKING;
+  
+  // Set document title
+  useEffect(() => {
+    document.title = "Book Meeting - EVzone Chat";
+    return () => {
+      document.title = "EVzone Chat";
+    };
+  }, []);
 
   const [selectedDate, setSelectedDate] = useState(availability.startDate);
   const [selectedSlot, setSelectedSlot] = useState(null);
@@ -118,7 +126,7 @@ export default function PublicBookingPage({ onBack, onNavigate }) {
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none`}</style>
 
-      <Box sx={{ width: '100%', height: '100%', bgcolor: 'background.default', maxWidth: '100vw', overflowX: 'hidden' }}>
+      <Box sx={{ width: '100%', height: '100%', bgcolor: 'background.default', overflowX: 'hidden', margin: 0, padding: 0 }}>
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
           {/* Header */}
           <AppBar elevation={0} position="fixed" sx={{ bgcolor: 'background.paper', color: 'text.primary', borderBottom: `1px solid ${muiTheme.palette.divider}`, width: '100%', zIndex: 1100 }}>
@@ -146,17 +154,31 @@ export default function PublicBookingPage({ onBack, onNavigate }) {
           <Box className="no-scrollbar" sx={{ 
             flex: 1, 
             pt: { xs: "56px", md: "64px" }, 
-            pb: { xs: 12, md: 14 }, 
+            pb: { xs: 10, md: 12 }, 
             px: { xs: 1.5, sm: 2, md: 3, lg: 4 },
             overflowY: "auto",
             width: '100%'
           }}>
+            {/* Page Title */}
+            <Typography 
+              variant="h5" 
+              sx={{ 
+                fontWeight: 600, 
+                mt: 2, 
+                mb: 1.5, 
+                color: 'text.primary',
+                fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' }
+              }}
+            >
+              Book Meeting
+            </Typography>
+            
             {/* Meeting header card */}
             <Paper
               elevation={0}
               sx={{
                 p: 2,
-                mt: 2,
+                mt: 1.5,
                 borderRadius: 2,
                 border: "1px solid rgba(0,0,0,0.06)",
                 bgcolor: "#fff",
@@ -184,7 +206,7 @@ export default function PublicBookingPage({ onBack, onNavigate }) {
             </Paper>
 
             {/* Date picker */}
-            <Typography variant="caption" sx={{ color: 'text.secondary', mt: 3, mb: 1, display: 'block' }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', mt: 2.5, mb: 1, display: 'block' }}>
               1. Pick a day
             </Typography>
             <Box sx={{ display: 'flex', gap: 1, overflowX: 'auto', pb: 1, mb: 2, className: 'no-scrollbar' }}>

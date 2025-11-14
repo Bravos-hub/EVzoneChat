@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
 import { useTheme } from "../context/ThemeContext";
@@ -55,6 +55,14 @@ export default function LiveMeetingShell({ onBack, onNavigate, location, registr
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
   const routeLocation = useLocation();
   
+  // Set document title
+  useEffect(() => {
+    document.title = "Live Meeting - EVzone Chat";
+    return () => {
+      document.title = "EVzone Chat";
+    };
+  }, []);
+  
   // Get meeting ID from URL (for future use when fetching real meeting data)
   // const meetingId = useMemo(() => {
   //   if (routeLocation?.pathname) {
@@ -83,7 +91,7 @@ export default function LiveMeetingShell({ onBack, onNavigate, location, registr
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none`}</style>
 
-      <Box sx={{ width: '100%', height: '100%', bgcolor: '#000', maxWidth: '100vw', overflowX: 'hidden' }}>
+      <Box sx={{ width: '100%', height: '100%', bgcolor: '#000', overflowX: 'hidden', margin: 0, padding: 0 }}>
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
           {/* Header */}
           <AppBar
@@ -117,9 +125,28 @@ export default function LiveMeetingShell({ onBack, onNavigate, location, registr
             </Toolbar>
           </AppBar>
 
-          {/* Meeting summary pill just under header */}
+          {/* Page Title */}
           <Box sx={{ 
             pt: { xs: "56px", md: "64px" }, 
+            px: { xs: 1.5, sm: 2, md: 3, lg: 4 }, 
+            pb: 1,
+            width: '100%'
+          }}>
+            <Typography 
+              variant="h5" 
+              sx={{ 
+                fontWeight: 600, 
+                mb: 1, 
+                color: '#fff',
+                fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' }
+              }}
+            >
+              Live Meeting
+            </Typography>
+          </Box>
+          
+          {/* Meeting summary pill just under header */}
+          <Box sx={{ 
             px: { xs: 1.5, sm: 2, md: 3, lg: 4 }, 
             pb: 1,
             width: '100%'

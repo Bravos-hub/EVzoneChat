@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTheme } from "../context/ThemeContext";
 import {
   AppBar,
@@ -49,6 +49,14 @@ export default function MeetingConfirmationJoin({ onBack, onNavigate }) {
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
   const [snack, setSnack] = useState("");
   const b = DEMO_CONFIRM;
+  
+  // Set document title
+  useEffect(() => {
+    document.title = "Meeting Confirmation - EVzone Chat";
+    return () => {
+      document.title = "EVzone Chat";
+    };
+  }, []);
 
   const modeIcon =
     b.mode === "video" ? (
@@ -100,7 +108,7 @@ export default function MeetingConfirmationJoin({ onBack, onNavigate }) {
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none`}</style>
 
-      <Box sx={{ width: '100%', height: '100%', bgcolor: 'background.default', maxWidth: '100vw', overflowX: 'hidden' }}>
+      <Box sx={{ width: '100%', height: '100%', bgcolor: 'background.default', overflowX: 'hidden', margin: 0, padding: 0 }}>
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
           {/* Header */}
           <AppBar elevation={0} position="fixed" sx={{ bgcolor: accentColor, color: "#fff", width: '100%', zIndex: 1100 }}>
@@ -137,16 +145,30 @@ export default function MeetingConfirmationJoin({ onBack, onNavigate }) {
               flex: 1, 
               overflowY: "auto", 
               pt: { xs: "56px", md: "64px" }, 
-              pb: { xs: 12, md: 14 }, 
+              pb: { xs: 8, md: 10 }, 
               px: { xs: 1.5, sm: 2, md: 3, lg: 4 },
               width: '100%'
             }}
           >
+            {/* Page Title */}
+            <Typography 
+              variant="h5" 
+              sx={{ 
+                fontWeight: 600, 
+                mt: 2, 
+                mb: 1.5, 
+                color: 'text.primary',
+                fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' }
+              }}
+            >
+              Meeting Confirmation
+            </Typography>
+            
             <Paper
               elevation={0}
               sx={{
                 p: 2,
-                mt: 2,
+                mt: 1.5,
                 borderRadius: 2,
                 border: "1px solid rgba(0,0,0,0.06)",
                 bgcolor: "#fff",

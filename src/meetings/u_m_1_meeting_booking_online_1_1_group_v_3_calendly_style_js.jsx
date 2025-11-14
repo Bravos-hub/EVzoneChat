@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
 import { useTheme } from "../context/ThemeContext";
 import {
@@ -57,6 +57,14 @@ export default function MeetingBooking({ onBack, onNavigate }) {
   const muiTheme = useMuiTheme();
   const { accent, isDark } = useTheme();
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
+  
+  // Set document title
+  useEffect(() => {
+    document.title = "Meeting Booking - EVzone Chat";
+    return () => {
+      document.title = "EVzone Chat";
+    };
+  }, []);
   
   const [meetingType, setMeetingType] = useState("1:1"); // '1:1' | 'group'
   const [module, setModule] = useState("E-Commerce");
@@ -155,8 +163,9 @@ export default function MeetingBooking({ onBack, onNavigate }) {
         flexDirection: 'column', 
         bgcolor: 'background.default',
         position: 'relative',
-        maxWidth: '100vw',
-        overflowX: 'hidden'
+        overflowX: 'hidden',
+        margin: 0,
+        padding: 0
       }}>
         {/* Header - Fixed at top, full width */}
         <AppBar 
@@ -186,6 +195,14 @@ export default function MeetingBooking({ onBack, onNavigate }) {
                   Guests pick a time inside your availability
                 </Typography>
               </Box>
+              <IconButton 
+                onClick={() => onNavigate?.('/meetings')} 
+                aria-label="My meetings" 
+                title="My meetings"
+                sx={{ color: "#fff" }}
+              >
+                <EventAvailableRoundedIcon />
+              </IconButton>
             </Toolbar>
           </AppBar>
 
@@ -195,7 +212,7 @@ export default function MeetingBooking({ onBack, onNavigate }) {
           sx={{ 
             flex: 1, 
             pt: { xs: "56px", md: "64px" }, 
-            pb: { xs: 14, sm: 16, md: 18 }, 
+            pb: { xs: 12, sm: 14, md: 16 }, 
             px: { xs: 1.5, sm: 2, md: 3, lg: 4 }, 
             overflowY: "auto",
             width: '100%',
@@ -203,8 +220,22 @@ export default function MeetingBooking({ onBack, onNavigate }) {
             WebkitOverflowScrolling: 'touch',
           }}
         >
+            {/* Page Title */}
+            <Typography 
+              variant="h5" 
+              sx={{ 
+                fontWeight: 600, 
+                mt: 2, 
+                mb: 1, 
+                color: 'text.primary',
+                fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' }
+              }}
+            >
+              Meeting Booking
+            </Typography>
+            
             {/* 1. Module */}
-            <Typography variant="caption" sx={{ color: 'text.secondary', mt: { xs: 3, md: 4 }, mb: 1.5, display: 'block', fontSize: { xs: '0.75rem', sm: '0.8125rem', md: '0.875rem' } }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', mt: 2, mb: 1.5, display: 'block', fontSize: { xs: '0.75rem', sm: '0.8125rem', md: '0.875rem' } }}>
               1. Choose the module for this meeting
             </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 0.75, sm: 1, md: 1.25 }, mb: { xs: 3, md: 4 } }}>
