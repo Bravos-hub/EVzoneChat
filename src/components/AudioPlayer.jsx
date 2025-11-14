@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Box, IconButton, LinearProgress, Typography } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
 import { useTheme } from '../context/ThemeContext';
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
 import PauseRoundedIcon from '@mui/icons-material/PauseRounded';
@@ -189,21 +189,36 @@ export default function AudioPlayer({
       />
 
       {/* Progress and Info */}
-      <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-        {/* Progress Bar */}
-        <LinearProgress
-          variant="determinate"
-          value={progress}
-          sx={{
-            height: 3,
-            borderRadius: 1.5,
-            bgcolor: isMine ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)',
-            '& .MuiLinearProgress-bar': {
-              bgcolor: themeAccentColor,
-              borderRadius: 1.5,
-            },
-          }}
-        />
+      <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 0.75 }}>
+        {/* Waveform Visual - Animated bars */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, height: 24, px: 0.5 }}>
+          {Array.from({ length: 20 }).map((_, i) => {
+            // Create animated waveform bars - higher bars in middle, lower on edges
+            const baseHeight = Math.abs(Math.sin((i / 20) * Math.PI * 2)) * 0.6 + 0.3;
+            const isActive = isPlaying && (i < (progress / 100) * 20);
+            const barHeight = isActive ? baseHeight : baseHeight * 0.4;
+            
+            return (
+              <Box
+                key={i}
+                sx={{
+                  width: 2,
+                  height: `${barHeight * 100}%`,
+                  minHeight: 4,
+                  bgcolor: isActive ? themeAccentColor : (isMine ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.3)'),
+                  borderRadius: 1,
+                  transition: 'all 0.1s ease',
+                  animation: isPlaying ? 'waveform 0.5s ease-in-out infinite' : 'none',
+                  animationDelay: `${i * 0.05}s`,
+                  '@keyframes waveform': {
+                    '0%, 100%': { height: `${barHeight * 100}%` },
+                    '50%': { height: `${(barHeight + 0.2) * 100}%` },
+                  },
+                }}
+              />
+            );
+          })}
+        </Box>
 
         {/* Text and Time */}
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
@@ -224,13 +239,14 @@ export default function AudioPlayer({
           <Typography
             variant="caption"
             sx={{
-              fontSize: '10px',
-              color: isMine ? 'rgba(255, 255, 255, 0.7)' : 'text.secondary',
+              fontSize: '11px',
+              color: isMine ? 'rgba(255, 255, 255, 0.8)' : 'text.secondary',
               whiteSpace: 'nowrap',
               flexShrink: 0,
+              fontWeight: 500,
             }}
           >
-            {formatTime(currentTime)} / {formatTime(duration)}
+            {formatTime(duration)}
           </Typography>
         </Box>
       </Box>
