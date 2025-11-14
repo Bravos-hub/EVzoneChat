@@ -29,6 +29,8 @@ import {
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import VideocamRoundedIcon from "@mui/icons-material/VideocamRounded";
 import CallRoundedIcon from "@mui/icons-material/CallRounded";
+import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
+import MeetingRoomRoundedIcon from "@mui/icons-material/MeetingRoomRounded";
 import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import MicRoundedIcon from "@mui/icons-material/MicRounded";
@@ -1363,6 +1365,28 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
                   }}
                 >
                   <VideocamRoundedIcon fontSize="small"/>
+                </IconButton>
+                <IconButton 
+                  aria-label="Conference call" 
+                  size="small" 
+                  sx={{ color: 'text.secondary' }}
+                  onClick={()=>{
+                    // Navigate to conference call page
+                    onNavigate?.(`/group-call?contact=${encodeURIComponent(title)}&type=conference`);
+                  }}
+                >
+                  <GroupsRoundedIcon fontSize="small"/>
+                </IconButton>
+                <IconButton 
+                  aria-label="Meeting" 
+                  size="small" 
+                  sx={{ color: 'text.secondary' }}
+                  onClick={()=>{
+                    // Navigate to meeting page
+                    onNavigate?.(`/group-call?contact=${encodeURIComponent(title)}&type=meeting`);
+                  }}
+                >
+                  <MeetingRoomRoundedIcon fontSize="small"/>
                 </IconButton>
                 <IconButton 
                   aria-label="Voice call" 

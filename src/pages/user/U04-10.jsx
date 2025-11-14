@@ -23,6 +23,8 @@ import ClosedCaptionRoundedIcon from "@mui/icons-material/ClosedCaptionRounded";
 import SignalCellularAltRoundedIcon from "@mui/icons-material/SignalCellularAltRounded";
 import PeopleAltRoundedIcon from "@mui/icons-material/PeopleAltRounded";
 import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
+import VideoCallRoundedIcon from "@mui/icons-material/VideoCallRounded";
+import MeetingRoomRoundedIcon from "@mui/icons-material/MeetingRoomRounded";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
@@ -85,6 +87,7 @@ export default function OneToOneCall({
     { id: 'c3', name: 'Dr. Cohen', avatar: 'https://i.pravatar.cc/100?img=12', type: 'video', time: 'Mon', duration: '—', status: 'missed', missed: true },
     { id: 'c4', name: 'EVzone Support', avatar: 'https://i.pravatar.cc/100?img=8', type: 'voice', time: 'Last week', duration: '8:45', status: 'completed', missed: false },
     { id: 'c5', name: 'Team Meeting', avatar: 'https://i.pravatar.cc/100?img=15', type: 'conference', time: 'Today', duration: '32:15', status: 'completed', missed: false },
+    { id: 'c6', name: 'Project Review', avatar: 'https://i.pravatar.cc/100?img=16', type: 'meeting', time: 'Today', duration: '45:30', status: 'completed', missed: false },
   ];
 
   // All hooks must be called before any conditional returns
@@ -259,9 +262,20 @@ export default function OneToOneCall({
             <Toolbar className="!min-h-[56px]">
               <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>Calls</Typography>
               <Box sx={{ flexGrow: 1 }} />
-              <IconButton onClick={()=>onNavigate?.('/new-message')} aria-label="New call" sx={{ color: accentColor }}>
-                <CallRoundedIcon />
-              </IconButton>
+              <Box sx={{ display: 'flex', gap: 0.5 }}>
+                <IconButton onClick={()=>onNavigate?.('/call?type=video&state=dialing')} aria-label="New video call" sx={{ color: accentColor }}>
+                  <VideoCallRoundedIcon />
+                </IconButton>
+                <IconButton onClick={()=>onNavigate?.('/group-call?type=conference')} aria-label="New conference" sx={{ color: accentColor }}>
+                  <GroupsRoundedIcon />
+                </IconButton>
+                <IconButton onClick={()=>onNavigate?.('/group-call?type=meeting')} aria-label="New meeting" sx={{ color: accentColor }}>
+                  <MeetingRoomRoundedIcon />
+                </IconButton>
+                <IconButton onClick={()=>onNavigate?.('/call?type=voice&state=dialing')} aria-label="New voice call" sx={{ color: accentColor }}>
+                  <CallRoundedIcon />
+                </IconButton>
+              </Box>
             </Toolbar>
           </AppBar>
 
@@ -287,9 +301,11 @@ export default function OneToOneCall({
                       secondary={
                         <div className="flex items-center gap-2 mt-0.5">
                           {call.type === 'video' ? (
-                            <VideocamRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                            <VideoCallRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
                           ) : call.type === 'conference' ? (
                             <GroupsRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                          ) : call.type === 'meeting' ? (
+                            <MeetingRoomRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
                           ) : (
                             <CallRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
                           )}
