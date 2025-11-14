@@ -18,6 +18,7 @@ import {
   Button
 } from "@mui/material";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import GroupAddRoundedIcon from "@mui/icons-material/GroupAddRounded";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
@@ -38,6 +39,7 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState([]); // ids
   const [forwardingMessages, setForwardingMessages] = useState(null);
+  const [isGroupMode, setIsGroupMode] = useState(false); // Track if we're creating a group
   
   // Get theme accent color
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
@@ -50,6 +52,32 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
 
   const toggle = (id) => {
     setSelected((prev) => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  };
+
+  // Handle contact click - immediate start for 1:1, toggle selection for group
+  const handleContactClick = (id) => {
+    // If sharing contact, use toggle behavior
+    if (sharingContact) {
+      toggle(id);
+      return;
+    }
+
+    // If in group mode, toggle selection
+    if (isGroupMode) {
+      toggle(id);
+      return;
+    }
+
+    // If NOT in group mode and NOT sharing contact, immediately start 1:1 chat
+    if (!isGroupMode && !sharingContact) {
+      onStart?.([id]);
+    }
+  };
+
+  // Enable group mode
+  const handleCreateGroup = () => {
+    setIsGroupMode(true);
+    setSelected([]); // Clear any previous selections
   };
 
   const [sharingContact, setSharingContact] = useState(false);
@@ -103,6 +131,12 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
     } else {
       onStart?.(selected);
     }
+    
+    // Reset group mode after starting chat
+    if (isGroupMode) {
+      setIsGroupMode(false);
+      setSelected([]);
+    }
   };
 
   return (
@@ -114,7 +148,11 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
         <AppBar elevation={0} position="static" sx={{ bgcolor: 'background.paper', color: 'text.primary', borderBottom: `1px solid ${muiTheme.palette.divider}` }}>
           <Toolbar className="!min-h-[56px] !px-3" sx={{ position: 'relative' }}>
             <IconButton 
-              onClick={onClose} 
+              onClick={() => {
+                setIsGroupMode(false);
+                setSelected([]);
+                onClose?.();
+              }} 
               aria-label="Close"
               sx={{ 
                 position: 'absolute',
@@ -135,64 +173,123 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
                 color: 'text.primary'
               }}
             >
-              {sharingContact ? 'Share Contact' : 'New message'}
+              {sharingContact ? 'Share Contact' : isGroupMode ? 'Create Group' : 'New message'}
             </Typography>
+            {/* Create Group button - only show when NOT in group mode and NOT sharing contact */}
+            {!isGroupMode && !sharingContact && (
+              <IconButton
+                onClick={handleCreateGroup}
+                aria-label="Create Group"
+                sx={{
+                  position: 'absolute',
+                  right: 8,
+                  color: accentColor
+                }}
+              >
+                <GroupAddRoundedIcon />
+              </IconButton>
+            )}
           </Toolbar>
         </AppBar>
 
-        {/* To: field with chips below */}
-        <Box sx={{ px: 3, pt: 3, pb: 2 }}>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              fontSize: '12px',
-              color: 'text.secondary',
-              mb: 1,
-              fontWeight: 500
-            }}
-          >
-            To:
-          </Typography>
-          {/* Selected contacts as chips */}
-          {chips.length > 0 && (
-            <Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap', mb: 1.5 }}>
-              {chips.map((c) => (
-                <Chip
-                  key={c.id}
-                  avatar={<Avatar src={c.avatar} sx={{ width: 20, height: 20 }} />}
-                  label={c.name}
-                  onDelete={() => toggle(c.id)}
-                  size="small"
+        {/* To: field with chips and action button - only show in group mode or when sharing contact */}
+        {(isGroupMode || sharingContact) && (
+          <Box sx={{ px: 3, pt: 3, pb: 2, borderBottom: `1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper', position: 'sticky', top: 0, zIndex: 5 }}>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                fontSize: '12px',
+                color: 'text.secondary',
+                mb: 1,
+                fontWeight: 500
+              }}
+            >
+              To:
+            </Typography>
+            {/* Selected contacts as chips */}
+            {chips.length > 0 ? (
+              <>
+                <Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap', mb: 2 }}>
+                  {chips.map((c) => (
+                    <Chip
+                      key={c.id}
+                      avatar={<Avatar src={c.avatar} sx={{ width: 20, height: 20 }} />}
+                      label={c.name}
+                      onDelete={() => toggle(c.id)}
+                      size="small"
+                      sx={{
+                        bgcolor: accentColor,
+                        color: '#fff',
+                        height: '28px',
+                        fontSize: '13px',
+                        fontWeight: 500,
+                        '& .MuiChip-deleteIcon': {
+                          color: '#fff',
+                          fontSize: '18px',
+                          '&:hover': {
+                            color: 'rgba(255, 255, 255, 0.8)',
+                          },
+                        },
+                        '& .MuiChip-avatar': {
+                          width: 20,
+                          height: 20,
+                          marginLeft: '4px',
+                        },
+                      }}
+                    />
+                  ))}
+                </Box>
+                {/* Action Button - Right here, always visible */}
+                <Button
+                  fullWidth
+                  variant="contained"
+                  size="medium"
+                  onClick={handleStart}
                   sx={{
                     bgcolor: accentColor,
                     color: '#fff',
-                    height: '28px',
-                    fontSize: '13px',
-                    fontWeight: 500,
-                    '& .MuiChip-deleteIcon': {
-                      color: '#fff',
-                      fontSize: '18px',
-                      '&:hover': {
-                        color: 'rgba(255, 255, 255, 0.8)',
-                      },
+                    textTransform: 'none',
+                    fontSize: '15px',
+                    fontWeight: 600,
+                    py: 1.25,
+                    borderRadius: 2,
+                    boxShadow: `0 4px 12px ${accentColor}40`,
+                    '&:hover': {
+                      bgcolor: accent === 'orange' ? '#e06f00' : accent === 'green' ? '#02b37b' : '#8f8f8f',
+                      boxShadow: `0 6px 16px ${accentColor}60`,
                     },
-                    '& .MuiChip-avatar': {
-                      width: 20,
-                      height: 20,
-                      marginLeft: '4px',
+                    '&:active': {
+                      transform: 'scale(0.98)',
                     },
                   }}
-                />
-              ))}
-            </Box>
-          )}
-          {/* Text input field */}
+                >
+                  {sharingContact ? 'Share Contact' : forwardingMessages ? `Forward to ${selected.length}` : isGroupMode ? `Create Group (${selected.length})` : `Start chat${selected.length > 1 ? ` (${selected.length})` : ''}`}
+                </Button>
+              </>
+            ) : (
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  fontSize: '13px',
+                  color: 'text.secondary',
+                  fontStyle: 'italic',
+                  mb: 1
+                }}
+              >
+                {isGroupMode ? 'Select participants to create a group' : 'Select a contact to share'}
+              </Typography>
+            )}
+          </Box>
+        )}
+        
+        {/* Search field - always visible */}
+        <Box sx={{ px: 3, pt: isGroupMode || sharingContact ? 2 : 3, pb: 2 }}>
           <TextField
             fullWidth
             size="small"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Type a name or multiple names"
+            placeholder={isGroupMode ? "Search participants" : "Type a name or multiple names"}
             sx={{
               '& .MuiOutlinedInput-root': {
                 bgcolor: 'background.default',
@@ -221,7 +318,7 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
         </Box>
 
         {/* Select Participant section */}
-        <Box sx={{ px: 3, pb: 1 }}>
+        <Box sx={{ px: 3, pb: 1, pt: isGroupMode || sharingContact ? 2 : 3 }}>
           <Typography
             variant="body2"
             sx={{
@@ -233,7 +330,7 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
               mb: 1
             }}
           >
-            Select Participant
+            {isGroupMode ? 'Select Participants' : 'Select Participant'}
           </Typography>
         </Box>
 
@@ -254,7 +351,7 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
                 <ListItem
                   key={p.id}
                   button
-                  onClick={() => toggle(p.id)}
+                  onClick={() => handleContactClick(p.id)}
                   sx={{
                     py: 1.5,
                     px: 3,
@@ -294,45 +391,6 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
           </List>
         </Box>
 
-        {/* Action Button - Start Chat */}
-        {selected.length > 0 && (
-          <Box 
-            sx={{ 
-              p: 2, 
-              borderTop: `1px solid ${muiTheme.palette.divider}`,
-              bgcolor: 'background.paper',
-              position: 'sticky',
-              bottom: 0,
-              zIndex: 10
-            }}
-          >
-            <Button
-              fullWidth
-              variant="contained"
-              size="large"
-              onClick={handleStart}
-              sx={{
-                bgcolor: accentColor,
-                color: '#fff',
-                textTransform: 'none',
-                fontSize: '16px',
-                fontWeight: 600,
-                py: 1.5,
-                borderRadius: 2,
-                boxShadow: `0 4px 12px ${accentColor}40`,
-                '&:hover': {
-                  bgcolor: accent === 'orange' ? '#e06f00' : accent === 'green' ? '#02b37b' : '#8f8f8f',
-                  boxShadow: `0 6px 16px ${accentColor}60`,
-                },
-                '&:active': {
-                  transform: 'scale(0.98)',
-                },
-              }}
-            >
-              {sharingContact ? 'Share Contact' : forwardingMessages ? `Forward to ${selected.length}` : `Start chat${selected.length > 1 ? ` (${selected.length})` : ''}`}
-            </Button>
-          </Box>
-        )}
       </Box>
     </>
   );
