@@ -551,9 +551,13 @@ function RouteWrapper({ Component, ...props }) {
       console.log('Refresh triggered');
     },
     onLiveOpen: (live) => {
-      // Navigate to live session
-      if (live?.id) {
-        navigate(`/live/${live.id}`);
+      // Navigate to video call for live session (not chat - live sessions are video-based)
+      if (live?.host) {
+        // Open video call with the host - live sessions are video calls, not messages
+        navigate(`/call?type=video&contact=${encodeURIComponent(live.host)}&state=connecting&live=${live.id}&module=${live.module || 'School'}`);
+      } else if (live?.id) {
+        // Fallback: navigate to video call with session ID
+        navigate(`/call?type=video&state=connecting&live=${live.id}`);
       }
     },
     onModuleChange: (module) => {
