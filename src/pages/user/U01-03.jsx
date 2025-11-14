@@ -484,18 +484,6 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                   {module}
                 </MenuItem>
               ))}
-              {/* Always show E-Commerce in the menu if it's not the selected module */}
-              {selectedModule !== 'E-Commerce' && (
-                <MenuItem
-                  onClick={() => {
-                    setSelectedModule('E-Commerce');
-                    setTab(0); // Switch to the first tab
-                    setModuleMenuEl(null);
-                  }}
-                >
-                  E-Commerce
-                </MenuItem>
-              )}
               {/* Option to view "Other" tab (all conversations not matching selected module) */}
               <MenuItem
                 onClick={() => {
