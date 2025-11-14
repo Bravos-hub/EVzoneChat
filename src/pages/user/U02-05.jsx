@@ -32,7 +32,7 @@ import CallRoundedIcon from "@mui/icons-material/CallRounded";
 import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import MicRoundedIcon from "@mui/icons-material/MicRounded";
-import StopRoundedIcon from "@mui/icons-material/StopRounded";
+import PauseRoundedIcon from "@mui/icons-material/PauseRounded";
 import CameraAltRoundedIcon from "@mui/icons-material/CameraAltRounded";
 import InsertEmoticonRoundedIcon from "@mui/icons-material/InsertEmoticonRounded";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
@@ -58,6 +58,7 @@ import ReplyRoundedIcon from "@mui/icons-material/ReplyRounded";
 import TranslateRoundedIcon from "@mui/icons-material/TranslateRounded";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import ReportRoundedIcon from "@mui/icons-material/ReportRounded";
+import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 const lighten = (hex, a=0.12) => `rgba(${parseInt(hex.slice(1,3),16)},${parseInt(hex.slice(3,5),16)},${parseInt(hex.slice(5,7),16)},${a})`;
@@ -86,12 +87,14 @@ function Bubble({ msg, onQuote, onAction, scrollTo, onSelect, isSelected }){
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
 
   const isMine = msg.mine;
-  // Outgoing messages: Dark background (accent color) with white text (per design spec)
-  // Incoming messages: Light background with dark text (per design spec)
+  // Outgoing messages: Dark blue background with white text (per design spec)
+  // Incoming messages: Light blue/gray background with dark text (per design spec)
   const bg = isMine ? accentColor : (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)');
   const br = isMine ? `1px solid ${accentColor}` : `1px solid ${muiTheme.palette.divider}`;
   const tx = isMine ? '#fff' : muiTheme.palette.text.primary; // White text for outgoing, dark text for incoming
   const isVoiceMessage = msg.audioUrl || msg.text?.includes('🎤');
+  const isVideoMessage = msg.videoUrl || msg.text?.includes('🎥') || msg.fileName?.match(/\.(mp4|webm|mov|avi)$/i);
+  const isImageMessage = msg.imageUrl || msg.text?.includes('🖼️') || msg.text?.includes('📷');
   const selected = isSelected || false;
 
   const onTouchStart = (e)=>{ 
@@ -176,18 +179,74 @@ function Bubble({ msg, onQuote, onAction, scrollTo, onSelect, isSelected }){
                     textColor={tx}
                     isMine={isMine}
                   />
-                ) : msg.imageUrl ? (
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                ) : isVideoMessage && msg.videoUrl ? (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, width: '100%' }}>
+                    <Box
+                      sx={{
+                        position: 'relative',
+                        width: '100%',
+                        borderRadius: 1,
+                        overflow: 'hidden',
+                        cursor: 'pointer',
+                        bgcolor: '#000',
+                        '&:hover': {
+                          opacity: 0.9,
+                        },
+                      }}
+                      onClick={() => {
+                        // Open video in new tab/window for full view
+                        window.open(msg.videoUrl, '_blank');
+                      }}
+                    >
+                      <video
+                        src={msg.videoUrl}
+                        style={{
+                          width: '100%',
+                          maxHeight: '300px',
+                          objectFit: 'cover',
+                          display: 'block',
+                        }}
+                        preload="metadata"
+                      />
+                      {/* Play icon overlay */}
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          top: '50%',
+                          left: '50%',
+                          transform: 'translate(-50%, -50%)',
+                          bgcolor: 'rgba(0, 0, 0, 0.6)',
+                          borderRadius: '50%',
+                          width: 56,
+                          height: 56,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          pointerEvents: 'none',
+                        }}
+                      >
+                        <PlayArrowRoundedIcon sx={{ fontSize: 32, color: '#fff' }} />
+                      </Box>
+                    </Box>
+                    {msg.text && (
+                      <Typography variant="caption" sx={{ fontSize: '11px', color: muiTheme.palette.text.secondary }}>
+                        {msg.text}
+                      </Typography>
+                    )}
+                  </Box>
+                ) : isImageMessage && msg.imageUrl ? (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, width: '100%' }}>
                     <Box
                       component="img"
                       src={msg.imageUrl}
-                      alt={msg.fileName || 'Captured photo'}
+                      alt={msg.fileName || 'Shared photo'}
                       sx={{
-                        maxWidth: '100%',
+                        width: '100%',
                         maxHeight: '300px',
                         borderRadius: 1,
-                        objectFit: 'contain',
+                        objectFit: 'cover',
                         cursor: 'pointer',
+                        display: 'block',
                         '&:hover': {
                           opacity: 0.9,
                         },
@@ -197,9 +256,11 @@ function Bubble({ msg, onQuote, onAction, scrollTo, onSelect, isSelected }){
                         window.open(msg.imageUrl, '_blank');
                       }}
                     />
-                    <Typography variant="caption" sx={{ fontSize: '11px', color: muiTheme.palette.text.secondary }}>
-                      {msg.text}
-                    </Typography>
+                    {msg.text && (
+                      <Typography variant="caption" sx={{ fontSize: '11px', color: muiTheme.palette.text.secondary }}>
+                        {msg.text}
+                      </Typography>
+                    )}
                   </Box>
                 ) : (
                   <div className="text-[13.5px] whitespace-pre-wrap" style={{ color:tx }}>{msg.text}</div>
@@ -356,7 +417,10 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
   const [emojiEl, setEmojiEl] = useState(null);
   const [attachEl, setAttachEl] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
+  const [isRecordingVideo, setIsRecordingVideo] = useState(false);
+  const [videoRecordingTime, setVideoRecordingTime] = useState(0);
   const [muted, setMuted] = useState(false);
   const [selectedMessages, setSelectedMessages] = useState(new Set());
   const fileInputRef = useRef(null);
@@ -365,6 +429,11 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
   const audioInputRef = useRef(null);
   const videoInputRef = useRef(null);
   const recordingIntervalRef = useRef(null);
+  const videoRecordingIntervalRef = useRef(null);
+  const videoMediaRecorderRef = useRef(null);
+  const videoStreamRef = useRef(null);
+  const videoChunksRef = useRef([]);
+  const videoRecordingTimeRef = useRef(0); // Use ref to track current video recording time
   const listRef = useRef(null);
 
   // Check if this is a group chat from URL params
@@ -607,34 +676,8 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
         videoInputRef.current?.click();
         break;
       case 'camera':
-        // Open camera on mobile - force camera to open instead of gallery
-        if (cameraInputRef.current) {
-          // Reset the input value to allow re-selecting the same file
-          cameraInputRef.current.value = '';
-          
-          // Remove all attributes first to reset state
-          cameraInputRef.current.removeAttribute('capture');
-          cameraInputRef.current.removeAttribute('accept');
-          
-          // Set accept first, then capture
-          // Using just 'capture' (boolean) works better on some devices
-          // Some browsers need 'capture' without value, others need 'capture="environment"'
-          cameraInputRef.current.setAttribute('accept', 'image/*');
-          
-          // Try setting capture as boolean attribute (works on more devices)
-          cameraInputRef.current.setAttribute('capture', '');
-          
-          // Force click after ensuring attributes are set
-          requestAnimationFrame(() => {
-            if (cameraInputRef.current) {
-              // Ensure capture is set - try both methods for compatibility
-              if (!cameraInputRef.current.hasAttribute('capture')) {
-                cameraInputRef.current.setAttribute('capture', '');
-              }
-              cameraInputRef.current.click();
-            }
-          });
-        }
+        // Start video recording with camera and microphone
+        startVideoRecording();
         break;
       case 'document':
         fileInputRef.current?.click();
@@ -693,14 +736,9 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const streamRef = useRef(null);
+  const recordingTimeRef = useRef(0); // Use ref to track current recording time
 
-  const startRecording = async (e) => {
-    // Prevent default to avoid conflicts
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    
+  const startRecording = async () => {
     // Don't start if already recording
     if (isRecording) return;
     
@@ -728,50 +766,87 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
         }
       };
 
+      // Store the shouldSend flag in the mediaRecorder for access in sendRecording
+      mediaRecorder._shouldSend = false;
+      
       mediaRecorder.onstop = () => {
-        // Only create message if we have audio chunks and recording time > 0
-        if (audioChunksRef.current.length > 0 && recordingTime > 0) {
-          const audioBlob = new Blob(audioChunksRef.current, { type: audioChunksRef.current[0].type || 'audio/webm' });
-          const audioUrl = URL.createObjectURL(audioBlob);
-          const duration = recordingTime;
-          
-          // Create voice message
-          const ts = new Date();
-          const newMsg = { 
-            id:'m'+Date.now(), 
-            author:{ id:'me', name:'You', avatar:'https://i.pravatar.cc/100?img=2' }, 
-            text: `🎤 Voice message (${Math.floor(duration/60)}:${String(duration%60).padStart(2,'0')})`, 
-            time: ts.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }), 
-            mine:true, 
-            read:false,
-            audioUrl,
-            audioBlob
-          };
-          setMessages(prev=> [...prev, newMsg]);
-          requestAnimationFrame(()=>{ const el=listRef.current; if(el) el.scrollTop = el.scrollHeight; });
+        // Only create message if _shouldSend is true (user clicked send)
+        const shouldSend = mediaRecorder._shouldSend === true;
+        const finalDuration = recordingTimeRef.current; // Use ref value which is always current
+        
+        if (shouldSend && audioChunksRef.current.length > 0 && finalDuration > 0) {
+          try {
+            const audioBlob = new Blob(audioChunksRef.current, { type: audioChunksRef.current[0].type || 'audio/webm' });
+            const audioUrl = URL.createObjectURL(audioBlob);
+            
+            // Create voice message
+            const ts = new Date();
+            const newMsg = { 
+              id:'m'+Date.now(), 
+              author:{ id:'me', name:'You', avatar:'https://i.pravatar.cc/100?img=2' }, 
+              text: `🎤 Voice message (${Math.floor(finalDuration/60)}:${String(finalDuration%60).padStart(2,'0')})`, 
+              time: ts.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }), 
+              mine:true, 
+              read:false,
+              audioUrl,
+              audioBlob
+            };
+            
+            // Add message to state
+            setMessages(prev=> {
+              const updated = [...prev, newMsg];
+              return updated;
+            });
+            
+            // Scroll to bottom after message is added
+            setTimeout(() => {
+              const el = listRef.current;
+              if (el) {
+                el.scrollTop = el.scrollHeight;
+              }
+            }, 100);
+          } catch (error) {
+            console.error('Error creating voice message:', error);
+            alert('Error creating voice message. Please try again.');
+          }
         }
         
         // Clean up
         audioChunksRef.current = [];
+        recordingTimeRef.current = 0;
         
         // Stop all tracks
         if (streamRef.current) {
           streamRef.current.getTracks().forEach(track => track.stop());
           streamRef.current = null;
         }
+        
+        // Reset recording state
+        setIsRecording(false);
+        setIsPaused(false);
+        if(recordingIntervalRef.current) {
+          clearInterval(recordingIntervalRef.current);
+          recordingIntervalRef.current = null;
+        }
+        setRecordingTime(0);
       };
 
       mediaRecorder.onerror = (event) => {
         console.error('MediaRecorder error:', event);
-        stopRecording();
+        cancelRecording();
       };
 
       // Start recording with timeslice for better chunk handling
       mediaRecorder.start(100);
       setIsRecording(true);
+      setIsPaused(false);
       setRecordingTime(0);
+      recordingTimeRef.current = 0; // Reset ref
       recordingIntervalRef.current = setInterval(() => {
-        setRecordingTime(prev => prev + 1);
+        if (!isPaused) {
+          recordingTimeRef.current += 1; // Update ref
+          setRecordingTime(prev => prev + 1);
+        }
       }, 1000);
     } catch (error) {
       console.error('Error accessing microphone:', error);
@@ -780,15 +855,33 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
     }
   };
 
-  const stopRecording = (e) => {
-    // Prevent default
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    
-    // Only stop if actually recording
+  // Pause/Resume recording
+  const togglePauseRecording = () => {
     if (!isRecording) return;
+    
+    if (isPaused) {
+      // Resume recording
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'paused') {
+        mediaRecorderRef.current.resume();
+      }
+      setIsPaused(false);
+    } else {
+      // Pause recording
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+        mediaRecorderRef.current.pause();
+      }
+      setIsPaused(true);
+    }
+  };
+
+  // Cancel/Delete recording
+  const cancelRecording = () => {
+    if (!isRecording) return;
+    
+    // Set flag to NOT send
+    if (mediaRecorderRef.current && mediaRecorderRef.current._shouldSend !== undefined) {
+      mediaRecorderRef.current._shouldSend = false;
+    }
     
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
       try {
@@ -798,6 +891,7 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
       }
     }
     setIsRecording(false);
+    setIsPaused(false);
     if(recordingIntervalRef.current) {
       clearInterval(recordingIntervalRef.current);
       recordingIntervalRef.current = null;
@@ -807,7 +901,194 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
     }
+    // Clear audio chunks
+    audioChunksRef.current = [];
+    recordingTimeRef.current = 0;
     setRecordingTime(0);
+  };
+
+  // Send the recording
+  const sendRecording = () => {
+    if (!isRecording || !mediaRecorderRef.current) return;
+    
+    // Check if we have valid recording time using ref
+    if (recordingTimeRef.current === 0) {
+      alert('Please record something before sending.');
+      return;
+    }
+    
+    // Set flag to send the recording when onstop fires
+    if (mediaRecorderRef.current._shouldSend !== undefined) {
+      mediaRecorderRef.current._shouldSend = true;
+    }
+    
+    // Stop recording - onstop will handle creating the message
+    if (mediaRecorderRef.current.state !== 'inactive') {
+      try {
+        mediaRecorderRef.current.stop();
+      } catch (error) {
+        console.error('Error stopping recorder:', error);
+        alert('Error stopping recording. Please try again.');
+      }
+    }
+  };
+
+  // Video recording handlers
+  const startVideoRecording = async () => {
+    try {
+      // Request both video and audio
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'environment' }, // Use back camera
+        audio: true 
+      });
+      videoStreamRef.current = stream;
+      
+      // Try to use mimeType that's supported for video
+      let options = {};
+      if (MediaRecorder.isTypeSupported('video/webm')) {
+        options = { mimeType: 'video/webm' };
+      } else if (MediaRecorder.isTypeSupported('video/mp4')) {
+        options = { mimeType: 'video/mp4' };
+      } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus')) {
+        options = { mimeType: 'video/webm;codecs=vp8,opus' };
+      }
+      
+      const mediaRecorder = new MediaRecorder(stream, options);
+      videoMediaRecorderRef.current = mediaRecorder;
+      videoChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) {
+          videoChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        // Create video blob and message
+        const finalDuration = videoRecordingTimeRef.current; // Use ref value which is always current
+        
+        if (videoChunksRef.current.length > 0 && finalDuration > 0) {
+          try {
+            const videoBlob = new Blob(videoChunksRef.current, { type: videoChunksRef.current[0].type || 'video/webm' });
+            const videoUrl = URL.createObjectURL(videoBlob);
+            
+            // Create video message
+            const ts = new Date();
+            const newMsg = { 
+              id:'m'+Date.now(), 
+              author:{ id:'me', name:'You', avatar:'https://i.pravatar.cc/100?img=2' }, 
+              text: `🎥 Video (${Math.floor(finalDuration/60)}:${String(finalDuration%60).padStart(2,'0')})`, 
+              time: ts.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }), 
+              mine:true, 
+              read:false,
+              videoUrl,
+              videoBlob,
+              fileName: `video-${Date.now()}.webm`
+            };
+            
+            // Add message to state
+            setMessages(prev=> {
+              const updated = [...prev, newMsg];
+              return updated;
+            });
+            
+            // Scroll to bottom after message is added
+            setTimeout(() => {
+              const el = listRef.current;
+              if (el) {
+                el.scrollTop = el.scrollHeight;
+              }
+            }, 100);
+          } catch (error) {
+            console.error('Error creating video message:', error);
+            alert('Error creating video message. Please try again.');
+          }
+        }
+        
+        // Clean up
+        videoChunksRef.current = [];
+        videoRecordingTimeRef.current = 0;
+        
+        if (videoStreamRef.current) {
+          videoStreamRef.current.getTracks().forEach(track => track.stop());
+          videoStreamRef.current = null;
+        }
+        setIsRecordingVideo(false);
+        setVideoRecordingTime(0);
+      };
+
+      mediaRecorder.onerror = (event) => {
+        console.error('Video MediaRecorder error:', event);
+        stopVideoRecording();
+      };
+
+      // Start recording
+      mediaRecorder.start(100);
+      setIsRecordingVideo(true);
+      setVideoRecordingTime(0);
+      videoRecordingTimeRef.current = 0; // Reset ref
+      videoRecordingIntervalRef.current = setInterval(() => {
+        videoRecordingTimeRef.current += 1; // Update ref
+        setVideoRecordingTime(prev => prev + 1);
+      }, 1000);
+    } catch (error) {
+      console.error('Error accessing camera/microphone:', error);
+      alert('Camera/microphone access denied. Please enable permissions.');
+      setIsRecordingVideo(false);
+    }
+  };
+
+  const stopVideoRecording = () => {
+    if (!isRecordingVideo || !videoMediaRecorderRef.current) return;
+    
+    // Check if we have valid recording time using ref
+    if (videoRecordingTimeRef.current === 0) {
+      alert('Please record something before sending.');
+      return;
+    }
+    
+    if (videoMediaRecorderRef.current.state !== 'inactive') {
+      try {
+        videoMediaRecorderRef.current.stop();
+      } catch (error) {
+        console.error('Error stopping video recorder:', error);
+        alert('Error stopping video recording. Please try again.');
+      }
+    }
+    
+    if(videoRecordingIntervalRef.current) {
+      clearInterval(videoRecordingIntervalRef.current);
+      videoRecordingIntervalRef.current = null;
+    }
+    
+    // Stream will be stopped in onstop handler
+  };
+
+  const cancelVideoRecording = () => {
+    if (!isRecordingVideo) return;
+    
+    if (videoMediaRecorderRef.current && videoMediaRecorderRef.current.state !== 'inactive') {
+      try {
+        videoMediaRecorderRef.current.stop();
+      } catch (error) {
+        console.error('Error stopping video recorder:', error);
+      }
+    }
+    
+    setIsRecordingVideo(false);
+    if(videoRecordingIntervalRef.current) {
+      clearInterval(videoRecordingIntervalRef.current);
+      videoRecordingIntervalRef.current = null;
+    }
+    
+    if (videoStreamRef.current) {
+      videoStreamRef.current.getTracks().forEach(track => track.stop());
+      videoStreamRef.current = null;
+    }
+    
+    videoChunksRef.current = [];
+    videoRecordingTimeRef.current = 0;
+    setVideoRecordingTime(0);
   };
 
   // File handlers
@@ -830,18 +1111,44 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
   };
 
   const handleImageSelect = (e) => {
-    const file = e.target.files?.[0];
-    if(file) {
-      const ts = new Date();
-      const newMsg = { 
-        id:'m'+Date.now(), 
-        author:{ id:'me', name:'You', avatar:'https://i.pravatar.cc/100?img=2' }, 
-        text: `🖼️ ${file.name}`, 
-        time: ts.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }), 
-        mine:true, 
-        read:false 
-      };
-      setMessages(prev=> [...prev, newMsg]);
+    const files = Array.from(e.target.files || []);
+    if(files.length > 0) {
+      files.forEach(file => {
+        const isVideo = file.type.startsWith('video/') || file.name.match(/\.(mp4|webm|mov|avi)$/i);
+        const isImage = file.type.startsWith('image/');
+        
+        if (isVideo) {
+          const videoUrl = URL.createObjectURL(file);
+          const ts = new Date();
+          const newMsg = { 
+            id:'m'+Date.now() + Math.random(), 
+            author:{ id:'me', name:'You', avatar:'https://i.pravatar.cc/100?img=2' }, 
+            text: `🎥 ${file.name}`, 
+            time: ts.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }), 
+            mine:true, 
+            read:false,
+            videoUrl,
+            videoFile: file,
+            fileName: file.name
+          };
+          setMessages(prev=> [...prev, newMsg]);
+        } else if (isImage) {
+          const imageUrl = URL.createObjectURL(file);
+          const ts = new Date();
+          const newMsg = { 
+            id:'m'+Date.now() + Math.random(), 
+            author:{ id:'me', name:'You', avatar:'https://i.pravatar.cc/100?img=2' }, 
+            text: `🖼️ ${file.name}`, 
+            time: ts.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }), 
+            mine:true, 
+            read:false,
+            imageUrl,
+            imageFile: file,
+            fileName: file.name
+          };
+          setMessages(prev=> [...prev, newMsg]);
+        }
+      });
       requestAnimationFrame(()=>{ const el=listRef.current; if(el) el.scrollTop = el.scrollHeight; });
     }
     e.target.value = '';
@@ -974,28 +1281,45 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
                   {title}
                 </Typography>
                 <Box sx={{ display:'flex', alignItems:'center', gap:0.75, minWidth:0, mt: 0.25 }}>
-                  <Chip 
-                    size="small" 
-                    label={effectiveModuleLabel} 
-                    sx={{ 
-                      borderColor: accentColor, 
-                      color: accent === 'green' ? '#0f5132' : accent === 'orange' ? '#5d2c00' : '#424242', 
-                      bgcolor: lighten(accentColor,0.12), 
-                      border:`1px solid ${lighten(accentColor,0.28)}`,
-                      height: 20,
-                      fontSize: '10px',
-                      fontWeight: 600
-                    }} 
-                  />
-                  <Typography 
-                    variant="caption" 
-                    sx={{ 
-                      fontSize: '11px',
-                      color: muiTheme.palette.text.secondary
-                    }}
-                  >
-                    {meta}
-                  </Typography>
+                  {/* Online status indicator - green "Online" text */}
+                  {!isGroupChat && (
+                    <Typography 
+                      variant="caption" 
+                      sx={{ 
+                        fontSize: '12px',
+                        color: accentColor,
+                        fontWeight: 500
+                      }}
+                    >
+                      Online
+                    </Typography>
+                  )}
+                  {isGroupChat && (
+                    <>
+                      <Chip 
+                        size="small" 
+                        label={effectiveModuleLabel} 
+                        sx={{ 
+                          borderColor: accentColor, 
+                          color: accent === 'green' ? '#0f5132' : accent === 'orange' ? '#5d2c00' : '#424242', 
+                          bgcolor: lighten(accentColor,0.12), 
+                          border:`1px solid ${lighten(accentColor,0.28)}`,
+                          height: 20,
+                          fontSize: '10px',
+                          fontWeight: 600
+                        }} 
+                      />
+                      <Typography 
+                        variant="caption" 
+                        sx={{ 
+                          fontSize: '11px',
+                          color: muiTheme.palette.text.secondary
+                        }}
+                      >
+                        {meta}
+                      </Typography>
+                    </>
+                  )}
                 </Box>
               </Box>
               <Box sx={{ position:'absolute', top: 8, right: 4, display:'flex', gap: 0.5 }}>
@@ -1152,6 +1476,22 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
           }}
         >
           <div className="space-y-3" style={{ paddingTop: 8, paddingBottom: 8 }}>
+            {/* Today divider */}
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', my: 2 }}>
+              <Divider sx={{ flex: 1, mx: 2 }} />
+              <Typography 
+                variant="caption" 
+                sx={{ 
+                  fontSize: '12px',
+                  color: 'text.secondary',
+                  fontWeight: 500,
+                  px: 1
+                }}
+              >
+                Today
+              </Typography>
+              <Divider sx={{ flex: 1, mx: 2 }} />
+            </Box>
             {messages.map(m=> (
               <Bubble 
                 key={m.id} 
@@ -1227,7 +1567,13 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
             <TextField
               fullWidth 
               size="small" 
-              placeholder={isRecording ? `Recording... ${Math.floor(recordingTime/60)}:${String(recordingTime%60).padStart(2,'0')}` : "Type a message"}
+              placeholder={
+                isRecordingVideo 
+                  ? `Recording video... ${Math.floor(videoRecordingTime/60)}:${String(videoRecordingTime%60).padStart(2,'0')}`
+                  : isRecording 
+                    ? (isPaused ? `Paused ${Math.floor(recordingTime/60)}:${String(recordingTime%60).padStart(2,'0')}` : `Recording... ${Math.floor(recordingTime/60)}:${String(recordingTime%60).padStart(2,'0')}`)
+                    : "Type a message"
+              }
               value={draft}
               onChange={(e)=>setDraft(e.target.value)}
               onFocus={()=>{ const el=listRef.current; if(el) el.scrollTop = el.scrollHeight; }}
@@ -1235,7 +1581,7 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
               multiline 
               minRows={1} 
               maxRows={6}
-              disabled={isRecording}
+              disabled={isRecording || isRecordingVideo}
               InputProps={{ 
                 sx:{ 
                   bgcolor: 'background.paper',
@@ -1262,46 +1608,106 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
               <InsertEmoticonRoundedIcon/>
             </IconButton>
             
-            {/* Microphone/Send button - Fourth, as per design */}
-            {draft.trim().length>0 ? (
-              <IconButton aria-label="Send" sx={{ color: accentColor }} onClick={send}>
-                <SendRoundedIcon/>
-              </IconButton>
+            {/* Recording Controls - Show when recording */}
+            {isRecordingVideo ? (
+              <>
+                {/* Delete/Cancel button */}
+                <IconButton 
+                  aria-label="Cancel video recording" 
+                  onClick={cancelVideoRecording}
+                  sx={{ 
+                    color: '#e53935',
+                    '&:hover': {
+                      bgcolor: 'rgba(229, 57, 53, 0.1)',
+                    },
+                  }}
+                >
+                  <DeleteRoundedIcon/>
+                </IconButton>
+                
+                {/* Stop and Send button */}
+                <IconButton 
+                  aria-label="Stop and send video" 
+                  onClick={stopVideoRecording}
+                  disabled={videoRecordingTime === 0}
+                  sx={{ 
+                    color: accentColor,
+                    '&:hover': {
+                      bgcolor: lighten(accentColor, 0.1),
+                    },
+                    '&:disabled': {
+                      opacity: 0.5,
+                    },
+                  }}
+                >
+                  <SendRoundedIcon/>
+                </IconButton>
+              </>
+            ) : isRecording ? (
+              <>
+                {/* Delete/Cancel button */}
+                <IconButton 
+                  aria-label="Delete recording" 
+                  onClick={cancelRecording}
+                  sx={{ 
+                    color: '#e53935',
+                    '&:hover': {
+                      bgcolor: 'rgba(229, 57, 53, 0.1)',
+                    },
+                  }}
+                >
+                  <DeleteRoundedIcon/>
+                </IconButton>
+                
+                {/* Pause/Resume button */}
+                <IconButton 
+                  aria-label={isPaused ? "Resume recording" : "Pause recording"} 
+                  onClick={togglePauseRecording}
+                  sx={{ 
+                    color: accentColor,
+                    '&:hover': {
+                      bgcolor: lighten(accentColor, 0.1),
+                    },
+                  }}
+                >
+                  {isPaused ? <PlayArrowRoundedIcon/> : <PauseRoundedIcon/>}
+                </IconButton>
+                
+                {/* Send recording button */}
+                <IconButton 
+                  aria-label="Send recording" 
+                  onClick={sendRecording}
+                  disabled={recordingTime === 0}
+                  sx={{ 
+                    color: accentColor,
+                    '&:hover': {
+                      bgcolor: lighten(accentColor, 0.1),
+                    },
+                    '&:disabled': {
+                      opacity: 0.5,
+                    },
+                  }}
+                >
+                  <SendRoundedIcon/>
+                </IconButton>
+              </>
             ) : (
-              <IconButton 
-                aria-label="Record" 
-                sx={{ color: isRecording ? '#e53935' : accentColor }}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  startRecording(e);
-                }}
-                onMouseUp={(e) => {
-                  e.preventDefault();
-                  stopRecording(e);
-                }}
-                onMouseLeave={(e) => {
-                  if (isRecording) {
-                    e.preventDefault();
-                    stopRecording(e);
-                  }
-                }}
-                onTouchStart={(e) => {
-                  e.preventDefault();
-                  startRecording(e);
-                }}
-                onTouchEnd={(e) => {
-                  e.preventDefault();
-                  stopRecording(e);
-                }}
-                onTouchCancel={(e) => {
-                  if (isRecording) {
-                    e.preventDefault();
-                    stopRecording(e);
-                  }
-                }}
-              >
-                {isRecording ? <StopRoundedIcon/> : <MicRoundedIcon/>}
-              </IconButton>
+              <>
+                {/* Microphone/Send button - Fourth, as per design */}
+                {draft.trim().length>0 ? (
+                  <IconButton aria-label="Send" sx={{ color: accentColor }} onClick={send}>
+                    <SendRoundedIcon/>
+                  </IconButton>
+                ) : (
+                  <IconButton 
+                    aria-label="Record" 
+                    onClick={startRecording}
+                    sx={{ color: accentColor }}
+                  >
+                    <MicRoundedIcon/>
+                  </IconButton>
+                )}
+              </>
             )}
           </Box>
         </Box>
