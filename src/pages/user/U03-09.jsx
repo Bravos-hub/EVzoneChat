@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
+import { useTheme } from "../../context/ThemeContext";
 import {
   AppBar,
   Toolbar,
@@ -51,6 +52,7 @@ function highlight(text, q, muiTheme){
 
 export default function SearchGlobalInThread({ onBack, onOpenResult }) {
   const muiTheme = useMuiTheme();
+  const { accentColor } = useTheme();
   const [tab, setTab] = useState(0); // 0 global, 1 in-thread
   const [q, setQ] = useState("");
 
@@ -212,9 +214,9 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
           <Box className="px-3 pb-3 pt-2">
             <div className="flex gap-2 flex-wrap">
               {['people','channels','messages'].map(k => (
-                <Chip key={k} label={`Filter: ${k}`} sx={{ border:`1px solid ${EV.orange}`, color: EV.orange }} variant="outlined" />
+                <Chip key={k} label={`Filter: ${k}`} sx={{ border:`1px solid ${accentColor}`, color: accentColor }} variant="outlined" />
               ))}
-              <Button variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>Apply</Button>
+              <Button variant="contained" sx={{ bgcolor: accentColor, textTransform:'none', '&:hover':{ bgcolor: accentColor, opacity: 0.9 } }}>Apply</Button>
             </div>
           </Box>
         )}

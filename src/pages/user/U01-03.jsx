@@ -1,5 +1,6 @@
 import React, { useMemo, useRef, useState } from "react";
 import { useTheme } from "../../context/ThemeContext";
+import { useNavigate } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -54,6 +55,7 @@ const LIVE_DEMO = [
  */
 export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, onRefresh, onNew, onLiveOpen, onModuleChange, onBack }) {
   const { accent, isDark } = useTheme();
+  const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [tab, setTab] = useState(0); // 0 = Evzone Rides, 1 = Other
   const [showSearch, setShowSearch] = useState(false);
@@ -124,6 +126,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
             </Typography>
             <IconButton 
               aria-label="Notifications" 
+              onClick={() => navigate('/dnd')}
               sx={{ color: '#fff' }}
             >
               <Badge 

@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
+import { useTheme } from "../../context/ThemeContext";
 import {
   AppBar,
   Toolbar,
@@ -45,7 +46,7 @@ const SESSIONS = [
  */
 export default function SecuritySessionsDevices({ onBack }) {
   const muiTheme = useMuiTheme();
-  // const { actualMode } = useTheme();
+  const { accentColor } = useTheme();
   const [snack, setSnack] = useState('');
   const [sessions, setSessions] = useState(SESSIONS);
   const [twoFA, setTwoFA] = useState(false);
@@ -80,7 +81,7 @@ export default function SecuritySessionsDevices({ onBack }) {
                   s.me ? (
                     <Chip size="small" label="This device" sx={{ bgcolor: EV.green, color:'#fff' }} />
                   ) : (
-                    <Button startIcon={<LogoutRoundedIcon/>} size="small" onClick={()=>signOut(s.id)} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Sign out</Button>
+                    <Button startIcon={<LogoutRoundedIcon/>} size="small" onClick={()=>signOut(s.id)} variant="outlined" sx={{ borderColor: accentColor, color: accentColor, textTransform:'none' }}>Sign out</Button>
                   )
                 }>
                   <ListItemAvatar><Avatar src={s.avatar} /></ListItemAvatar>
@@ -89,7 +90,7 @@ export default function SecuritySessionsDevices({ onBack }) {
               ))}
             </List>
             <div className="mt-2 flex justify-end">
-              <Button startIcon={<LogoutRoundedIcon/>} onClick={signOutOthers} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>Sign out others</Button>
+              <Button startIcon={<LogoutRoundedIcon/>} onClick={signOutOthers} variant="contained" sx={{ bgcolor: accentColor, textTransform:'none', '&:hover':{ bgcolor: accentColor, opacity: 0.9 } }}>Sign out others</Button>
             </div>
           </Box>
 
@@ -100,8 +101,8 @@ export default function SecuritySessionsDevices({ onBack }) {
               <FormControlLabel control={<Switch checked={twoFA} onChange={(e)=>setTwoFA(e.target.checked)} />} label="Enable 2FA (authenticator app)" sx={{ color: 'text.primary' }} />
             </FormGroup>
             <div className="mt-2 flex gap-2">
-              <Button disabled={!twoFA} startIcon={<QrCode2RoundedIcon/>} onClick={()=>setQrOpen(true)} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>Setup</Button>
-              <Button disabled={!twoFA} startIcon={<KeyRoundedIcon/>} onClick={()=>setCodesOpen(true)} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Backup codes</Button>
+              <Button disabled={!twoFA} startIcon={<QrCode2RoundedIcon/>} onClick={()=>setQrOpen(true)} variant="contained" sx={{ bgcolor: accentColor, textTransform:'none', '&:hover':{ bgcolor: accentColor, opacity: 0.9 } }}>Setup</Button>
+              <Button disabled={!twoFA} startIcon={<KeyRoundedIcon/>} onClick={()=>setCodesOpen(true)} variant="outlined" sx={{ borderColor: accentColor, color: accentColor, textTransform:'none' }}>Backup codes</Button>
             </div>
           </Box>
         </Box>
@@ -109,8 +110,8 @@ export default function SecuritySessionsDevices({ onBack }) {
         {/* Footer */}
         <Box className="px-3 pb-3">
           <div className="grid grid-cols-2 gap-2">
-            <Button variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Cancel</Button>
-            <Button variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>Save</Button>
+            <Button variant="outlined" sx={{ borderColor: accentColor, color: accentColor, textTransform:'none' }}>Cancel</Button>
+            <Button variant="contained" sx={{ bgcolor: accentColor, textTransform:'none', '&:hover':{ bgcolor: accentColor, opacity: 0.9 } }}>Save</Button>
           </div>
         </Box>
       </Box>
@@ -123,7 +124,7 @@ export default function SecuritySessionsDevices({ onBack }) {
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>Secret key: <strong style={{ color: 'text.primary' }}>{secret}</strong></Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={()=>setQrOpen(false)} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>Done</Button>
+          <Button onClick={()=>setQrOpen(false)} variant="contained" sx={{ bgcolor: accentColor, textTransform:'none', '&:hover':{ bgcolor: accentColor, opacity: 0.9 } }}>Done</Button>
         </DialogActions>
       </Dialog>
 
@@ -141,8 +142,8 @@ export default function SecuritySessionsDevices({ onBack }) {
           <TextField fullWidth size="small" label="Type CONFIRM to regenerate" value={codeConfirm} onChange={(e)=>setCodeConfirm(e.target.value)} sx={{ '& .MuiInputBase-input': { color: 'text.primary' } }} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={()=>setCodesOpen(false)} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Close</Button>
-          <Button disabled={codeConfirm!=="CONFIRM"} onClick={()=>setSnack('New backup codes generated')} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>Regenerate</Button>
+          <Button onClick={()=>setCodesOpen(false)} variant="outlined" sx={{ borderColor: accentColor, color: accentColor, textTransform:'none' }}>Close</Button>
+          <Button disabled={codeConfirm!=="CONFIRM"} onClick={()=>setSnack('New backup codes generated')} variant="contained" sx={{ bgcolor: accentColor, textTransform:'none', '&:hover':{ bgcolor: accentColor, opacity: 0.9 } }}>Regenerate</Button>
         </DialogActions>
       </Dialog>
 

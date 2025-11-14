@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
+import { useTheme } from "../../context/ThemeContext";
 import {
   AppBar,
   Toolbar,
@@ -30,7 +31,7 @@ const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2
  */
 export default function ContextPanelsPack1({ onBack }) {
   const muiTheme = useMuiTheme();
-  // const { actualMode } = useTheme();
+  const { accentColor } = useTheme();
   const tabs = [
     { key:'marketplace', label:'Marketplace', icon: <LocalMallRoundedIcon/> },
     { key:'rides', label:'Rides', icon: <CommuteRoundedIcon/> },
@@ -68,7 +69,7 @@ export default function ContextPanelsPack1({ onBack }) {
       <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
         <div className="flex items-center gap-2 mb-2" style={{ color: muiTheme.palette.text.primary }}>
           <CommuteRoundedIcon/><span className="font-semibold">Trip #R‑90312</span>
-          <Chip size="small" label="On route" sx={{ bgcolor: EV.orange, color:'#fff', ml:'auto' }} />
+          <Chip size="small" label="On route" sx={{ bgcolor: accentColor, color:'#fff', ml:'auto' }} />
         </div>
         <div className="text-sm flex items-center gap-1 mb-1" style={{ color: muiTheme.palette.text.primary }}><PlaceRoundedIcon sx={{ fontSize:16 }} /> Pickup: Kira Rd Police</div>
         <div className="text-sm flex items-center gap-1" style={{ color: muiTheme.palette.text.primary }}><PlaceRoundedIcon sx={{ fontSize:16 }} /> Dropoff: Entebbe Airport</div>

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
 import { useCall } from "../../context/CallContext";
+import { useTheme } from "../../context/ThemeContext";
 import {
   AppBar, Toolbar, IconButton, Box, Avatar, Button, Menu, MenuItem, ListItemIcon, ListItemText,
   List, ListItem, ListItemAvatar, ListItemText as ListItemTextComp, Divider, Chip, Typography
@@ -79,6 +80,7 @@ export default function OneToOneCall({
 
   // All hooks must be called before any conditional returns
   const muiTheme = useMuiTheme();
+  const { accentColor } = useTheme();
   const { startCall, endCall, updateCallState, activeCall } = useCall();
   
   // Toggles (uncontrolled defaults)
@@ -247,7 +249,7 @@ export default function OneToOneCall({
             <Toolbar className="!min-h-[56px]">
               <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>Calls</Typography>
               <Box sx={{ flexGrow: 1 }} />
-              <IconButton onClick={()=>onNavigate?.('/new-message')} aria-label="New call" sx={{ color: EV.orange }}>
+              <IconButton onClick={()=>onNavigate?.('/new-message')} aria-label="New call" sx={{ color: accentColor }}>
                 <CallRoundedIcon />
               </IconButton>
             </Toolbar>

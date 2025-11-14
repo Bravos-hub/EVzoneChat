@@ -32,7 +32,7 @@ const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2
  * U10-30 — Theme (EV Colors) & Export/Delete & Tips
  */
 export default function ThemeExportDeleteTips({ onBack }) {
-  const { mode, setMode, accent, setAccent, actualMode, isSystem } = useTheme();
+  const { mode, setMode, accent, setAccent, accentColor, actualMode, isSystem } = useTheme();
   const muiTheme = useMuiTheme();
   const [snack, setSnack] = useState('');
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -87,17 +87,6 @@ export default function ThemeExportDeleteTips({ onBack }) {
             <div className="flex items-center gap-2 flex-wrap">
               <Chip 
                 clickable 
-                onClick={()=>setAccent('orange')} 
-                label="EV Orange" 
-                sx={{ 
-                  bgcolor: accent === 'orange' ? '#f77f00' : '#f2f2f2', 
-                  color: accent === 'orange' ? '#fff' : '#111',
-                  border: accent === 'orange' ? '2px solid #f77f00' : '2px solid transparent',
-                  '&:hover': { bgcolor: accent === 'orange' ? '#e06f00' : '#e9e9e9' }
-                }} 
-              />
-              <Chip 
-                clickable 
                 onClick={()=>setAccent('green')} 
                 label="EV Green" 
                 sx={{ 
@@ -105,6 +94,17 @@ export default function ThemeExportDeleteTips({ onBack }) {
                   color: accent === 'green' ? '#fff' : '#111',
                   border: accent === 'green' ? '2px solid #03cd8c' : '2px solid transparent',
                   '&:hover': { bgcolor: accent === 'green' ? '#02b37b' : '#e9e9e9' }
+                }} 
+              />
+              <Chip 
+                clickable 
+                onClick={()=>setAccent('orange')} 
+                label="EV Orange" 
+                sx={{ 
+                  bgcolor: accent === 'orange' ? '#f77f00' : '#f2f2f2', 
+                  color: accent === 'orange' ? '#fff' : '#111',
+                  border: accent === 'orange' ? '2px solid #f77f00' : '2px solid transparent',
+                  '&:hover': { bgcolor: accent === 'orange' ? '#e06f00' : '#e9e9e9' }
                 }} 
               />
               <Chip 
@@ -158,7 +158,7 @@ export default function ThemeExportDeleteTips({ onBack }) {
             <Button 
               variant="outlined" 
               onClick={onBack}
-              sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}
+              sx={{ borderColor: accentColor, color: accentColor, textTransform:'none' }}
             >
               Cancel
             </Button>
@@ -184,7 +184,7 @@ export default function ThemeExportDeleteTips({ onBack }) {
           <TextField fullWidth size="small" value={confirmText} onChange={(e)=>setConfirmText(e.target.value)} sx={{ mt:1.5 }} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={()=>setConfirmOpen(false)} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Cancel</Button>
+          <Button onClick={()=>setConfirmOpen(false)} variant="outlined" sx={{ borderColor: accentColor, color: accentColor, textTransform:'none' }}>Cancel</Button>
           <Button disabled={confirmText!=="DELETE"} onClick={doDelete} variant="contained" sx={{ bgcolor:'#e53935', textTransform:'none', '&:hover':{ bgcolor:'#c62828' } }}>Delete</Button>
         </DialogActions>
       </Dialog>

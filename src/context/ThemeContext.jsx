@@ -38,13 +38,19 @@ export const ThemeContextProvider = ({ children }) => {
   const [accent, setAccent] = useState(() => {
     try {
       const saved = localStorage.getItem('themeAccent');
+      // Only use saved value if it exists and is valid
+      // For new users (no saved value), default to 'green'
       if (saved && ['orange', 'green', 'grey'].includes(saved)) {
         return saved;
       }
+      // New user: default to green (primary color)
+      // This will be saved to localStorage by the useEffect below
+      return 'green';
     } catch (e) {
       console.warn('Failed to read accent from localStorage', e);
+      // Default to green on error
+      return 'green';
     }
-    return 'orange';
   });
 
   // Track system preference changes
@@ -102,9 +108,13 @@ export const ThemeContextProvider = ({ children }) => {
     }
   }, [accent]);
 
+  // Calculate accent color value
+  const accentColor = useMemo(() => {
+    return accent === 'green' ? EV.green : accent === 'orange' ? EV.orange : EV.grey;
+  }, [accent]);
+
   // Create MUI theme with proper dark/light mode support
   const muiTheme = useMemo(() => {
-    const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
     const isDark = actualMode === 'dark';
     
     return createTheme({
@@ -116,7 +126,7 @@ export const ThemeContextProvider = ({ children }) => {
           dark: accent === 'orange' ? '#c56200' : accent === 'green' ? '#029a6a' : '#757575',
         },
         secondary: {
-          main: accent === 'orange' ? EV.orange : EV.green,
+          main: accent === 'green' ? EV.orange : accent === 'orange' ? EV.green : EV.orange,
         },
         background: {
           default: isDark ? '#121212' : '#f2f2f2',
@@ -182,7 +192,7 @@ export const ThemeContextProvider = ({ children }) => {
         },
       },
     });
-  }, [actualMode, accent]);
+  }, [actualMode, accent, accentColor]);
 
   // Memoize context value to prevent unnecessary re-renders
   const value = useMemo(() => ({
@@ -190,11 +200,12 @@ export const ThemeContextProvider = ({ children }) => {
     setMode,
     accent,
     setAccent,
+    accentColor, // Export the accent color value
     actualMode,
     isDark: actualMode === 'dark',
     isLight: actualMode === 'light',
     isSystem: mode === 'system',
-  }), [mode, accent, actualMode]);
+  }), [mode, accent, accentColor, actualMode]);
 
   return (
     <ThemeContext.Provider value={value}>
