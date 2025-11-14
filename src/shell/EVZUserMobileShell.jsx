@@ -39,6 +39,7 @@ import ShieldRoundedIcon from "@mui/icons-material/ShieldRounded";
 import SecurityRoundedIcon from "@mui/icons-material/SecurityRounded";
 import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
+import EventAvailableRoundedIcon from "@mui/icons-material/EventAvailableRounded";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
@@ -227,6 +228,14 @@ function ShellFrame({ children }){
         <MenuItem onClick={()=>go('/call')}>
           <ListItemIcon><CallRoundedIcon fontSize="small"/></ListItemIcon>
           <ListItemText primary="Start call" />
+        </MenuItem>
+        <MenuItem onClick={()=>go('/meetings/book')}>
+          <ListItemIcon><EventAvailableRoundedIcon fontSize="small"/></ListItemIcon>
+          <ListItemText primary="Schedule meeting" />
+        </MenuItem>
+        <MenuItem onClick={()=>go('/meetings')}>
+          <ListItemIcon><EventAvailableRoundedIcon fontSize="small" sx={{ opacity: 0.7 }}/></ListItemIcon>
+          <ListItemText primary="My meetings" />
         </MenuItem>
         <Divider sx={{ my: 0.5 }} />
         {/* Personalization */}

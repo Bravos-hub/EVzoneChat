@@ -30,6 +30,7 @@ import BrushRoundedIcon from "@mui/icons-material/BrushRounded";
 import SecurityRoundedIcon from "@mui/icons-material/SecurityRounded";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
+import EventAvailableRoundedIcon from "@mui/icons-material/EventAvailableRounded";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
@@ -110,12 +111,34 @@ export default function LTASettings({ onBack, onNavigate }) {
               <ListItem 
                 button 
                 onClick={() => onNavigate?.('/profile')}
-                sx={{ borderRadius: '0 0 8px 8px' }}
               >
                 <ListItemIcon>
                   <PersonRoundedIcon sx={{ color: 'text.primary' }} />
                 </ListItemIcon>
                 <ListItemText primary="Profile" secondary="Edit your profile" sx={{ color: 'text.primary' }} />
+                <ChevronRightRoundedIcon sx={{ color: 'text.secondary' }} />
+              </ListItem>
+              <Divider />
+              <ListItem 
+                button 
+                onClick={() => onNavigate?.('/meetings/book')}
+              >
+                <ListItemIcon>
+                  <EventAvailableRoundedIcon sx={{ color: 'text.primary' }} />
+                </ListItemIcon>
+                <ListItemText primary="Schedule meeting" secondary="Create a new meeting" sx={{ color: 'text.primary' }} />
+                <ChevronRightRoundedIcon sx={{ color: 'text.secondary' }} />
+              </ListItem>
+              <Divider />
+              <ListItem 
+                button 
+                onClick={() => onNavigate?.('/meetings')}
+                sx={{ borderRadius: '0 0 8px 8px' }}
+              >
+                <ListItemIcon>
+                  <EventAvailableRoundedIcon sx={{ color: 'text.primary', opacity: 0.7 }} />
+                </ListItemIcon>
+                <ListItemText primary="My meetings" secondary="View all meetings" sx={{ color: 'text.primary' }} />
                 <ChevronRightRoundedIcon sx={{ color: 'text.secondary' }} />
               </ListItem>
             </List>
