@@ -53,11 +53,13 @@ export default function MediaViewerFS({ open, item = { type: 'image', src: '' },
 
       {/* Header */}
       <AppBar elevation={0} position="static" sx={{ bgcolor: '#000', color: '#fff' }}>
-        <Toolbar className="!min-h-[56px]">
-          <IconButton onClick={onClose} aria-label="Close" sx={{ color: '#fff' }}><CloseRoundedIcon /></IconButton>
-          <Typography variant="h6" className="font-bold ml-1 truncate">{title || 'Media'}</Typography>
+        <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
+          <IconButton onClick={onClose} aria-label="Close" sx={{ color: '#fff', padding: { xs: '6px', sm: '8px' } }}>
+            <CloseRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+          </IconButton>
+          <Typography variant="h6" className="font-bold" sx={{ fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 }, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: { xs: '60%', sm: '70%' } }}>{title || 'Media'}</Typography>
           <Box sx={{ flexGrow: 1 }} />
-          {meta && <Typography variant="caption" className="opacity-80 mr-2">{meta}</Typography>}
+          {meta && <Typography variant="caption" sx={{ fontSize: { xs: '10px', sm: '12px' }, opacity: 0.8, mr: { xs: 1, sm: 2 }, display: { xs: 'none', sm: 'block' } }}>{meta}</Typography>}
         </Toolbar>
       </AppBar>
 
@@ -68,11 +70,11 @@ export default function MediaViewerFS({ open, item = { type: 'image', src: '' },
 
       {/* Actions */}
       <Box className="fixed inset-x-0 bottom-0 z-10 flex justify-center" sx={{ pb: 'env(safe-area-inset-bottom)' }}>
-        <Box className="w-full mx-auto bg-white/95 backdrop-blur px-3 py-2 border-t" sx={{ borderColor: EV.light }}>
-          <div className="grid grid-cols-3 gap-2">
-            <Button onClick={()=>onSave?.(item)} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Save</Button>
-            <Button onClick={()=>onShare?.(item)} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Share</Button>
-            <Button onClick={()=>onDelete?.(item)} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover': { bgcolor: '#e06f00' } }}>Delete</Button>
+        <Box className="w-full mx-auto bg-white/95 backdrop-blur border-t" sx={{ borderColor: EV.light, px: { xs: 2, sm: 3 }, py: { xs: 1.5, sm: 2 } }}>
+          <div className="grid grid-cols-3" style={{ gap: '8px' }}>
+            <Button onClick={()=>onSave?.(item)} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none', fontSize: { xs: '12px', sm: '14px' }, py: { xs: 0.75, sm: 1 } }}>Save</Button>
+            <Button onClick={()=>onShare?.(item)} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none', fontSize: { xs: '12px', sm: '14px' }, py: { xs: 0.75, sm: 1 } }}>Share</Button>
+            <Button onClick={()=>onDelete?.(item)} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', fontSize: { xs: '12px', sm: '14px' }, py: { xs: 0.75, sm: 1 }, '&:hover': { bgcolor: '#e06f00' } }}>Delete</Button>
           </div>
         </Box>
       </Box>

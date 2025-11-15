@@ -128,7 +128,7 @@ export default function OneToOneCall({
   
   // Update global call state
   useEffect(() => {
-    if (activeCall) {
+    if (activeCall && activeCall.state !== callState) {
       updateCallState(callState);
     }
   }, [callState, activeCall, updateCallState]);
@@ -259,49 +259,41 @@ export default function OneToOneCall({
         <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none`}</style>
         <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.default' }}>
           <AppBar elevation={0} position="static" sx={{ bgcolor: 'background.paper', color: 'text.primary', borderBottom: `1px solid ${muiTheme.palette.divider}` }}>
-            <Toolbar className="!min-h-[56px]">
-              <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>Calls</Typography>
+            <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
+              <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 } }}>Calls</Typography>
               <Box sx={{ flexGrow: 1 }} />
-              <Box sx={{ display: 'flex', gap: 0.5 }}>
+              <Box sx={{ display: 'flex', gap: { xs: 0.25, sm: 0.5 }, flexWrap: 'nowrap' }}>
                 <IconButton 
                   onClick={()=>onNavigate?.('/call?type=video&state=dialing')} 
                   aria-label="New video call" 
                   title="New video call"
-                  sx={{ color: accentColor }}
+                  sx={{ color: accentColor, padding: { xs: '6px', sm: '8px' } }}
                 >
-                  <VideoCallRoundedIcon />
+                  <VideoCallRoundedIcon sx={{ fontSize: { xs: '20px', sm: '24px' } }} />
                 </IconButton>
                 <IconButton 
                   onClick={()=>onNavigate?.('/group-call?type=conference')} 
                   aria-label="New conference" 
                   title="New conference"
-                  sx={{ color: accentColor }}
+                  sx={{ color: accentColor, padding: { xs: '6px', sm: '8px' } }}
                 >
-                  <GroupsRoundedIcon />
+                  <GroupsRoundedIcon sx={{ fontSize: { xs: '20px', sm: '24px' } }} />
                 </IconButton>
                 <IconButton 
                   onClick={()=>onNavigate?.('/meetings/book')} 
                   aria-label="Schedule meeting" 
                   title="Schedule meeting"
-                  sx={{ color: accentColor }}
+                  sx={{ color: accentColor, padding: { xs: '6px', sm: '8px' } }}
                 >
-                  <EventAvailableRoundedIcon />
-                </IconButton>
-                <IconButton 
-                  onClick={()=>onNavigate?.('/meetings')} 
-                  aria-label="My meetings" 
-                  title="My meetings"
-                  sx={{ color: accentColor }}
-                >
-                  <EventAvailableRoundedIcon sx={{ fontSize: '0.9em', opacity: 0.8 }} />
+                  <EventAvailableRoundedIcon sx={{ fontSize: { xs: '20px', sm: '24px' } }} />
                 </IconButton>
                 <IconButton 
                   onClick={()=>onNavigate?.('/call?type=voice&state=dialing')} 
                   aria-label="New voice call" 
                   title="New voice call"
-                  sx={{ color: accentColor }}
+                  sx={{ color: accentColor, padding: { xs: '6px', sm: '8px' } }}
                 >
-                  <CallRoundedIcon />
+                  <CallRoundedIcon sx={{ fontSize: { xs: '20px', sm: '24px' } }} />
                 </IconButton>
               </Box>
             </Toolbar>
@@ -320,14 +312,14 @@ export default function OneToOneCall({
                     </ListItemAvatar>
                     <ListItemTextComp
                       primary={
-                        <div className="flex items-center gap-2">
+                        <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap' }}>
                           <span className="font-semibold" style={{ color: muiTheme.palette.text.primary }}>{call.name}</span>
                           {call.missed && <Chip size="small" label="Missed" sx={{ bgcolor: '#e53935', color: '#fff', height: 18, fontSize: '10px' }} />}
                           <span className="text-xs ml-auto" style={{ color: muiTheme.palette.text.secondary }}>{call.time}</span>
-                        </div>
+                        </Box>
                       }
                       secondary={
-                        <div className="flex items-center gap-2 mt-0.5">
+                        <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
                           {call.type === 'video' ? (
                             <VideoCallRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
                           ) : call.type === 'conference' ? (
@@ -338,7 +330,7 @@ export default function OneToOneCall({
                             <CallRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
                           )}
                           <span className="text-[12px]" style={{ color: muiTheme.palette.text.secondary }}>{call.duration}</span>
-                        </div>
+                        </Box>
                       }
                     />
                   </ListItem>

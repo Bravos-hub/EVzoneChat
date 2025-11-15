@@ -49,20 +49,22 @@ export default function HostControlsLobby({ onBack }) {
 
       <Box className="w-full h-full mx-auto bg-white flex flex-col">
         <AppBar elevation={0} position="static" sx={{ bgcolor:'#fff', color:'#111', borderBottom:`1px solid ${EV.light}` }}>
-          <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back"><ArrowBackRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold ml-1">Host Controls</Typography>
+          <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ padding: { xs: '6px', sm: '8px' } }}>
+              <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+            </IconButton>
+            <Typography variant="h6" className="font-bold" sx={{ fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 } }}>Host Controls</Typography>
           </Toolbar>
         </AppBar>
 
-        {alert && <Alert severity="success" onClose={()=>setAlert('')} className="m-3">{alert}</Alert>}
+        {alert && <Alert severity="success" onClose={()=>setAlert('')} sx={{ m: { xs: 2, sm: 3 } }}>{alert}</Alert>}
 
-        <Box className="p-3 space-y-3">
+        <Box sx={{ p: { xs: 2, sm: 3 }, '& > * + *': { mt: { xs: 2, sm: 3 } } }}>
           {/* Top controls */}
-          <div className="grid grid-cols-3 gap-2">
-            <Button startIcon={<VolumeOffRoundedIcon/>} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }} onClick={()=>setMutedAll(true)}>Mute all</Button>
-            <Button startIcon={locked ? <LockOpenRoundedIcon/> : <LockRoundedIcon/>} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }} onClick={()=>setLocked(l=>!l)}>{locked? 'Unlock' : 'Lock'}</Button>
-            <Button startIcon={<CallEndRoundedIcon/>} variant="contained" sx={{ bgcolor:'#e53935', textTransform:'none', '&:hover':{ bgcolor:'#c62828' } }} onClick={endAll}>End for all</Button>
+          <div className="grid grid-cols-3" style={{ gap: '8px' }}>
+            <Button startIcon={<VolumeOffRoundedIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none', fontSize: { xs: '11px', sm: '12px' }, py: { xs: 0.5, sm: 0.75 } }} onClick={()=>setMutedAll(true)}>Mute all</Button>
+            <Button startIcon={locked ? <LockOpenRoundedIcon sx={{ fontSize: { xs: 16, sm: 18 } }} /> : <LockRoundedIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none', fontSize: { xs: '11px', sm: '12px' }, py: { xs: 0.5, sm: 0.75 } }} onClick={()=>setLocked(l=>!l)}>{locked? 'Unlock' : 'Lock'}</Button>
+            <Button startIcon={<CallEndRoundedIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />} variant="contained" sx={{ bgcolor:'#e53935', textTransform:'none', fontSize: { xs: '11px', sm: '12px' }, py: { xs: 0.5, sm: 0.75 }, '&:hover':{ bgcolor:'#c62828' } }} onClick={endAll}>End for all</Button>
           </div>
 
           <Divider />
@@ -79,31 +81,34 @@ export default function HostControlsLobby({ onBack }) {
 
           {/* Lobby */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2"><PeopleAltRoundedIcon /><span className="font-semibold">Lobby</span></div>
-            <Chip size="small" label={waiting.length} sx={{ bgcolor: EV.light }} />
+            <div className="flex items-center" style={{ gap: '8px' }}><PeopleAltRoundedIcon sx={{ fontSize: { xs: 18, sm: 20 } }} /><span className="font-semibold" style={{ fontSize: '14px' }}>Lobby</span></div>
+            <Chip size="small" label={waiting.length} sx={{ bgcolor: EV.light, fontSize: { xs: '11px', sm: '12px' }, height: { xs: 22, sm: 24 } }} />
           </div>
-          <List className="no-scrollbar" sx={{ maxHeight: 340, overflowY:'auto', border:`1px solid ${EV.light}`, borderRadius: 2 }}>
+          <List className="no-scrollbar" sx={{ maxHeight: { xs: 280, sm: 340 }, overflowY:'auto', border:`1px solid ${EV.light}`, borderRadius: 2 }}>
             {waiting.length === 0 && (
-              <Box className="p-4 text-sm text-gray-500">No one is waiting.</Box>
+              <Box sx={{ p: { xs: 3, sm: 4 }, fontSize: { xs: '12px', sm: '14px' }, color: 'text.secondary' }}>No one is waiting.</Box>
             )}
             {waiting.map(w => (
               <ListItem key={w.id} secondaryAction={
-                <div className="flex items-center gap-2">
-                  <Button size="small" onClick={()=>admit(w.id)} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>Admit</Button>
-                  <Button size="small" onClick={()=>deny(w.id)} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Deny</Button>
+                <div className="flex items-center" style={{ gap: '8px', flexWrap: 'wrap' }}>
+                  <Button size="small" onClick={()=>admit(w.id)} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', fontSize: { xs: '11px', sm: '12px' }, py: { xs: 0.25, sm: 0.5 }, '&:hover':{ bgcolor:'#e06f00' } }}>Admit</Button>
+                  <Button size="small" onClick={()=>deny(w.id)} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none', fontSize: { xs: '11px', sm: '12px' }, py: { xs: 0.25, sm: 0.5 } }}>Deny</Button>
                 </div>
-              }>
-                <ListItemAvatar><Avatar src={w.avatar} /></ListItemAvatar>
-                <ListItemText primary={<span className="font-semibold">{w.name}</span>} secondary={w.note} />
+              } sx={{ px: { xs: 2, sm: 3 }, py: { xs: 1, sm: 1.25 } }}>
+                <ListItemAvatar><Avatar src={w.avatar} sx={{ width: { xs: 36, sm: 40 }, height: { xs: 36, sm: 40 } }} /></ListItemAvatar>
+                <ListItemText 
+                  primary={<span className="font-semibold" style={{ fontSize: '14px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{w.name}</span>} 
+                  secondary={<span style={{ fontSize: '12px' }}>{w.note}</span>} 
+                />
               </ListItem>
             ))}
           </List>
 
           {/* Security note */}
-          <Box className="rounded-2xl p-3" sx={{ background: EV.light }}>
-            <div className="flex items-start gap-2">
-              <SecurityRoundedIcon sx={{ color: EV.green }} />
-              <div className="text-sm text-gray-700">
+          <Box className="rounded-2xl" sx={{ background: EV.light, p: { xs: 2, sm: 3 } }}>
+            <div className="flex items-start" style={{ gap: '8px' }}>
+              <SecurityRoundedIcon sx={{ color: EV.green, fontSize: { xs: 18, sm: 20 } }} />
+              <div style={{ fontSize: '13px', color: '#666' }}>
                 When the room is <strong>{locked? 'locked' : 'unlocked'}</strong>, only hosts/co‑hosts can admit people from the lobby. Recording and screen‑share follow your room policy.
               </div>
             </div>

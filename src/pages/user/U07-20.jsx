@@ -42,58 +42,62 @@ export default function MeetingSummary({ onBack, meta = { title:'Weekly Sync', d
 
       <Box className="w-full h-full mx-auto bg-white flex flex-col">
         <AppBar elevation={0} position="static" sx={{ bgcolor:'#fff', color:'#111', borderBottom:`1px solid ${EV.light}` }}>
-          <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back"><ArrowBackRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold ml-1">Meeting summary</Typography>
+          <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ padding: { xs: '6px', sm: '8px' } }}>
+              <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+            </IconButton>
+            <Typography variant="h6" className="font-bold" sx={{ fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 } }}>Meeting summary</Typography>
           </Toolbar>
         </AppBar>
 
-        <Box className="p-3 space-y-3 flex-1 no-scrollbar" sx={{ overflowY:'auto' }}>
+        <Box sx={{ p: { xs: 2, sm: 3 }, '& > * + *': { mt: { xs: 2, sm: 3 } }, flex: 1, overflowY: 'auto' }} className="no-scrollbar">
           {/* meta */}
-          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${EV.light}` }}>
-            <div className="font-semibold">{meta.title}</div>
-            <div className="text-sm text-gray-700">{meta.date} • {meta.duration} • {meta.participants} participants</div>
+          <Box className="rounded-2xl" sx={{ border:`1px solid ${EV.light}`, p: { xs: 2, sm: 3 } }}>
+            <div className="font-semibold" style={{ fontSize: '15px' }}>{meta.title}</div>
+            <div style={{ fontSize: '13px', color: '#666', marginTop: '4px' }}>{meta.date} • {meta.duration} • {meta.participants} participants</div>
           </Box>
 
           {/* recording */}
-          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${EV.light}` }}>
+          <Box className="rounded-2xl" sx={{ border:`1px solid ${EV.light}`, p: { xs: 2, sm: 3 } }}>
             <div className="flex items-center justify-between">
-              <div className="font-semibold">Recording</div>
-              <Button startIcon={<DownloadRoundedIcon/>} onClick={()=>download('recording')} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>Download</Button>
+              <div className="font-semibold" style={{ fontSize: '15px' }}>Recording</div>
+              <Button startIcon={<DownloadRoundedIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />} onClick={()=>download('recording')} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 }, '&:hover':{ bgcolor:'#e06f00' } }}>Download</Button>
             </div>
-            <video className="w-full rounded-lg mt-2" controls>
+            <video className="w-full rounded-lg" style={{ marginTop: '8px' }} controls>
               <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm" type="video/webm" />
             </video>
           </Box>
 
           {/* transcript */}
-          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${EV.light}` }}>
+          <Box className="rounded-2xl" sx={{ border:`1px solid ${EV.light}`, p: { xs: 2, sm: 3 } }}>
             <div className="flex items-center justify-between">
-              <div className="font-semibold">Transcript</div>
-              <Button startIcon={<ReceiptLongRoundedIcon/>} onClick={()=>download('transcript')} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Download</Button>
+              <div className="font-semibold" style={{ fontSize: '15px' }}>Transcript</div>
+              <Button startIcon={<ReceiptLongRoundedIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />} onClick={()=>download('transcript')} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 } }}>Download</Button>
             </div>
-            <Paper variant="outlined" sx={{ p:1.5, mt:1, borderColor: EV.light }}>
-              <div className="text-sm text-gray-800 whitespace-pre-wrap">[07:03] Alice: We need to test API limits…{"\n"}[07:06] Bob: Vendor says D‑3 is feasible…{"\n"}[07:10] You: OK, let’s capture risks…</div>
+            <Paper variant="outlined" sx={{ p: { xs: 1.25, sm: 1.5 }, mt: 1, borderColor: EV.light }}>
+              <div className="whitespace-pre-wrap" style={{ fontSize: '13px', color: '#333' }}>[07:03] Alice: We need to test API limits…{"\n"}[07:06] Bob: Vendor says D‑3 is feasible…{"\n"}[07:10] You: OK, let's capture risks…</div>
             </Paper>
           </Box>
 
           {/* AI summary */}
-          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${EV.light}` }}>
+          <Box className="rounded-2xl" sx={{ border:`1px solid ${EV.light}`, p: { xs: 2, sm: 3 } }}>
             <div className="flex items-center justify-between">
-              <div className="font-semibold">AI summary</div>
+              <div className="font-semibold" style={{ fontSize: '15px' }}>AI summary</div>
               {!ai ? (
-                <Button startIcon={<SummarizeRoundedIcon/>} onClick={generateAi} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>Generate</Button>
+                <Button startIcon={<SummarizeRoundedIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />} onClick={generateAi} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 }, '&:hover':{ bgcolor:'#e06f00' } }}>Generate</Button>
               ) : (
-                <Chip size="small" label="Generated" sx={{ bgcolor: EV.green, color:'#fff' }} />
+                <Chip size="small" label="Generated" sx={{ bgcolor: EV.green, color:'#fff', fontSize: { xs: '11px', sm: '12px' }, height: { xs: 22, sm: 24 } }} />
               )}
             </div>
             {ai && (
               <>
-                <div className="text-sm text-gray-800 mt-2">{ai.summary}</div>
-                <div className="text-sm font-semibold mt-2">Action items</div>
+                <div style={{ fontSize: '13px', color: '#333', marginTop: '8px' }}>{ai.summary}</div>
+                <div className="font-semibold" style={{ fontSize: '14px', marginTop: '8px' }}>Action items</div>
                 <List>
                   {ai.actions.map((a,i)=> (
-                    <ListItem key={i}><ListItemText primary={<span className="text-sm">• {a}</span>} /></ListItem>
+                    <ListItem key={i} sx={{ px: { xs: 1, sm: 2 }, py: { xs: 0.5, sm: 0.75 } }}>
+                      <ListItemText primary={<span style={{ fontSize: '13px' }}>• {a}</span>} />
+                    </ListItem>
                   ))}
                 </List>
               </>
@@ -101,17 +105,20 @@ export default function MeetingSummary({ onBack, meta = { title:'Weekly Sync', d
           </Box>
 
           {/* highlights timeline */}
-          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${EV.light}` }}>
-            <div className="flex items-center gap-2 mb-1"><InsightsRoundedIcon/><span className="font-semibold">Highlights</span></div>
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <Button variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Risk discussion 07:10</Button>
-              <Button variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Roadmap update 07:25</Button>
+          <Box className="rounded-2xl" sx={{ border:`1px solid ${EV.light}`, p: { xs: 2, sm: 3 } }}>
+            <div className="flex items-center mb-1" style={{ gap: '8px' }}>
+              <InsightsRoundedIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />
+              <span className="font-semibold" style={{ fontSize: '15px' }}>Highlights</span>
+            </div>
+            <div className="grid grid-cols-2" style={{ gap: '8px' }}>
+              <Button variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none', fontSize: { xs: '11px', sm: '12px' }, py: { xs: 0.5, sm: 0.75 } }}>Risk discussion 07:10</Button>
+              <Button variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none', fontSize: { xs: '11px', sm: '12px' }, py: { xs: 0.5, sm: 0.75 } }}>Roadmap update 07:25</Button>
             </div>
           </Box>
 
-          <div className="grid grid-cols-2 gap-2">
-            <Button variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Share summary</Button>
-            <Button variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>Back to meetings</Button>
+          <div className="grid grid-cols-2" style={{ gap: '8px' }}>
+            <Button variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none', fontSize: { xs: '13px', sm: '14px' }, py: { xs: 0.75, sm: 1 } }}>Share summary</Button>
+            <Button variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', fontSize: { xs: '13px', sm: '14px' }, py: { xs: 0.75, sm: 1 }, '&:hover':{ bgcolor:'#e06f00' } }}>Back to meetings</Button>
           </div>
         </Box>
       </Box>

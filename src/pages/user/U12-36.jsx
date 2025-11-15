@@ -70,52 +70,63 @@ export default function PermissionHelpers({ onBack }) {
 
       <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.paper' }}>
         <AppBar elevation={0} position="static" sx={{ bgcolor:'background.paper', color:'text.primary', borderBottom:`1px solid ${muiTheme.palette.divider}` }}>
-          <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary' }}><ArrowBackRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>Permission helpers</Typography>
+          <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary', padding: { xs: '6px', sm: '8px' } }}>
+              <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+            </IconButton>
+            <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 } }}>Permission helpers</Typography>
           </Toolbar>
         </AppBar>
 
-        {err && <Alert severity="warning" sx={{ borderRadius:0 }}>{err}</Alert>}
+        {err && <Alert severity="warning" sx={{ borderRadius:0, fontSize: { xs: '13px', sm: '14px' } }}>{err}</Alert>}
 
-        <Box className="flex-1 p-3 space-y-3 no-scrollbar" sx={{ overflowY:'auto' }}>
+        <Box sx={{ p: { xs: 2, sm: 3 }, flex: 1, overflowY: 'auto' }} className="no-scrollbar">
           {/* Mic */}
-          <Paper elevation={0} sx={{ border:`1px solid ${muiTheme.palette.divider}`, borderRadius:2, p:2, bgcolor: 'background.paper' }}>
-            <div className="flex items-center gap-2 mb-1" style={{ color: muiTheme.palette.text.primary }}><MicRoundedIcon/><span className="font-semibold">Microphone</span></div>
-            <div className="text-sm mb-2" style={{ color: muiTheme.palette.text.secondary }}>Check OS/browser access. If blocked, enable "Microphone" in site settings.</div>
-            <div className="flex gap-2">
-              <Button onClick={testMic} variant="contained" sx={{ textTransform:'none' }}>Test mic</Button>
-              {micOK && <Chip size="small" label="OK" sx={{ bgcolor: EV.green, color:'#fff' }} />}
+          <Paper elevation={0} sx={{ border:`1px solid ${muiTheme.palette.divider}`, borderRadius:2, p: { xs: 2, sm: 2.5 }, bgcolor: 'background.paper', mb: { xs: 2, sm: 3 } }}>
+            <div className="flex items-center mb-1" style={{ gap: '8px', color: muiTheme.palette.text.primary }}>
+              <MicRoundedIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />
+              <span className="font-semibold" style={{ fontSize: '15px' }}>Microphone</span>
+            </div>
+            <div style={{ color: muiTheme.palette.text.secondary, fontSize: '13px', marginBottom: '8px' }}>Check OS/browser access. If blocked, enable "Microphone" in site settings.</div>
+            <div className="flex" style={{ gap: '8px' }}>
+              <Button onClick={testMic} variant="contained" sx={{ textTransform:'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 } }}>Test mic</Button>
+              {micOK && <Chip size="small" label="OK" sx={{ bgcolor: EV.green, color:'#fff', fontSize: { xs: '11px', sm: '12px' }, height: { xs: 22, sm: 24 } }} />}
             </div>
           </Paper>
 
           {/* Camera */}
-          <Paper elevation={0} sx={{ border:`1px solid ${muiTheme.palette.divider}`, borderRadius:2, p:2, bgcolor: 'background.paper' }}>
-            <div className="flex items-center gap-2 mb-1" style={{ color: muiTheme.palette.text.primary }}><VideocamRoundedIcon/><span className="font-semibold">Camera</span></div>
-            <div className="text-sm mb-2" style={{ color: muiTheme.palette.text.secondary }}>If the preview is black, another app may be using your camera.</div>
-            <div className="flex gap-2 items-center">
-              <Button onClick={testCam} variant="contained" sx={{ textTransform:'none' }}>Start preview</Button>
-              <Button onClick={stopCam} variant="outlined" sx={{ textTransform:'none' }}>Stop</Button>
-              {camOK && <Chip size="small" label="OK" sx={{ bgcolor: EV.green, color:'#fff' }} />}
+          <Paper elevation={0} sx={{ border:`1px solid ${muiTheme.palette.divider}`, borderRadius:2, p: { xs: 2, sm: 2.5 }, bgcolor: 'background.paper', mb: { xs: 2, sm: 3 } }}>
+            <div className="flex items-center mb-1" style={{ gap: '8px', color: muiTheme.palette.text.primary }}>
+              <VideocamRoundedIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />
+              <span className="font-semibold" style={{ fontSize: '15px' }}>Camera</span>
             </div>
-            <video ref={videoRef} className="w-full rounded-md mt-2" autoPlay playsInline muted />
+            <div style={{ color: muiTheme.palette.text.secondary, fontSize: '13px', marginBottom: '8px' }}>If the preview is black, another app may be using your camera.</div>
+            <div className="flex items-center" style={{ gap: '8px' }}>
+              <Button onClick={testCam} variant="contained" sx={{ textTransform:'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 } }}>Start preview</Button>
+              <Button onClick={stopCam} variant="outlined" sx={{ textTransform:'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 } }}>Stop</Button>
+              {camOK && <Chip size="small" label="OK" sx={{ bgcolor: EV.green, color:'#fff', fontSize: { xs: '11px', sm: '12px' }, height: { xs: 22, sm: 24 } }} />}
+            </div>
+            <video ref={videoRef} className="w-full rounded-md mt-2" autoPlay playsInline muted style={{ maxWidth: '100%' }} />
           </Paper>
 
           {/* Notifications */}
-          <Paper elevation={0} sx={{ border:`1px solid ${muiTheme.palette.divider}`, borderRadius:2, p:2, bgcolor: 'background.paper' }}>
-            <div className="flex items-center gap-2 mb-1" style={{ color: muiTheme.palette.text.primary }}><NotificationsActiveRoundedIcon/><span className="font-semibold">Notifications</span></div>
-            <div className="text-sm mb-2" style={{ color: muiTheme.palette.text.secondary }}>On iOS, allow notifications in Settings → Safari/Browser → Notifications.</div>
-            <div className="flex gap-2 items-center">
-              <Button onClick={testNotif} variant="contained" sx={{ textTransform:'none' }}>Request permission</Button>
-              {notifOK && <Chip size="small" label="OK" sx={{ bgcolor: EV.green, color:'#fff' }} />}
+          <Paper elevation={0} sx={{ border:`1px solid ${muiTheme.palette.divider}`, borderRadius:2, p: { xs: 2, sm: 2.5 }, bgcolor: 'background.paper' }}>
+            <div className="flex items-center mb-1" style={{ gap: '8px', color: muiTheme.palette.text.primary }}>
+              <NotificationsActiveRoundedIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />
+              <span className="font-semibold" style={{ fontSize: '15px' }}>Notifications</span>
+            </div>
+            <div style={{ color: muiTheme.palette.text.secondary, fontSize: '13px', marginBottom: '8px' }}>On iOS, allow notifications in Settings → Safari/Browser → Notifications.</div>
+            <div className="flex items-center" style={{ gap: '8px' }}>
+              <Button onClick={testNotif} variant="contained" sx={{ textTransform:'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 } }}>Request permission</Button>
+              {notifOK && <Chip size="small" label="OK" sx={{ bgcolor: EV.green, color:'#fff', fontSize: { xs: '11px', sm: '12px' }, height: { xs: 22, sm: 24 } }} />}
             </div>
           </Paper>
         </Box>
 
-        <Box className="px-3 pb-3">
-          <div className="grid grid-cols-2 gap-2">
-            <Button variant="outlined" sx={{ textTransform:'none' }}>Close</Button>
-            <Button variant="contained" sx={{ textTransform:'none' }}>Done</Button>
+        <Box sx={{ px: { xs: 2, sm: 3 }, pb: { xs: 2, sm: 3 } }}>
+          <div className="grid grid-cols-2" style={{ gap: '8px' }}>
+            <Button variant="outlined" sx={{ textTransform:'none', fontSize: { xs: '13px', sm: '14px' }, py: { xs: 0.75, sm: 1 } }}>Close</Button>
+            <Button variant="contained" sx={{ textTransform:'none', fontSize: { xs: '13px', sm: '14px' }, py: { xs: 0.75, sm: 1 } }}>Done</Button>
           </div>
         </Box>
       </Box>

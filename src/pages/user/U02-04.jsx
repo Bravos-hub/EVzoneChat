@@ -146,7 +146,7 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
       <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.paper' }}>
         {/* Header with centered title */}
         <AppBar elevation={0} position="static" sx={{ bgcolor: 'background.paper', color: 'text.primary', borderBottom: `1px solid ${muiTheme.palette.divider}` }}>
-          <Toolbar className="!min-h-[56px] !px-3" sx={{ position: 'relative' }}>
+          <Toolbar className="!min-h-[56px]" sx={{ position: 'relative', px: { xs: 1.5, sm: 3 } }}>
             <IconButton 
               onClick={() => {
                 setIsGroupMode(false);
@@ -156,21 +156,26 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
               aria-label="Close"
               sx={{ 
                 position: 'absolute',
-                left: 8,
-                color: 'text.primary'
+                left: { xs: 4, sm: 8 },
+                color: 'text.primary',
+                padding: { xs: '6px', sm: '8px' }
               }}
             >
-              <CloseRoundedIcon />
+              <CloseRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
             </IconButton>
             <Typography 
               variant="h6" 
               sx={{ 
                 fontWeight: 600,
-                fontSize: '18px',
+                fontSize: { xs: '16px', sm: '18px' },
                 position: 'absolute',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                color: 'text.primary'
+                color: 'text.primary',
+                maxWidth: { xs: '60%', sm: '70%' },
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
               }}
             >
               {sharingContact ? 'Share Contact' : isGroupMode ? 'Create Group' : 'New message'}
@@ -182,11 +187,12 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
                 aria-label="Create Group"
                 sx={{
                   position: 'absolute',
-                  right: 8,
-                  color: accentColor
+                  right: { xs: 4, sm: 8 },
+                  color: accentColor,
+                  padding: { xs: '6px', sm: '8px' }
                 }}
               >
-                <GroupAddRoundedIcon />
+                <GroupAddRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
               </IconButton>
             )}
           </Toolbar>
@@ -194,11 +200,11 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
 
         {/* To: field with chips and action button - only show in group mode or when sharing contact */}
         {(isGroupMode || sharingContact) && (
-          <Box sx={{ px: 3, pt: 3, pb: 2, borderBottom: `1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper', position: 'sticky', top: 0, zIndex: 5 }}>
+          <Box sx={{ px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 3 }, pb: 2, borderBottom: `1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper', position: 'sticky', top: 0, zIndex: 5 }}>
             <Typography 
               variant="body2" 
               sx={{ 
-                fontSize: '12px',
+                fontSize: { xs: '11px', sm: '12px' },
                 color: 'text.secondary',
                 mb: 1,
                 fontWeight: 500
@@ -209,31 +215,37 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
             {/* Selected contacts as chips */}
             {chips.length > 0 ? (
               <>
-                <Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap', mb: 2 }}>
+                <Box sx={{ display: 'flex', gap: { xs: 0.5, sm: 0.75 }, flexWrap: 'wrap', mb: 2 }}>
                   {chips.map((c) => (
                     <Chip
                       key={c.id}
-                      avatar={<Avatar src={c.avatar} sx={{ width: 20, height: 20 }} />}
+                      avatar={<Avatar src={c.avatar} sx={{ width: { xs: 18, sm: 20 }, height: { xs: 18, sm: 20 } }} />}
                       label={c.name}
                       onDelete={() => toggle(c.id)}
                       size="small"
                       sx={{
                         bgcolor: accentColor,
                         color: '#fff',
-                        height: '28px',
-                        fontSize: '13px',
+                        height: { xs: '26px', sm: '28px' },
+                        fontSize: { xs: '12px', sm: '13px' },
                         fontWeight: 500,
+                        maxWidth: { xs: '200px', sm: 'none' },
+                        '& .MuiChip-label': {
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        },
                         '& .MuiChip-deleteIcon': {
                           color: '#fff',
-                          fontSize: '18px',
+                          fontSize: { xs: '16px', sm: '18px' },
                           '&:hover': {
                             color: 'rgba(255, 255, 255, 0.8)',
                           },
                         },
                         '& .MuiChip-avatar': {
-                          width: 20,
-                          height: 20,
-                          marginLeft: '4px',
+                          width: { xs: 18, sm: 20 },
+                          height: { xs: 18, sm: 20 },
+                          marginLeft: { xs: '3px', sm: '4px' },
                         },
                       }}
                     />
@@ -249,9 +261,9 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
                     bgcolor: accentColor,
                     color: '#fff',
                     textTransform: 'none',
-                    fontSize: '15px',
+                    fontSize: { xs: '14px', sm: '15px' },
                     fontWeight: 600,
-                    py: 1.25,
+                    py: { xs: 1, sm: 1.25 },
                     borderRadius: 2,
                     boxShadow: `0 4px 12px ${accentColor}40`,
                     '&:hover': {
@@ -270,7 +282,7 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
               <Typography 
                 variant="body2" 
                 sx={{ 
-                  fontSize: '13px',
+                  fontSize: { xs: '12px', sm: '13px' },
                   color: 'text.secondary',
                   fontStyle: 'italic',
                   mb: 1
@@ -283,7 +295,7 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
         )}
         
         {/* Search field - always visible */}
-        <Box sx={{ px: 3, pt: isGroupMode || sharingContact ? 2 : 3, pb: 2 }}>
+        <Box sx={{ px: { xs: 2, sm: 3 }, pt: isGroupMode || sharingContact ? { xs: 1.5, sm: 2 } : { xs: 2, sm: 3 }, pb: 2 }}>
           <TextField
             fullWidth
             size="small"
@@ -306,8 +318,8 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
               },
               '& .MuiInputBase-input': {
                 color: 'text.primary',
-                py: 1.5,
-                fontSize: '15px',
+                py: { xs: 1.25, sm: 1.5 },
+                fontSize: { xs: '14px', sm: '15px' },
               },
               '& .MuiInputBase-input::placeholder': {
                 color: 'text.secondary',
@@ -318,11 +330,11 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
         </Box>
 
         {/* Select Participant section */}
-        <Box sx={{ px: 3, pb: 1, pt: isGroupMode || sharingContact ? 2 : 3 }}>
+        <Box sx={{ px: { xs: 2, sm: 3 }, pb: 1, pt: isGroupMode || sharingContact ? { xs: 1.5, sm: 2 } : { xs: 2, sm: 3 } }}>
           <Typography
             variant="body2"
             sx={{
-              fontSize: '14px',
+              fontSize: { xs: '12px', sm: '14px' },
               fontWeight: 600,
               color: 'text.primary',
               textTransform: 'uppercase',
@@ -369,7 +381,7 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
                   }}
                 >
                   <ListItemAvatar>
-                    <Avatar src={p.avatar} sx={{ width: 40, height: 40 }} />
+                    <Avatar src={p.avatar} sx={{ width: { xs: 36, sm: 40 }, height: { xs: 36, sm: 40 } }} />
                   </ListItemAvatar>
                   <ListItemText
                     primary={
@@ -377,8 +389,12 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
                         variant="body1"
                         sx={{
                           fontWeight: 600,
-                          fontSize: '15px',
+                          fontSize: { xs: '14px', sm: '15px' },
                           color: isSelected ? accentColor : 'text.primary',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                          maxWidth: { xs: '200px', sm: 'none' }
                         }}
                       >
                         {p.name}

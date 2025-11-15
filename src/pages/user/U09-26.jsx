@@ -35,28 +35,30 @@ export default function ContactOrgProfiles({ onBack, person = { name:'Leslie Ale
 
       <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.default' }}>
         <AppBar elevation={0} position="static" sx={{ bgcolor: 'background.paper', color: 'text.primary', borderBottom:`1px solid ${muiTheme.palette.divider}` }}>
-          <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary' }}><ArrowBackRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>Profile</Typography>
+          <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary', padding: { xs: '6px', sm: '8px' } }}>
+              <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+            </IconButton>
+            <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 } }}>Profile</Typography>
           </Toolbar>
         </AppBar>
 
         <Box className="flex-1 no-scrollbar" sx={{ overflowY:'auto' }}>
           {/* Contact card */}
-          <Box className="p-4">
-            <Box className="rounded-2xl p-4" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
-              <div className="flex items-start gap-3">
-                <Avatar src={person.avatar} sx={{ width: 64, height: 64 }} />
-                <div className="flex-1">
-                  <div className="font-semibold" style={{ color: muiTheme.palette.text.primary }}>{person.name}</div>
-                  <div className="text-sm" style={{ color: muiTheme.palette.text.secondary }}>{person.role}</div>
-                  <div className="mt-2 flex gap-2">
-                    {person.contexts.map(c => (<Chip key={c} size="small" label={c} sx={{ bgcolor: 'background.default', color: 'text.primary' }} />))}
+          <Box sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
+            <Box className="rounded-2xl" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper', p: { xs: 2, sm: 3, md: 4 } }}>
+              <div className="flex items-start" style={{ gap: '12px' }}>
+                <Avatar src={person.avatar} sx={{ width: { xs: 56, sm: 60, md: 64 }, height: { xs: 56, sm: 60, md: 64 } }} />
+                <div className="flex-1" style={{ minWidth: 0 }}>
+                  <div className="font-semibold" style={{ color: muiTheme.palette.text.primary, fontSize: '15px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{person.name}</div>
+                  <div style={{ color: muiTheme.palette.text.secondary, fontSize: '13px', marginTop: '4px' }}>{person.role}</div>
+                  <div className="mt-2 flex flex-wrap" style={{ gap: '8px' }}>
+                    {person.contexts.map(c => (<Chip key={c} size="small" label={c} sx={{ bgcolor: 'background.default', color: 'text.primary', fontSize: { xs: '11px', sm: '12px' }, height: { xs: 22, sm: 24 } }} />))}
                   </div>
-                  <div className="mt-3 grid grid-cols-3 gap-2">
-                    <Button startIcon={<ChatRoundedIcon/>} variant="contained" sx={{ textTransform:'none' }}>Message</Button>
-                    <Button startIcon={<PhoneRoundedIcon/>} variant="outlined" sx={{ textTransform:'none' }}>Call</Button>
-                    <Button startIcon={<VideocamRoundedIcon/>} variant="outlined" sx={{ textTransform:'none' }}>Video</Button>
+                  <div className="mt-3 grid grid-cols-3" style={{ gap: '8px' }}>
+                    <Button startIcon={<ChatRoundedIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />} variant="contained" sx={{ textTransform:'none', fontSize: { xs: '11px', sm: '12px' }, py: { xs: 0.5, sm: 0.75 } }}>Message</Button>
+                    <Button startIcon={<PhoneRoundedIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />} variant="outlined" sx={{ textTransform:'none', fontSize: { xs: '11px', sm: '12px' }, py: { xs: 0.5, sm: 0.75 } }}>Call</Button>
+                    <Button startIcon={<VideocamRoundedIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />} variant="outlined" sx={{ textTransform:'none', fontSize: { xs: '11px', sm: '12px' }, py: { xs: 0.5, sm: 0.75 } }}>Video</Button>
                   </div>
                 </div>
               </div>
@@ -64,16 +66,22 @@ export default function ContactOrgProfiles({ onBack, person = { name:'Leslie Ale
           </Box>
 
           {/* Organization card */}
-          <Box className="px-4 pb-4">
-            <Box className="rounded-2xl p-4" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
-              <div className="flex items-start gap-3">
-                <Avatar src={org.logo} sx={{ width: 64, height: 64 }} />
-                <div className="flex-1">
-                  <div className="font-semibold" style={{ color: muiTheme.palette.text.primary }}>{org.name}</div>
-                  <div className="mt-1 flex items-center gap-1 text-sm" style={{ color: muiTheme.palette.text.primary }}><PlaceRoundedIcon sx={{ fontSize:16 }} /> {org.location}</div>
+          <Box sx={{ px: { xs: 2, sm: 3, md: 4 }, pb: { xs: 2, sm: 3, md: 4 } }}>
+            <Box className="rounded-2xl" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper', p: { xs: 2, sm: 3, md: 4 } }}>
+              <div className="flex items-start" style={{ gap: '12px' }}>
+                <Avatar src={org.logo} sx={{ width: { xs: 56, sm: 60, md: 64 }, height: { xs: 56, sm: 60, md: 64 } }} />
+                <div className="flex-1" style={{ minWidth: 0 }}>
+                  <div className="font-semibold" style={{ color: muiTheme.palette.text.primary, fontSize: '15px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{org.name}</div>
+                  <div className="mt-1 flex items-center" style={{ gap: '4px', color: muiTheme.palette.text.primary, fontSize: '13px' }}>
+                    <PlaceRoundedIcon sx={{ fontSize: { xs: 14, sm: 16 } }} /> 
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{org.location}</span>
+                  </div>
 
-                  <div className="mt-3 text-sm font-semibold flex items-center gap-1" style={{ color: muiTheme.palette.text.primary }}><AccessTimeRoundedIcon sx={{ fontSize:16 }} /> Office hours</div>
-                  <Grid container spacing={0.5} className="mt-1 text-sm" style={{ color: muiTheme.palette.text.primary }}>
+                  <div className="mt-3 font-semibold flex items-center" style={{ gap: '4px', color: muiTheme.palette.text.primary, fontSize: '14px' }}>
+                    <AccessTimeRoundedIcon sx={{ fontSize: { xs: 14, sm: 16 } }} /> 
+                    <span>Office hours</span>
+                  </div>
+                  <Grid container spacing={0.5} sx={{ mt: 1 }} style={{ color: muiTheme.palette.text.primary, fontSize: '13px' }}>
                     {Object.entries(org.hours).map(([d,h]) => (
                       <React.Fragment key={d}>
                         <Grid item xs={4} style={{ color: muiTheme.palette.text.secondary }}>{d}</Grid>
@@ -83,9 +91,9 @@ export default function ContactOrgProfiles({ onBack, person = { name:'Leslie Ale
                   </Grid>
 
                   <Divider className="my-3" sx={{ borderColor: muiTheme.palette.divider }} />
-                  <div className="text-sm font-semibold mb-1" style={{ color: muiTheme.palette.text.primary }}>Channels</div>
-                  <div className="flex gap-2 flex-wrap">
-                    {org.channels.map(ch => (<Chip key={ch} size="small" label={ch} sx={{ bgcolor: 'background.default', color: 'text.primary' }} />))}
+                  <div className="font-semibold mb-1" style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Channels</div>
+                  <div className="flex flex-wrap" style={{ gap: '8px' }}>
+                    {org.channels.map(ch => (<Chip key={ch} size="small" label={ch} sx={{ bgcolor: 'background.default', color: 'text.primary', fontSize: { xs: '11px', sm: '12px' }, height: { xs: 22, sm: 24 } }} />))}
                   </div>
                 </div>
               </div>
@@ -94,10 +102,10 @@ export default function ContactOrgProfiles({ onBack, person = { name:'Leslie Ale
         </Box>
 
         {/* footer */}
-        <Box className="px-4 pb-4">
-          <div className="grid grid-cols-2 gap-2">
-            <Button variant="outlined" sx={{ textTransform:'none' }}>Share contact</Button>
-            <Button variant="contained" sx={{ textTransform:'none' }}>Add to group</Button>
+        <Box sx={{ px: { xs: 2, sm: 3, md: 4 }, pb: { xs: 2, sm: 3, md: 4 } }}>
+          <div className="grid grid-cols-2" style={{ gap: '8px' }}>
+            <Button variant="outlined" sx={{ textTransform:'none', fontSize: { xs: '13px', sm: '14px' }, py: { xs: 0.75, sm: 1 } }}>Share contact</Button>
+            <Button variant="contained" sx={{ textTransform:'none', fontSize: { xs: '13px', sm: '14px' }, py: { xs: 0.75, sm: 1 } }}>Add to group</Button>
           </div>
         </Box>
       </Box>

@@ -66,59 +66,67 @@ export default function GroupChannelDetailsModeration({ onBack, onInvite }) {
 
       <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.default' }}>
         <AppBar elevation={0} position="static" sx={{ bgcolor: 'background.paper', color: 'text.primary', borderBottom:`1px solid ${muiTheme.palette.divider}` }}>
-          <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary' }}><ArrowBackRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>Group details</Typography>
+          <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary', padding: { xs: '6px', sm: '8px' } }}>
+              <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+            </IconButton>
+            <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 } }}>Group details</Typography>
           </Toolbar>
         </AppBar>
 
-        <Box className="p-3 space-y-3 flex-1 no-scrollbar" sx={{ overflowY:'auto' }}>
+        <Box sx={{ p: { xs: 2, sm: 3 }, '& > * + *': { mt: { xs: 2, sm: 3 } }, flex: 1, overflowY: 'auto' }} className="no-scrollbar">
           {/* header info */}
-          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
-            <div className="flex items-center gap-2">
-              <Typography variant="subtitle1" className="font-semibold" sx={{ color: 'text.primary' }}>Charging Crew — Kampala</Typography>
-              <Chip size="small" label="Open" sx={{ bgcolor: 'background.default', color: 'text.primary' }} />
-              <Chip size="small" label={adminOnly? 'Admin-only' : (preApproval? 'Pre-approval' : 'Auto-approve')} sx={{ bgcolor: 'background.default', color: 'text.primary' }} />
+          <Box className="rounded-2xl" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper', p: { xs: 2, sm: 3 } }}>
+            <div className="flex items-center flex-wrap" style={{ gap: '8px' }}>
+              <Typography variant="subtitle1" className="font-semibold" sx={{ color: 'text.primary', fontSize: { xs: '15px', sm: '16px' }, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>Charging Crew — Kampala</Typography>
+              <Chip size="small" label="Open" sx={{ bgcolor: 'background.default', color: 'text.primary', fontSize: { xs: '11px', sm: '12px' }, height: { xs: 22, sm: 24 } }} />
+              <Chip size="small" label={adminOnly? 'Admin-only' : (preApproval? 'Pre-approval' : 'Auto-approve')} sx={{ bgcolor: 'background.default', color: 'text.primary', fontSize: { xs: '11px', sm: '12px' }, height: { xs: 22, sm: 24 } }} />
             </div>
-            <div className="text-sm mt-1" style={{ color: muiTheme.palette.text.primary }}>For technicians and riders to coordinate charging tasks around Kampala.</div>
+            <div className="mt-1" style={{ color: muiTheme.palette.text.primary, fontSize: '13px' }}>For technicians and riders to coordinate charging tasks around Kampala.</div>
           </Box>
 
           {/* guidelines */}
-          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
-            <div className="font-semibold mb-1" style={{ color: muiTheme.palette.text.primary }}>Guidelines</div>
-            <div className="text-sm whitespace-pre-wrap" style={{ color: muiTheme.palette.text.primary }}>• Be respectful\n• Stay on topic\n• No personal info or external solicitations</div>
+          <Box className="rounded-2xl" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper', p: { xs: 2, sm: 3 } }}>
+            <div className="font-semibold mb-1" style={{ color: muiTheme.palette.text.primary, fontSize: '15px' }}>Guidelines</div>
+            <div className="whitespace-pre-wrap" style={{ color: muiTheme.palette.text.primary, fontSize: '13px' }}>• Be respectful\n• Stay on topic\n• No personal info or external solicitations</div>
           </Box>
 
           {/* pinned */}
-          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
-            <div className="flex items-center gap-2 mb-1" style={{ color: muiTheme.palette.text.primary }}><PushPinRoundedIcon/><span className="font-semibold">Pinned</span></div>
-            <div className="text-sm" style={{ color: muiTheme.palette.text.primary }}>Welcome post, Safety checklist, Shift schedule</div>
+          <Box className="rounded-2xl" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper', p: { xs: 2, sm: 3 } }}>
+            <div className="flex items-center mb-1" style={{ gap: '8px', color: muiTheme.palette.text.primary }}>
+              <PushPinRoundedIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />
+              <span className="font-semibold" style={{ fontSize: '15px' }}>Pinned</span>
+            </div>
+            <div style={{ color: muiTheme.palette.text.primary, fontSize: '13px' }}>Welcome post, Safety checklist, Shift schedule</div>
           </Box>
 
           {/* members */}
-          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
+          <Box className="rounded-2xl" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper', p: { xs: 2, sm: 3 } }}>
             <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2" style={{ color: muiTheme.palette.text.primary }}><ManageAccountsRoundedIcon/><span className="font-semibold">Members</span></div>
-              <Button startIcon={<PersonAddAlt1RoundedIcon/>} onClick={onInvite} variant="contained" sx={{ textTransform:'none' }}>Invite</Button>
+              <div className="flex items-center" style={{ gap: '8px', color: muiTheme.palette.text.primary }}>
+                <ManageAccountsRoundedIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />
+                <span className="font-semibold" style={{ fontSize: '15px' }}>Members</span>
+              </div>
+              <Button startIcon={<PersonAddAlt1RoundedIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />} onClick={onInvite} variant="contained" sx={{ textTransform:'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 } }}>Invite</Button>
             </div>
-            <TextField fullWidth size="small" placeholder="Search members" value={search} onChange={(e)=>setSearch(e.target.value)} />
-            <List className="no-scrollbar" sx={{ maxHeight: 260, overflowY:'auto', mt:1, border: `1px solid ${muiTheme.palette.divider}`, borderRadius: 2, bgcolor: 'background.paper' }}>
+            <TextField fullWidth size="small" placeholder="Search members" value={search} onChange={(e)=>setSearch(e.target.value)} sx={{ '& .MuiInputBase-input': { fontSize: { xs: '13px', sm: '14px' } } }} />
+            <List className="no-scrollbar" sx={{ maxHeight: { xs: 240, sm: 260 }, overflowY:'auto', mt:1, border: `1px solid ${muiTheme.palette.divider}`, borderRadius: 2, bgcolor: 'background.paper' }}>
               {filtered.map(m => (
                 <ListItem key={m.id} secondaryAction={
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center" style={{ gap: '4px', flexWrap: 'wrap' }}>
                     {m.role!=='admin' && (
-                      <Button size="small" onClick={()=>promote(m.id)} variant="outlined" sx={{ textTransform:'none' }}>Promote</Button>
+                      <Button size="small" onClick={()=>promote(m.id)} variant="outlined" sx={{ textTransform:'none', fontSize: { xs: '11px', sm: '12px' }, py: { xs: 0.25, sm: 0.5 } }}>Promote</Button>
                     )}
                     {m.role!=='member' && (
-                      <Button size="small" onClick={()=>demote(m.id)} variant="outlined" sx={{ textTransform:'none' }}>Demote</Button>
+                      <Button size="small" onClick={()=>demote(m.id)} variant="outlined" sx={{ textTransform:'none', fontSize: { xs: '11px', sm: '12px' }, py: { xs: 0.25, sm: 0.5 } }}>Demote</Button>
                     )}
-                    <Button size="small" onClick={()=>remove(m.id)} startIcon={<DeleteOutlineRoundedIcon/>} variant="outlined" sx={{ textTransform:'none' }}>Remove</Button>
+                    <Button size="small" onClick={()=>remove(m.id)} startIcon={<DeleteOutlineRoundedIcon sx={{ fontSize: { xs: 14, sm: 16 } }} />} variant="outlined" sx={{ textTransform:'none', fontSize: { xs: '11px', sm: '12px' }, py: { xs: 0.25, sm: 0.5 } }}>Remove</Button>
                   </div>
-                }>
-                  <ListItemAvatar><Avatar src={m.avatar} /></ListItemAvatar>
+                } sx={{ px: { xs: 2, sm: 3 }, py: { xs: 1, sm: 1.25 } }}>
+                  <ListItemAvatar><Avatar src={m.avatar} sx={{ width: { xs: 36, sm: 40 }, height: { xs: 36, sm: 40 } }} /></ListItemAvatar>
                   <ListItemText 
-                    primary={<span className="font-semibold" style={{ color: muiTheme.palette.text.primary }}>{m.name}</span>} 
-                    secondary={<span style={{ color: muiTheme.palette.text.secondary }}>{m.role}</span>} 
+                    primary={<span className="font-semibold" style={{ color: muiTheme.palette.text.primary, fontSize: '14px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</span>} 
+                    secondary={<span style={{ color: muiTheme.palette.text.secondary, fontSize: '12px' }}>{m.role}</span>} 
                   />
                 </ListItem>
               ))}
@@ -126,16 +134,16 @@ export default function GroupChannelDetailsModeration({ onBack, onInvite }) {
           </Box>
 
           {/* moderation controls */}
-          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
-            <div className="font-semibold mb-1" style={{ color: muiTheme.palette.text.primary }}>Moderation</div>
+          <Box className="rounded-2xl" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper', p: { xs: 2, sm: 3 } }}>
+            <div className="font-semibold mb-1" style={{ color: muiTheme.palette.text.primary, fontSize: '15px' }}>Moderation</div>
             <FormGroup>
-              <FormControlLabel control={<Switch checked={preApproval} onChange={(e)=>setPreApproval(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary }}>Require pre‑approval for posts</span>} />
-              <FormControlLabel control={<Switch checked={adminOnly} onChange={(e)=>setAdminOnly(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary }}>Admins only can post (announcement)</span>} />
+              <FormControlLabel control={<Switch checked={preApproval} onChange={(e)=>setPreApproval(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Require pre‑approval for posts</span>} />
+              <FormControlLabel control={<Switch checked={adminOnly} onChange={(e)=>setAdminOnly(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Admins only can post (announcement)</span>} />
             </FormGroup>
-            <TextField fullWidth size="small" label="Banned words (comma‑separated)" value={banned} onChange={(e)=>setBanned(e.target.value)} sx={{ mt:1 }} />
-            <div className="mt-2 grid grid-cols-2 gap-2">
-              <Button variant="outlined" sx={{ textTransform:'none' }} onClick={()=>{ setPreApproval(false); setAdminOnly(false); setBanned(''); }}>Reset</Button>
-              <Button variant="contained" sx={{ textTransform:'none' }} onClick={saveModeration}>Save</Button>
+            <TextField fullWidth size="small" label="Banned words (comma‑separated)" value={banned} onChange={(e)=>setBanned(e.target.value)} sx={{ mt:1, '& .MuiInputBase-input': { fontSize: { xs: '13px', sm: '14px' } } }} />
+            <div className="mt-2 grid grid-cols-2" style={{ gap: '8px' }}>
+              <Button variant="outlined" sx={{ textTransform:'none', fontSize: { xs: '13px', sm: '14px' }, py: { xs: 0.75, sm: 1 } }} onClick={()=>{ setPreApproval(false); setAdminOnly(false); setBanned(''); }}>Reset</Button>
+              <Button variant="contained" sx={{ textTransform:'none', fontSize: { xs: '13px', sm: '14px' }, py: { xs: 0.75, sm: 1 } }} onClick={saveModeration}>Save</Button>
             </div>
           </Box>
         </Box>

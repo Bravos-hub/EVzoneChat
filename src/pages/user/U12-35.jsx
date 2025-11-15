@@ -47,35 +47,37 @@ export default function EdgeStatesDemo({ onBack }) {
 
       <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.paper' }}>
         <AppBar elevation={0} position="static" sx={{ bgcolor:'background.paper', color:'text.primary', borderBottom:`1px solid ${muiTheme.palette.divider}` }}>
-          <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary' }}><ArrowBackRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>Edge states</Typography>
+          <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary', padding: { xs: '6px', sm: '8px' } }}>
+              <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+            </IconButton>
+            <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 } }}>Edge states</Typography>
           </Toolbar>
         </AppBar>
 
         {/* banners */}
         {offline && (
-          <Alert icon={<CloudOffRoundedIcon/>} severity="warning" sx={{ borderRadius:0 }}>You are offline. Messages will be queued.</Alert>
+          <Alert icon={<CloudOffRoundedIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />} severity="warning" sx={{ borderRadius:0, fontSize: { xs: '13px', sm: '14px' } }}>You are offline. Messages will be queued.</Alert>
         )}
         {reconnecting && (
-          <Alert icon={<RestartAltRoundedIcon/>} severity="info" sx={{ borderRadius:0 }}>Reconnecting…</Alert>
+          <Alert icon={<RestartAltRoundedIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />} severity="info" sx={{ borderRadius:0, fontSize: { xs: '13px', sm: '14px' } }}>Reconnecting…</Alert>
         )}
 
-        <Box className="flex-1 p-3 no-scrollbar" sx={{ overflowY:'auto' }}>
-          <div className="space-y-2">
+        <Box sx={{ p: { xs: 2, sm: 3 }, flex: 1, overflowY: 'auto' }} className="no-scrollbar">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {messages.map(m => (
-              <Paper key={m.id} variant="outlined" sx={{ p:1.25, borderColor: 'divider', bgcolor: 'background.paper' }}>
-                <div className="text-[12px]" style={{ color: muiTheme.palette.text.secondary }}>{m.who} • {m.at}</div>
-                <div className="text-[14px]" style={{ color: muiTheme.palette.text.primary }}>{m.text}</div>
-                <div className="mt-1 text-[11px] flex items-center gap-2">
-                  {m.state==='sent' && <Chip size="small" label="Sent" sx={{ bgcolor: 'background.default', color: 'text.primary' }} />}
-                  {m.state==='uploading' && <Chip size="small" icon={<AttachFileRoundedIcon sx={{ fontSize:14 }} />} label="Uploading…" sx={{ bgcolor: 'background.default', color: 'text.primary' }} />}
-                  {m.state==='queued' && <Chip size="small" label="Queued (offline)" sx={{ bgcolor: 'background.default', color: 'text.primary' }} />}
+              <Paper key={m.id} variant="outlined" sx={{ p: { xs: 1.25, sm: 1.5 }, borderColor: 'divider', bgcolor: 'background.paper' }}>
+                <div style={{ color: muiTheme.palette.text.secondary, fontSize: '12px' }}>{m.who} • {m.at}</div>
+                <div style={{ color: muiTheme.palette.text.primary, fontSize: '14px', marginTop: '4px' }}>{m.text}</div>
+                <div className="mt-1 flex items-center flex-wrap" style={{ gap: '8px', fontSize: '11px' }}>
+                  {m.state==='sent' && <Chip size="small" label="Sent" sx={{ bgcolor: 'background.default', color: 'text.primary', fontSize: { xs: '10px', sm: '11px' }, height: { xs: 20, sm: 22 } }} />}
+                  {m.state==='uploading' && <Chip size="small" icon={<AttachFileRoundedIcon sx={{ fontSize: { xs: 12, sm: 14 } }} />} label="Uploading…" sx={{ bgcolor: 'background.default', color: 'text.primary', fontSize: { xs: '10px', sm: '11px' }, height: { xs: 20, sm: 22 } }} />}
+                  {m.state==='queued' && <Chip size="small" label="Queued (offline)" sx={{ bgcolor: 'background.default', color: 'text.primary', fontSize: { xs: '10px', sm: '11px' }, height: { xs: 20, sm: 22 } }} />}
                   {m.state==='error' && (
                     <>
-                      <Chip size="small" label="Failed" sx={{ bgcolor: '#fdecea', color:'#b71c1c' }} />
-                      <span style={{ color: '#b71c1c' }}>{m.error}</span>
-                      <Button onClick={()=>retryError(m.id)} size="small" variant="outlined" sx={{ textTransform:'none' }}>Retry</Button>
+                      <Chip size="small" label="Failed" sx={{ bgcolor: '#fdecea', color:'#b71c1c', fontSize: { xs: '10px', sm: '11px' }, height: { xs: 20, sm: 22 } }} />
+                      <span style={{ color: '#b71c1c', fontSize: '11px' }}>{m.error}</span>
+                      <Button onClick={()=>retryError(m.id)} size="small" variant="outlined" sx={{ textTransform:'none', fontSize: { xs: '11px', sm: '12px' }, py: { xs: 0.25, sm: 0.5 } }}>Retry</Button>
                     </>
                   )}
                 </div>
@@ -84,11 +86,11 @@ export default function EdgeStatesDemo({ onBack }) {
           </div>
         </Box>
 
-        <Box className="px-3 pb-3">
-          <div className="grid grid-cols-3 gap-2">
-            <Button onClick={toggleOffline} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>{offline? 'Go online' : 'Go offline'}</Button>
-            <Button onClick={doReconnect} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>Reconnect</Button>
-            <Button onClick={()=>setMessages(ms => [...ms, { id:String(Date.now()), who:'You', text:'Queued message while offline', at:'10:34', state: offline? 'queued':'sent' }])} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Send test</Button>
+        <Box sx={{ px: { xs: 2, sm: 3 }, pb: { xs: 2, sm: 3 } }}>
+          <div className="grid grid-cols-3" style={{ gap: '8px' }}>
+            <Button onClick={toggleOffline} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 } }}>{offline? 'Go online' : 'Go offline'}</Button>
+            <Button onClick={doReconnect} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 }, '&:hover':{ bgcolor:'#e06f00' } }}>Reconnect</Button>
+            <Button onClick={()=>setMessages(ms => [...ms, { id:String(Date.now()), who:'You', text:'Queued message while offline', at:'10:34', state: offline? 'queued':'sent' }])} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 } }}>Send test</Button>
           </div>
         </Box>
       </Box>
