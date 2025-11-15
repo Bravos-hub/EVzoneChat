@@ -60,6 +60,11 @@ export default function OneToOneCall({
     return params.get('contact') || remote.name;
   }, [location, remote.name]);
 
+  const callModule = useMemo(() => {
+    const params = new URLSearchParams(location?.search || '');
+    return params.get('module') || remote.module || null;
+  }, [location, remote.module]);
+
   const callStateFromUrl = useMemo(() => {
     const params = new URLSearchParams(location?.search || '');
     return params.get('state') || state;
@@ -369,9 +374,24 @@ export default function OneToOneCall({
               <Typography variant="subtitle1" sx={{ color: "#fff", fontWeight: 600, fontSize: '1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {actualRemote.name}
               </Typography>
-              <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.8)", fontSize: '0.6875rem' }}>
-                {status}
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.25 }}>
+                {callModule && (
+                  <Chip 
+                    label={callModule} 
+                    size="small" 
+                    sx={{ 
+                      height: 18, 
+                      fontSize: '10px', 
+                      bgcolor: 'rgba(255,255,255,0.15)', 
+                      color: '#fff',
+                      '& .MuiChip-label': { px: 0.75, py: 0 }
+                    }} 
+                  />
+                )}
+                <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.8)", fontSize: '0.6875rem' }}>
+                  {status}
+                </Typography>
+              </Box>
             </Box>
             <Box sx={{ flexGrow: 1 }} />
             <IconButton aria-label="More" onClick={(e)=>setMenuEl(e.currentTarget)} sx={{ color: "#fff" }}>
@@ -555,6 +575,19 @@ export default function OneToOneCall({
                       <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 600, fontSize: '1rem' }}>
                         {actualRemote.name}
                       </Typography>
+                      {callModule && (
+                        <Chip 
+                          label={callModule} 
+                          size="small" 
+                          sx={{ 
+                            height: 20, 
+                            fontSize: '11px', 
+                            bgcolor: 'rgba(255,255,255,0.15)', 
+                            color: '#fff',
+                            '& .MuiChip-label': { px: 1 }
+                          }} 
+                        />
+                      )}
                       <Box className="px-4 py-2 rounded-full backdrop-blur" sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: '0.875rem', fontWeight: 500 }}>
                         {status}
                       </Box>
@@ -598,6 +631,19 @@ export default function OneToOneCall({
                       <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 600, fontSize: '1rem' }}>
                         {actualRemote.name}
                       </Typography>
+                      {callModule && (
+                        <Chip 
+                          label={callModule} 
+                          size="small" 
+                          sx={{ 
+                            height: 20, 
+                            fontSize: '11px', 
+                            bgcolor: 'rgba(255,255,255,0.15)', 
+                            color: '#fff',
+                            '& .MuiChip-label': { px: 1 }
+                          }} 
+                        />
+                      )}
                       <Box className="px-4 py-2 rounded-full backdrop-blur" sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: '0.875rem', fontWeight: 500 }}>
                         {status}
                       </Box>
@@ -621,6 +667,19 @@ export default function OneToOneCall({
                       <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 600, fontSize: '1rem' }}>
                         {actualRemote.name}
                       </Typography>
+                      {callModule && (
+                        <Chip 
+                          label={callModule} 
+                          size="small" 
+                          sx={{ 
+                            height: 20, 
+                            fontSize: '11px', 
+                            bgcolor: 'rgba(255,255,255,0.15)', 
+                            color: '#fff',
+                            '& .MuiChip-label': { px: 1 }
+                          }} 
+                        />
+                      )}
                       <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.875rem' }}>
                         {callState === "connected" ? `Connected • ${hhmmss}` : status}
                       </Typography>

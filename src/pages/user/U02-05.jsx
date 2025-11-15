@@ -1434,8 +1434,9 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
                     padding: { xs: '6px', sm: '8px' }
                   }}
                   onClick={()=>{
-                    // Navigate to call page with voice type and contact name
-                    onNavigate?.(`/call?type=voice&contact=${encodeURIComponent(title)}&state=dialing`);
+                    // Navigate to call page with voice type, contact name, and module
+                    const moduleParam = effectiveModuleLabel ? `&module=${encodeURIComponent(effectiveModuleLabel)}` : '';
+                    onNavigate?.(`/call?type=voice&contact=${encodeURIComponent(title)}&state=dialing${moduleParam}`);
                   }}
                 >
                   <CallRoundedIcon fontSize="small"/>
@@ -1449,8 +1450,9 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
                     padding: { xs: '6px', sm: '8px' }
                   }}
                   onClick={()=>{
-                    // Navigate to call page with video type and contact name
-                    onNavigate?.(`/call?type=video&contact=${encodeURIComponent(title)}&state=dialing`);
+                    // Navigate to call page with video type, contact name, and module
+                    const moduleParam = effectiveModuleLabel ? `&module=${encodeURIComponent(effectiveModuleLabel)}` : '';
+                    onNavigate?.(`/call?type=video&contact=${encodeURIComponent(title)}&state=dialing${moduleParam}`);
                   }}
                 >
                   <VideocamRoundedIcon fontSize="small"/>
