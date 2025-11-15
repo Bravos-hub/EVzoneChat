@@ -326,16 +326,16 @@ export default function OneToOneCall({
                       secondary={
                         <Box component="span" sx={{ display: 'flex', flexDirection: 'column', gap: 0.25, mt: 0.5 }}>
                           <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            {call.type === 'video' ? (
-                              <VideoCallRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                            ) : call.type === 'conference' ? (
-                              <GroupsRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                            ) : call.type === 'meeting' ? (
-                              <EventAvailableRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                            ) : (
-                              <CallRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                            )}
-                            <span className="text-[12px]" style={{ color: muiTheme.palette.text.secondary }}>{call.duration}</span>
+                          {call.type === 'video' ? (
+                            <VideoCallRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                          ) : call.type === 'conference' ? (
+                            <GroupsRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                          ) : call.type === 'meeting' ? (
+                            <EventAvailableRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                          ) : (
+                            <CallRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                          )}
+                          <span className="text-[12px]" style={{ color: muiTheme.palette.text.secondary }}>{call.duration}</span>
                           </Box>
                           {call.module && (
                             <span className="text-[11px]" style={{ color: muiTheme.palette.text.secondary, opacity: 0.8 }}>{call.module}</span>
@@ -388,9 +388,9 @@ export default function OneToOneCall({
                     }} 
                   />
                 )}
-                <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.8)", fontSize: '0.6875rem' }}>
-                  {status}
-                </Typography>
+              <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.8)", fontSize: '0.6875rem' }}>
+                {status}
+              </Typography>
               </Box>
             </Box>
             <Box sx={{ flexGrow: 1 }} />

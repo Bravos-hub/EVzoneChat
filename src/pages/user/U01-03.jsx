@@ -655,19 +655,19 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                           }
                           
                           return (
-                            <Typography 
-                              variant="caption" 
-                              sx={{ 
-                                color: 'text.secondary',
-                                fontSize: '12px',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap',
-                                flex: 1
-                              }}
-                            >
-                              {c.last}
-                            </Typography>
+                          <Typography 
+                            variant="caption" 
+                            sx={{ 
+                              color: 'text.secondary',
+                              fontSize: '12px',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              flex: 1
+                            }}
+                          >
+                            {c.last}
+                          </Typography>
                           );
                         })()}
                       </Box>
