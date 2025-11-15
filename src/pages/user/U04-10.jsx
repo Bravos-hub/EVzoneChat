@@ -82,12 +82,12 @@ export default function OneToOneCall({
 
   // Calls list data
   const CALLS = [
-    { id: 'c1', name: 'Leslie Alexander', avatar: 'https://i.pravatar.cc/100?img=5', type: 'video', time: '2:30 PM', duration: '14:22', status: 'completed', missed: false },
-    { id: 'c2', name: 'Etty Duke', avatar: 'https://i.pravatar.cc/100?img=1', type: 'voice', time: 'Yesterday', duration: '5:10', status: 'completed', missed: false },
-    { id: 'c3', name: 'Dr. Cohen', avatar: 'https://i.pravatar.cc/100?img=12', type: 'video', time: 'Mon', duration: '—', status: 'missed', missed: true },
-    { id: 'c4', name: 'EVzone Support', avatar: 'https://i.pravatar.cc/100?img=8', type: 'voice', time: 'Last week', duration: '8:45', status: 'completed', missed: false },
-    { id: 'c5', name: 'Team Meeting', avatar: 'https://i.pravatar.cc/100?img=15', type: 'conference', time: 'Today', duration: '32:15', status: 'completed', missed: false },
-    { id: 'c6', name: 'Project Review', avatar: 'https://i.pravatar.cc/100?img=16', type: 'meeting', time: 'Today', duration: '45:30', status: 'completed', missed: false },
+    { id: 'c1', name: 'Leslie Alexander', avatar: 'https://i.pravatar.cc/100?img=5', type: 'video', time: '2:30 PM', duration: '14:22', status: 'completed', missed: false, module: 'E-Commerce' },
+    { id: 'c2', name: 'Etty Duke', avatar: 'https://i.pravatar.cc/100?img=1', type: 'voice', time: 'Yesterday', duration: '5:10', status: 'completed', missed: false, module: 'Rides & Logistics' },
+    { id: 'c3', name: 'Dr. Cohen', avatar: 'https://i.pravatar.cc/100?img=12', type: 'video', time: 'Mon', duration: '—', status: 'missed', missed: true, module: 'Medical & Health Care' },
+    { id: 'c4', name: 'EVzone Support', avatar: 'https://i.pravatar.cc/100?img=8', type: 'voice', time: 'Last week', duration: '8:45', status: 'completed', missed: false, module: 'EV Charging' },
+    { id: 'c5', name: 'Team Meeting', avatar: 'https://i.pravatar.cc/100?img=15', type: 'conference', time: 'Today', duration: '32:15', status: 'completed', missed: false, module: 'Virtual Workspace' },
+    { id: 'c6', name: 'Project Review', avatar: 'https://i.pravatar.cc/100?img=16', type: 'meeting', time: 'Today', duration: '45:30', status: 'completed', missed: false, module: 'Virtual Workspace' },
   ];
 
   // All hooks must be called before any conditional returns
@@ -319,17 +319,22 @@ export default function OneToOneCall({
                         </Box>
                       }
                       secondary={
-                        <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
-                          {call.type === 'video' ? (
-                            <VideoCallRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                          ) : call.type === 'conference' ? (
-                            <GroupsRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                          ) : call.type === 'meeting' ? (
-                            <EventAvailableRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                          ) : (
-                            <CallRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                        <Box component="span" sx={{ display: 'flex', flexDirection: 'column', gap: 0.25, mt: 0.5 }}>
+                          <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            {call.type === 'video' ? (
+                              <VideoCallRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                            ) : call.type === 'conference' ? (
+                              <GroupsRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                            ) : call.type === 'meeting' ? (
+                              <EventAvailableRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                            ) : (
+                              <CallRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                            )}
+                            <span className="text-[12px]" style={{ color: muiTheme.palette.text.secondary }}>{call.duration}</span>
+                          </Box>
+                          {call.module && (
+                            <span className="text-[11px]" style={{ color: muiTheme.palette.text.secondary, opacity: 0.8 }}>{call.module}</span>
                           )}
-                          <span className="text-[12px]" style={{ color: muiTheme.palette.text.secondary }}>{call.duration}</span>
                         </Box>
                       }
                     />

@@ -602,21 +602,53 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                           >
                             {c.name} typing…
                           </Typography>
-                        ) : (
-                          <Typography 
-                            variant="caption" 
-                            sx={{ 
-                              color: 'text.secondary',
-                              fontSize: '12px',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap',
-                              flex: 1
-                            }}
-                          >
-                            {c.last}
-                          </Typography>
-                        )}
+                        ) : (() => {
+                          // Check for draft message - use the same key format as chat component
+                          let draftText = '';
+                          try {
+                            // The conversation ID in chat component is the last part of the pathname
+                            // which matches c.id when navigating from the list
+                            const draftKey = `chat-draft-${c.id}`;
+                            draftText = localStorage.getItem(draftKey) || '';
+                          } catch (e) {
+                            // Ignore localStorage errors
+                          }
+                          
+                          if (draftText && draftText.trim()) {
+                            return (
+                              <Typography 
+                                variant="caption" 
+                                sx={{ 
+                                  color: accentColor,
+                                  fontSize: '12px',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap',
+                                  flex: 1,
+                                  fontStyle: 'italic'
+                                }}
+                              >
+                                Draft: {draftText.length > 30 ? draftText.substring(0, 30) + '...' : draftText}
+                              </Typography>
+                            );
+                          }
+                          
+                          return (
+                            <Typography 
+                              variant="caption" 
+                              sx={{ 
+                                color: 'text.secondary',
+                                fontSize: '12px',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                                flex: 1
+                              }}
+                            >
+                              {c.last}
+                            </Typography>
+                          );
+                        })()}
                       </Box>
                     }
                     sx={{ m: 0 }}
