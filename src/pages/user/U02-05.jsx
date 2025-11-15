@@ -425,7 +425,57 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
   const [messages, setMessages] = useState(DEMO);
   const [replyTo, setReplyTo] = useState(null);
-  const [draft, setDraft] = useState('');
+  
+  // Get conversation ID for draft storage
+  const conversationId = useMemo(() => {
+    if (location?.pathname) {
+      const pathParts = location.pathname.split('/');
+      const id = pathParts[pathParts.length - 1];
+      return id && id !== 'new' ? id : 'default';
+    }
+    return 'default';
+  }, [location]);
+  
+  // Load draft from localStorage on mount
+  const [draft, setDraft] = useState(() => {
+    try {
+      const saved = localStorage.getItem(`chat-draft-${conversationId}`);
+      return saved || '';
+    } catch {
+      return '';
+    }
+  });
+  
+  // Reload draft when conversation changes
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(`chat-draft-${conversationId}`);
+      setDraft(saved || '');
+    } catch {
+      setDraft('');
+    }
+  }, [conversationId]);
+  
+  // Save draft to localStorage whenever it changes (with debounce)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (draft.trim()) {
+        try {
+          localStorage.setItem(`chat-draft-${conversationId}`, draft);
+        } catch (e) {
+          console.warn('Failed to save draft:', e);
+        }
+      } else {
+        try {
+          localStorage.removeItem(`chat-draft-${conversationId}`);
+        } catch (e) {
+          console.warn('Failed to clear draft:', e);
+        }
+      }
+    }, 300); // Debounce by 300ms
+    
+    return () => clearTimeout(timer);
+  }, [draft, conversationId]);
   const [menuEl, setMenuEl] = useState(null);
   const [emojiEl, setEmojiEl] = useState(null);
   const [attachEl, setAttachEl] = useState(null);
@@ -689,6 +739,12 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
     const newMsg = { id:'m'+Date.now(), author:{ id:'me', name:'You', avatar:'https://i.pravatar.cc/100?img=2' }, text:draft, time: ts.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }), mine:true, read:false, replyTo: replyTo? { id: replyTo.id, text: replyTo.text } : undefined };
     setMessages(prev=> [...prev, newMsg]);
     setDraft(''); setReplyTo(null);
+    // Clear draft from localStorage when message is sent
+    try {
+      localStorage.removeItem(`chat-draft-${conversationId}`);
+    } catch (e) {
+      console.warn('Failed to clear draft:', e);
+    }
     requestAnimationFrame(()=>{ const el=listRef.current; if(el) el.scrollTop = el.scrollHeight; });
   };
 
