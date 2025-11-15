@@ -128,7 +128,7 @@ export default function OneToOneCall({
   
   // Update global call state
   useEffect(() => {
-    if (activeCall) {
+    if (activeCall && activeCall.state !== callState) {
       updateCallState(callState);
     }
   }, [callState, activeCall, updateCallState]);
@@ -312,14 +312,14 @@ export default function OneToOneCall({
                     </ListItemAvatar>
                     <ListItemTextComp
                       primary={
-                        <div className="flex items-center gap-2">
+                        <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap' }}>
                           <span className="font-semibold" style={{ color: muiTheme.palette.text.primary }}>{call.name}</span>
                           {call.missed && <Chip size="small" label="Missed" sx={{ bgcolor: '#e53935', color: '#fff', height: 18, fontSize: '10px' }} />}
                           <span className="text-xs ml-auto" style={{ color: muiTheme.palette.text.secondary }}>{call.time}</span>
-                        </div>
+                        </Box>
                       }
                       secondary={
-                        <div className="flex items-center gap-2 mt-0.5">
+                        <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
                           {call.type === 'video' ? (
                             <VideoCallRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
                           ) : call.type === 'conference' ? (
@@ -330,7 +330,7 @@ export default function OneToOneCall({
                             <CallRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
                           )}
                           <span className="text-[12px]" style={{ color: muiTheme.palette.text.secondary }}>{call.duration}</span>
-                        </div>
+                        </Box>
                       }
                     />
                   </ListItem>
