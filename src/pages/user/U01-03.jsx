@@ -1,6 +1,6 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState, useEffect } from "react";
 import { useTheme } from "../../context/ThemeContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   AppBar,
   Toolbar,
@@ -59,12 +59,23 @@ const LIVE_DEMO = [
 export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, onRefresh, onNew, onLiveOpen, onModuleChange, onBack }) {
   const { accent, isDark } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
   const [q, setQ] = useState("");
   const [tab, setTab] = useState(0); // 0 = E-Commerce, 1 = Other
   const [selectedModule, setSelectedModule] = useState('E-Commerce');
   const [moduleMenuEl, setModuleMenuEl] = useState(null);
   const [showSearch, setShowSearch] = useState(false);
   const searchInputRef = useRef(null);
+  const [draftRefresh, setDraftRefresh] = useState(0); // Force re-render to check drafts
+  
+  // Refresh drafts when location changes (when navigating back from chat)
+  useEffect(() => {
+    // Small delay to ensure localStorage is updated after navigation
+    const timer = setTimeout(() => {
+      setDraftRefresh(prev => prev + 1);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
   
   // Get theme accent color
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
@@ -76,6 +87,24 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
 
   // Available modules
   const MODULES = ['E-Commerce', 'EV Charging', 'Rides & Logistics', 'School & E-Learning', 'Medical & Health Care', 'Travel & Tourism', 'Green Investments', 'Faith Hub', 'Social Networking', 'Virtual Workspace', 'Wallet & Payments', 'AI Chatbot'];
+  
+  // Get drafts for all conversations - reactive to draftRefresh and location changes
+  const drafts = useMemo(() => {
+    const draftMap = {};
+    items.forEach((item) => {
+      try {
+        const draftKey = `chat-draft-${item.id}`;
+        const draftText = localStorage.getItem(draftKey);
+        if (draftText && draftText.trim()) {
+          draftMap[item.id] = draftText;
+        }
+      } catch (e) {
+        // Ignore localStorage errors
+      }
+    });
+    return draftMap;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items, draftRefresh, location.pathname]);
   
   // filter logic - filter by tab (E-Commerce = selected module, Other = everything else)
   const filtered = useMemo(() => {
@@ -603,16 +632,8 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                             {c.name} typing…
                           </Typography>
                         ) : (() => {
-                          // Check for draft message - use the same key format as chat component
-                          let draftText = '';
-                          try {
-                            // The conversation ID in chat component is the last part of the pathname
-                            // which matches c.id when navigating from the list
-                            const draftKey = `chat-draft-${c.id}`;
-                            draftText = localStorage.getItem(draftKey) || '';
-                          } catch (e) {
-                            // Ignore localStorage errors
-                          }
+                          // Check for draft message from the drafts map
+                          const draftText = drafts[c.id];
                           
                           if (draftText && draftText.trim()) {
                             return (
