@@ -60,58 +60,63 @@ export default function InviteJoinLinkQR({ onBack, info = { name:'Charging Crew 
 
       <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.default' }}>
         <AppBar elevation={0} position="static" sx={{ bgcolor: 'background.paper', color: 'text.primary', borderBottom:`1px solid ${muiTheme.palette.divider}` }}>
-          <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary' }}><ArrowBackRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>Invite / Join</Typography>
+          <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary', padding: { xs: '6px', sm: '8px' } }}>
+              <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+            </IconButton>
+            <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 } }}>Invite / Join</Typography>
           </Toolbar>
         </AppBar>
 
-        <Box className="p-3 space-y-3 flex-1 no-scrollbar" sx={{ overflowY:'auto' }}>
+        <Box sx={{ p: { xs: 2, sm: 3 }, '& > * + *': { mt: { xs: 2, sm: 3 } }, flex: 1, overflowY: 'auto' }} className="no-scrollbar">
           {/* Link & actions */}
-          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
-            <div className="font-semibold" style={{ color: muiTheme.palette.text.primary }}>{info.name}</div>
-            <div className="text-sm break-all mt-1 flex items-center gap-1" style={{ color: muiTheme.palette.text.primary }}><LinkRoundedIcon sx={{ fontSize: 16 }} /> {info.link}</div>
-            <div className="mt-2 flex gap-2">
-              <Button startIcon={<ContentCopyRoundedIcon/>} onClick={copy} variant="outlined" sx={{ textTransform:'none' }}>Copy</Button>
-              <Button startIcon={<ShareRoundedIcon/>} onClick={share} variant="contained" sx={{ textTransform:'none' }}>Share</Button>
+          <Box className="rounded-2xl" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper', p: { xs: 2, sm: 3 } }}>
+            <div className="font-semibold" style={{ color: muiTheme.palette.text.primary, fontSize: '15px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{info.name}</div>
+            <div className="break-all mt-1 flex items-center" style={{ gap: '4px', color: muiTheme.palette.text.primary, fontSize: '13px' }}>
+              <LinkRoundedIcon sx={{ fontSize: { xs: 16, sm: 18 } }} /> 
+              <span>{info.link}</span>
+            </div>
+            <div className="mt-2 flex" style={{ gap: '8px' }}>
+              <Button startIcon={<ContentCopyRoundedIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />} onClick={copy} variant="outlined" sx={{ textTransform:'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 } }}>Copy</Button>
+              <Button startIcon={<ShareRoundedIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />} onClick={share} variant="contained" sx={{ textTransform:'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 } }}>Share</Button>
             </div>
           </Box>
 
           {/* QR */}
-          <Box className="rounded-2xl p-3 grid place-items-center" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
-            <img src={qrSrc} alt="QR" width={220} height={220} className="rounded-lg" />
-            <Button startIcon={<QrCode2RoundedIcon/>} onClick={downloadQR} variant="outlined" sx={{ mt:1.5, textTransform:'none' }}>Download QR</Button>
+          <Box className="rounded-2xl grid place-items-center" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper', p: { xs: 2, sm: 3 } }}>
+            <img src={qrSrc} alt="QR" width={220} height={220} className="rounded-lg" style={{ maxWidth: '100%', height: 'auto' }} />
+            <Button startIcon={<QrCode2RoundedIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />} onClick={downloadQR} variant="outlined" sx={{ mt:1.5, textTransform:'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 } }}>Download QR</Button>
           </Box>
 
           {/* Permissions */}
-          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
-            <div className="text-sm font-semibold mb-1" style={{ color: muiTheme.palette.text.primary }}>Invite settings</div>
+          <Box className="rounded-2xl" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper', p: { xs: 2, sm: 3 } }}>
+            <div className="font-semibold mb-1" style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Invite settings</div>
             <FormGroup>
-              <FormControlLabel control={<Switch checked={allowAnyone} onChange={(e)=>setAllowAnyone(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary }}>Anyone with link can request to join</span>} />
-              <FormControlLabel control={<Switch checked={approval} onChange={(e)=>setApproval(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary }}>Require admin approval</span>} />
+              <FormControlLabel control={<Switch checked={allowAnyone} onChange={(e)=>setAllowAnyone(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Anyone with link can request to join</span>} />
+              <FormControlLabel control={<Switch checked={approval} onChange={(e)=>setApproval(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Require admin approval</span>} />
             </FormGroup>
-            <div className="grid grid-cols-2 gap-2 mt-2 items-end">
+            <div className="grid grid-cols-2 mt-2 items-end" style={{ gap: '8px' }}>
               <FormControl size="small">
-                <InputLabel>Expiry</InputLabel>
-                <Select label="Expiry" value={expiry} onChange={(e)=>setExpiry(e.target.value)}>
-                  <MenuItem value="24h">24 hours</MenuItem>
-                  <MenuItem value="7d">7 days</MenuItem>
-                  <MenuItem value="30d">30 days</MenuItem>
-                  <MenuItem value="never">Never</MenuItem>
+                <InputLabel sx={{ fontSize: { xs: '13px', sm: '14px' } }}>Expiry</InputLabel>
+                <Select label="Expiry" value={expiry} onChange={(e)=>setExpiry(e.target.value)} sx={{ fontSize: { xs: '13px', sm: '14px' } }}>
+                  <MenuItem value="24h" sx={{ fontSize: { xs: '13px', sm: '14px' } }}>24 hours</MenuItem>
+                  <MenuItem value="7d" sx={{ fontSize: { xs: '13px', sm: '14px' } }}>7 days</MenuItem>
+                  <MenuItem value="30d" sx={{ fontSize: { xs: '13px', sm: '14px' } }}>30 days</MenuItem>
+                  <MenuItem value="never" sx={{ fontSize: { xs: '13px', sm: '14px' } }}>Never</MenuItem>
                 </Select>
               </FormControl>
-              <Button onClick={apply} variant="contained" sx={{ textTransform:'none' }}>Apply</Button>
+              <Button onClick={apply} variant="contained" sx={{ textTransform:'none', fontSize: { xs: '13px', sm: '14px' }, py: { xs: 0.5, sm: 0.75 } }}>Apply</Button>
             </div>
           </Box>
 
           <Divider sx={{ borderColor: muiTheme.palette.divider }} />
 
           {/* Join by code */}
-          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
-            <div className="text-sm font-semibold mb-1" style={{ color: muiTheme.palette.text.primary }}>Join by code</div>
-            <div className="grid grid-cols-3 gap-2 items-end">
-              <TextField className="col-span-2" size="small" label="Enter code" value={joinCode} onChange={(e)=>setJoinCode(e.target.value)} placeholder={info.code} />
-              <Button onClick={join} variant="contained" sx={{ textTransform:'none' }}>Join</Button>
+          <Box className="rounded-2xl" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper', p: { xs: 2, sm: 3 } }}>
+            <div className="font-semibold mb-1" style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Join by code</div>
+            <div className="grid grid-cols-3 items-end" style={{ gap: '8px' }}>
+              <TextField className="col-span-2" size="small" label="Enter code" value={joinCode} onChange={(e)=>setJoinCode(e.target.value)} placeholder={info.code} sx={{ '& .MuiInputBase-input': { fontSize: { xs: '13px', sm: '14px' } } }} />
+              <Button onClick={join} variant="contained" sx={{ textTransform:'none', fontSize: { xs: '13px', sm: '14px' }, py: { xs: 0.5, sm: 0.75 } }}>Join</Button>
             </div>
           </Box>
         </Box>

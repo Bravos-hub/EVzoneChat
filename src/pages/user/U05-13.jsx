@@ -144,20 +144,20 @@ export default function ScreenshareWithChatPro({ onBack, remote = { name:'Group 
       <Box className="w-full h-full mx-auto bg-black text-white flex flex-col">
         {/* Header */}
         <AppBar elevation={0} position="fixed" sx={{ bgcolor: 'rgba(0,0,0,0.55)' }}>
-          <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back" sx={{ color: '#fff' }}>
-              <ArrowBackRoundedIcon />
+          <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ color: '#fff', padding: { xs: '6px', sm: '8px' } }}>
+              <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
             </IconButton>
-            <div className="flex flex-col">
-              <span className="font-semibold -mb-1" style={{ whiteSpace: 'nowrap' }}>{remote.name}</span>
-              <span className="text-[11px] opacity-80">{status}{captions ? ' • Captions on' : ''}</span>
+            <div className="flex flex-col" style={{ minWidth: 0, flex: 1 }}>
+              <span className="font-semibold" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '14px' }}>{remote.name}</span>
+              <span style={{ fontSize: '11px', opacity: 0.8 }}>{status}{captions ? ' • Captions on' : ''}</span>
             </div>
             <Box sx={{ flexGrow: 1 }} />
-            <IconButton aria-label="Chat" onClick={() => setChatOpen(true)} sx={{ color: '#fff' }}>
-              <ChatRoundedIcon />
+            <IconButton aria-label="Chat" onClick={() => setChatOpen(true)} sx={{ color: '#fff', padding: { xs: '6px', sm: '8px' } }}>
+              <ChatRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
             </IconButton>
-            <IconButton aria-label="More" onClick={(e) => setMenuEl(e.currentTarget)} sx={{ color: '#fff' }}>
-              <MoreVertRoundedIcon />
+            <IconButton aria-label="More" onClick={(e) => setMenuEl(e.currentTarget)} sx={{ color: '#fff', padding: { xs: '6px', sm: '8px' } }}>
+              <MoreVertRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
             </IconButton>
           </Toolbar>
         </AppBar>
@@ -186,15 +186,15 @@ export default function ScreenshareWithChatPro({ onBack, remote = { name:'Group 
 
         {/* Bottom controls */}
         <Box className="fixed inset-x-0 bottom-0 z-10 flex justify-center" sx={{ pb: 'env(safe-area-inset-bottom)' }}>
-          <Box className="w-full px-3 pb-3">
-            <div className="flex items-center justify-between bg-white/10 rounded-2xl px-3 py-2 backdrop-blur gap-2">
+          <Box className="w-full" sx={{ px: { xs: 2, sm: 3 }, pb: { xs: 2, sm: 3 } }}>
+            <div className="flex items-center justify-between bg-white/10 rounded-2xl backdrop-blur" style={{ padding: '8px 12px', gap: '8px', flexWrap: 'wrap' }}>
               {!sharing ? (
-                <Button onClick={startShare} startIcon={<ScreenShareRoundedIcon />} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform: 'none' }}>Start share</Button>
+                <Button onClick={startShare} startIcon={<ScreenShareRoundedIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform: 'none', fontSize: { xs: '12px', sm: '14px' }, py: { xs: 0.5, sm: 0.75 } }}>Start share</Button>
               ) : (
                 <>
-                  <Button onClick={pauseResume} startIcon={paused ? <PlayCircleOutlineRoundedIcon /> : <PauseCircleOutlineRoundedIcon />} variant="outlined" sx={{ borderColor: '#fff', color: '#fff', textTransform: 'none' }}>{paused ? 'Resume' : 'Pause'}</Button>
-                  <Button onClick={switchSource} startIcon={<SwapHorizRoundedIcon />} variant="outlined" sx={{ borderColor: '#fff', color: '#fff', textTransform: 'none' }}>Switch source</Button>
-                  <Button onClick={stopShare} startIcon={<StopScreenShareRoundedIcon />} variant="contained" sx={{ bgcolor: '#e53935', textTransform: 'none', '&:hover': { bgcolor: '#c62828' } }}>Stop share</Button>
+                  <Button onClick={pauseResume} startIcon={paused ? <PlayCircleOutlineRoundedIcon sx={{ fontSize: { xs: 18, sm: 20 } }} /> : <PauseCircleOutlineRoundedIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />} variant="outlined" sx={{ borderColor: '#fff', color: '#fff', textTransform: 'none', fontSize: { xs: '12px', sm: '14px' }, py: { xs: 0.5, sm: 0.75 } }}>{paused ? 'Resume' : 'Pause'}</Button>
+                  <Button onClick={switchSource} startIcon={<SwapHorizRoundedIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />} variant="outlined" sx={{ borderColor: '#fff', color: '#fff', textTransform: 'none', fontSize: { xs: '12px', sm: '14px' }, py: { xs: 0.5, sm: 0.75 } }}>Switch source</Button>
+                  <Button onClick={stopShare} startIcon={<StopScreenShareRoundedIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />} variant="contained" sx={{ bgcolor: '#e53935', textTransform: 'none', fontSize: { xs: '12px', sm: '14px' }, py: { xs: 0.5, sm: 0.75 }, '&:hover': { bgcolor: '#c62828' } }}>Stop share</Button>
                 </>
               )}
             </div>

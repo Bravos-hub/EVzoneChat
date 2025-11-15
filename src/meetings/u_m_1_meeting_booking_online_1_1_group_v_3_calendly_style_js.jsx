@@ -180,18 +180,17 @@ export default function MeetingBooking({ onBack, onNavigate }) {
         >
           <Toolbar sx={{ 
             minHeight: { xs: '56px', md: '64px' },
-            px: { xs: 1.5, sm: 2, md: 3, lg: 4 },
+            px: { xs: 1.5, sm: 2, md: 3 },
             width: '100%'
           }}>
-              <IconButton onClick={onBack} aria-label="Back" sx={{ color: "#fff", mr: 1 }}>
-                <ArrowBackRoundedIcon />
+              <IconButton onClick={onBack} aria-label="Back" sx={{ color: "#fff", mr: 1, padding: { xs: '6px', sm: '8px' } }}>
+                <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
               </IconButton>
-              <EventAvailableRoundedIcon sx={{ mr: 1 }} />
               <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                <Typography variant="subtitle1" className="font-semibold" noWrap>
+                <Typography variant="subtitle1" className="font-semibold" noWrap sx={{ fontSize: { xs: '15px', sm: '16px' } }}>
                   Meeting booking
                 </Typography>
-              <Typography variant="caption" sx={{ opacity: 0.9, fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
+              <Typography variant="caption" sx={{ opacity: 0.9, fontSize: { xs: '11px', sm: '12px' } }}>
                   Guests pick a time inside your availability
                 </Typography>
               </Box>
@@ -199,9 +198,9 @@ export default function MeetingBooking({ onBack, onNavigate }) {
                 onClick={() => onNavigate?.('/meetings')} 
                 aria-label="My meetings" 
                 title="My meetings"
-                sx={{ color: "#fff" }}
+                sx={{ color: "#fff", padding: { xs: '6px', sm: '8px' } }}
               >
-                <EventAvailableRoundedIcon />
+                <EventAvailableRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
               </IconButton>
             </Toolbar>
           </AppBar>
@@ -212,8 +211,8 @@ export default function MeetingBooking({ onBack, onNavigate }) {
           sx={{ 
             flex: 1, 
             pt: { xs: "56px", md: "64px" }, 
-            pb: { xs: 12, sm: 14, md: 16 }, 
-            px: { xs: 1.5, sm: 2, md: 3, lg: 4 }, 
+            pb: { xs: 1, sm: 1.5 }, 
+            px: { xs: 1.5, sm: 2, md: 3 }, 
             overflowY: "auto",
             width: '100%',
             minHeight: 0,
@@ -225,20 +224,20 @@ export default function MeetingBooking({ onBack, onNavigate }) {
               variant="h5" 
               sx={{ 
                 fontWeight: 600, 
-                mt: 2, 
-                mb: 1, 
+                mt: { xs: 0, sm: 0.25 }, 
+                mb: { xs: 1, sm: 1.5 }, 
                 color: 'text.primary',
-                fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' }
+                fontSize: { xs: '18px', sm: '20px', md: '22px' }
               }}
             >
               Meeting Booking
             </Typography>
             
             {/* 1. Module */}
-            <Typography variant="caption" sx={{ color: 'text.secondary', mt: 2, mb: 1.5, display: 'block', fontSize: { xs: '0.75rem', sm: '0.8125rem', md: '0.875rem' } }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', mt: { xs: 1.5, sm: 2 }, mb: { xs: 1, sm: 1.5 }, display: 'block', fontSize: { xs: '13px', sm: '14px' } }}>
               1. Choose the module for this meeting
             </Typography>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 0.75, sm: 1, md: 1.25 }, mb: { xs: 3, md: 4 } }}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 0.75, sm: 1 }, mb: { xs: 2, sm: 3 } }}>
               {["E-Commerce","Rides","Charging","School","Medical","Travel","Investments","Faith","Workspace","Wallet"].map((m) => (
                 <Chip
                   key={m}
@@ -268,10 +267,10 @@ export default function MeetingBooking({ onBack, onNavigate }) {
             </Box>
 
             {/* 2. Meeting type */}
-            <Typography variant="caption" sx={{ color: 'text.secondary', mt: { xs: 2, md: 3 }, mb: 1.5, display: 'block', fontSize: { xs: '0.75rem', sm: '0.8125rem', md: '0.875rem' } }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', mt: { xs: 1.5, sm: 2 }, mb: { xs: 1, sm: 1.5 }, display: 'block', fontSize: { xs: '13px', sm: '14px' } }}>
               2. Meeting type
             </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2, md: 2.5 }, mb: { xs: 3, md: 4 }, flexWrap: 'wrap' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2 }, mb: { xs: 2, sm: 2.5 }, flexWrap: 'wrap' }}>
               <Chip
                 icon={<PersonRoundedIcon sx={{ color: meetingType === "1:1" ? "#fff" : 'inherit', fontSize: { xs: 18, sm: 20 } }} />}
                 label="1:1 meeting"
@@ -329,16 +328,16 @@ export default function MeetingBooking({ onBack, onNavigate }) {
               placeholder={meetingType === "1:1" ? "Catch‑up with Leslie" : "Weekly team sync"}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              sx={{ mb: { xs: 3, md: 4 } }}
+              sx={{ mb: { xs: 2, sm: 2.5 } }}
               size="small"
             />
 
             {/* 3. Who is this with? */}
-            <Typography variant="caption" sx={{ color: 'text.secondary', mt: { xs: 2, md: 3 }, mb: 1.5, display: 'block', fontSize: { xs: '0.75rem', sm: '0.8125rem', md: '0.875rem' } }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', mt: { xs: 1.5, sm: 2 }, mb: { xs: 1, sm: 1.5 }, display: 'block', fontSize: { xs: '13px', sm: '14px' } }}>
               3. Who is this with?
             </Typography>
             {meetingType === "1:1" ? (
-              <FormControl fullWidth size="small" sx={{ mb: { xs: 3, md: 4 } }}>
+              <FormControl fullWidth size="small" sx={{ mb: { xs: 2, sm: 2.5 } }}>
                 <InputLabel>Person</InputLabel>
                 <Select
                   label="Person"
@@ -369,10 +368,10 @@ export default function MeetingBooking({ onBack, onNavigate }) {
                   </FormHelperText>
                 </FormControl>
 
-                <Typography variant="caption" sx={{ color: 'text.secondary', mb: 1.5, display: 'block', fontSize: { xs: '0.75rem', sm: '0.8125rem' } }}>
+                <Typography variant="caption" sx={{ color: 'text.secondary', mb: { xs: 1, sm: 1.5 }, display: 'block', fontSize: { xs: '13px', sm: '14px' } }}>
                   Co‑hosts (optional)
                 </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 0.75, sm: 1 }, mb: 2 }}>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 0.75, sm: 1 }, mb: { xs: 1.5, sm: 2 } }}>
                   {coHostOptions.map((name) => (
                     <Chip
                       key={name}
@@ -400,7 +399,7 @@ export default function MeetingBooking({ onBack, onNavigate }) {
                     />
                   ))}
                 </Box>
-                <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 1, mb: 3, flexDirection: { xs: 'column', sm: 'row' } }}>
+                <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 1, mb: { xs: 2, sm: 2.5 }, flexDirection: { xs: 'column', sm: 'row' } }}>
                   <TextField
                     size="small"
                     label="Add co‑host"
@@ -435,10 +434,10 @@ export default function MeetingBooking({ onBack, onNavigate }) {
             )}
 
             {/* 4. Availability window */}
-            <Typography variant="caption" sx={{ color: 'text.secondary', mt: { xs: 2, md: 3 }, mb: 1.5, display: 'block', fontSize: { xs: '0.75rem', sm: '0.8125rem', md: '0.875rem' } }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', mt: { xs: 1.5, sm: 2 }, mb: { xs: 1, sm: 1.5 }, display: 'block', fontSize: { xs: '13px', sm: '14px' } }}>
               4. When are you available? (Guests will choose a slot)
             </Typography>
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: { xs: 2, md: 2.5 }, mb: { xs: 2, md: 2.5 } }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: { xs: 1.5, sm: 2 }, mb: { xs: 1.5, sm: 2 } }}>
               <TextField
                 label="Earliest date"
                 type="date"
@@ -456,7 +455,7 @@ export default function MeetingBooking({ onBack, onNavigate }) {
                 onChange={(e) => setEndDate(e.target.value)}
               />
             </Box>
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: { xs: 2, md: 2.5 }, mb: { xs: 2, md: 2.5 } }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: { xs: 1.5, sm: 2 }, mb: { xs: 1.5, sm: 2 } }}>
               <TextField
                 label="Earliest time"
                 type="time"
@@ -474,7 +473,7 @@ export default function MeetingBooking({ onBack, onNavigate }) {
                 onChange={(e) => setWindowEnd(e.target.value)}
               />
             </Box>
-            <FormControl size="small" fullWidth sx={{ mb: { xs: 3, md: 4 } }}>
+            <FormControl size="small" fullWidth sx={{ mb: { xs: 2, sm: 2.5 } }}>
               <InputLabel sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>Slot length</InputLabel>
               <Select
                 label="Slot length"
@@ -493,10 +492,10 @@ export default function MeetingBooking({ onBack, onNavigate }) {
             </FormControl>
 
             {/* 5. Meeting mode */}
-            <Typography variant="caption" sx={{ color: 'text.secondary', mt: { xs: 2, md: 3 }, mb: 1.5, display: 'block', fontSize: { xs: '0.75rem', sm: '0.8125rem', md: '0.875rem' } }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', mt: { xs: 1.5, sm: 2 }, mb: { xs: 1, sm: 1.5 }, display: 'block', fontSize: { xs: '13px', sm: '14px' } }}>
               5. Meeting mode
             </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2, md: 2.5 }, mb: { xs: 3, md: 4 }, flexWrap: 'wrap' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2 }, mb: { xs: 2, sm: 2.5 }, flexWrap: 'wrap' }}>
               <Chip
                 icon={<VideocamRoundedIcon sx={{ color: mode === "video" ? "#fff" : 'inherit', fontSize: { xs: 18, sm: 20 } }} />}
                 label="Video meeting"
@@ -548,7 +547,7 @@ export default function MeetingBooking({ onBack, onNavigate }) {
             </Box>
 
             {/* 6. Notes */}
-            <Typography variant="caption" sx={{ color: 'text.secondary', mt: { xs: 2, md: 3 }, mb: 1.5, display: 'block', fontSize: { xs: '0.75rem', sm: '0.8125rem', md: '0.875rem' } }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary', mt: { xs: 1.5, sm: 2 }, mb: { xs: 1, sm: 1.5 }, display: 'block', fontSize: { xs: '13px', sm: '14px' } }}>
               6. Notes / agenda (optional)
             </Typography>
             <TextField
@@ -560,7 +559,7 @@ export default function MeetingBooking({ onBack, onNavigate }) {
               multiline
               minRows={3}
               maxRows={4}
-              sx={{ mb: { xs: 3, md: 4 } }}
+              sx={{ mb: { xs: 2, sm: 2.5 } }}
               size="small"
             />
 
@@ -571,7 +570,7 @@ export default function MeetingBooking({ onBack, onNavigate }) {
               boxShadow: { xs: 1, md: 2 }, 
               border: `1px solid ${muiTheme.palette.divider}`, 
               p: { xs: 2, md: 3 }, 
-              mb: { xs: 3, md: 4 } 
+              mb: { xs: 0.5, sm: 0.75 } 
             }}>
               <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: 'text.primary' }}>
                 Meeting summary

@@ -48,15 +48,17 @@ export default function ConversationGallery({ onBack, items = DEMO, onOpen }) {
 
       <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.paper' }}>
         <AppBar elevation={0} position="static" sx={{ bgcolor:'background.paper', color:'text.primary', borderBottom:`1px solid ${muiTheme.palette.divider}` }}>
-          <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary' }}><ArrowBackRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>Media</Typography>
+          <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary', padding: { xs: '6px', sm: '8px' } }}>
+              <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+            </IconButton>
+            <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 } }}>Media</Typography>
           </Toolbar>
         </AppBar>
 
         {/* filters */}
-        <Box className="px-3 py-2">
-          <div className="flex gap-2 flex-wrap">
+        <Box sx={{ px: { xs: 2, sm: 3 }, py: { xs: 1.5, sm: 2 } }}>
+          <div className="flex gap-2 flex-wrap" style={{ gap: '8px' }}>
             {types.map(t => (
               <Chip 
                 key={t} 
@@ -65,6 +67,8 @@ export default function ConversationGallery({ onBack, items = DEMO, onOpen }) {
                 sx={{ 
                   bgcolor: filter===t?EV.green:'background.default', 
                   color: filter===t?'#fff':'text.primary', 
+                  fontSize: { xs: '11px', sm: '12px' },
+                  height: { xs: 24, sm: 28 },
                   '&:hover':{ bgcolor: filter===t?'#02b37b':'action.hover' } 
                 }} 
               />
@@ -74,14 +78,14 @@ export default function ConversationGallery({ onBack, items = DEMO, onOpen }) {
 
         {/* grid */}
         <Box className="flex-1 no-scrollbar" sx={{ overflowY:'auto' }}>
-          <Grid container spacing={1.2} className="px-3 pb-3">
+          <Grid container spacing={{ xs: 1, sm: 1.2 }} sx={{ px: { xs: 2, sm: 3 }, pb: { xs: 2, sm: 3 } }}>
             {list.map((it) => (
               <Grid item xs={4} key={it.id}>
                 <Card elevation={0} sx={{ borderRadius: 2, overflow:'hidden', border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
                   <CardActionArea onClick={()=>onOpen?.(it)}>
-                    <CardMedia component="img" src={it.thumb || it.src} alt="thumb" sx={{ height: '6.125rem', objectFit:'cover' }} />
-                    <div className="absolute bottom-1 left-1 inline-flex items-center gap-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded-full">
-                      <Avatar src={it.by?.avatar} sx={{ width: '0.875rem', height: '0.875rem' }} />
+                    <CardMedia component="img" src={it.thumb || it.src} alt="thumb" sx={{ height: { xs: '5rem', sm: '6.125rem' }, objectFit:'cover' }} />
+                    <div className="absolute bottom-1 left-1 inline-flex items-center gap-1 bg-black/60 text-white rounded-full" style={{ fontSize: '10px', padding: '2px 6px' }}>
+                      <Avatar src={it.by?.avatar} sx={{ width: { xs: '0.75rem', sm: '0.875rem' }, height: { xs: '0.75rem', sm: '0.875rem' } }} />
                       <span>{it.type}</span>
                     </div>
                   </CardActionArea>

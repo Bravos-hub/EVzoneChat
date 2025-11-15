@@ -107,15 +107,17 @@ export default function OnboardingPermissionsFinal({ onClose, onContinue, requir
 
       <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.paper' }}>
         <AppBar elevation={0} position="static" sx={{ bgcolor: 'background.paper', color: 'text.primary', borderBottom: `1px solid ${muiTheme.palette.divider}` }}>
-          <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onClose} aria-label="Close" sx={{ color: 'text.primary' }}><CloseRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>First‑time Setup</Typography>
+          <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
+            <IconButton onClick={onClose} aria-label="Close" sx={{ color: 'text.primary', padding: { xs: '6px', sm: '8px' } }}>
+              <CloseRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+            </IconButton>
+            <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 } }}>First‑time Setup</Typography>
           </Toolbar>
         </AppBar>
 
-        <Box className="p-4 flex-1" sx={{ overflowY: 'auto', '&::-webkit-scrollbar': { display: 'none' }, scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-          <Typography variant="subtitle1" className="font-semibold mb-2" sx={{ color: 'text.primary' }}>Enable access & confirm consents</Typography>
-          <Typography variant="body2" className="mb-3" sx={{ color: 'text.secondary' }}>Allow the permissions below, then confirm your consents. You can change these later in Settings.</Typography>
+        <Box className="flex-1" sx={{ overflowY: 'auto', p: { xs: 2, sm: 3, md: 4 }, '&::-webkit-scrollbar': { display: 'none' }, scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <Typography variant="subtitle1" className="font-semibold mb-2" sx={{ color: 'text.primary', fontSize: { xs: '15px', sm: '16px' } }}>Enable access & confirm consents</Typography>
+          <Typography variant="body2" className="mb-3" sx={{ color: 'text.secondary', fontSize: { xs: '13px', sm: '14px' } }}>Allow the permissions below, then confirm your consents. You can change these later in Settings.</Typography>
 
           {err && <Alert role="status" aria-live="polite" severity="warning" className="mb-3">{err}</Alert>}
 
@@ -134,7 +136,7 @@ export default function OnboardingPermissionsFinal({ onClose, onContinue, requir
               >
                 <ListItemText primary={<span className="font-semibold">Microphone</span>} secondary="Required for voice calls & voice notes" />
                 <ListItemSecondaryAction>
-                  <Button aria-label="Allow microphone" onClick={requestMic} size="small" variant="outlined" sx={{ textTransform: 'none' }}>Allow</Button>
+                  <Button aria-label="Allow microphone" onClick={requestMic} size="small" variant="outlined" sx={{ textTransform: 'none', fontSize: { xs: '12px', sm: '13px' }, padding: { xs: '4px 12px', sm: '6px 16px' } }}>Allow</Button>
                 </ListItemSecondaryAction>
               </ListItem>
               <Divider />
@@ -150,7 +152,7 @@ export default function OnboardingPermissionsFinal({ onClose, onContinue, requir
               >
                 <ListItemText primary={<span className="font-semibold">Camera</span>} secondary="Optional, needed for video calls" />
                 <ListItemSecondaryAction>
-                  <Button aria-label="Allow camera" onClick={requestCam} size="small" variant="outlined" sx={{ textTransform: 'none' }}>Allow</Button>
+                  <Button aria-label="Allow camera" onClick={requestCam} size="small" variant="outlined" sx={{ textTransform: 'none', fontSize: { xs: '12px', sm: '13px' }, padding: { xs: '4px 12px', sm: '6px 16px' } }}>Allow</Button>
                 </ListItemSecondaryAction>
               </ListItem>
               <Divider />
@@ -166,21 +168,30 @@ export default function OnboardingPermissionsFinal({ onClose, onContinue, requir
               >
                 <ListItemText primary={<span className="font-semibold">Notifications</span>} secondary="Required for message alerts & call ringing" />
                 <ListItemSecondaryAction>
-                  <Button aria-label="Allow notifications" onClick={requestNotif} size="small" variant="outlined" sx={{ textTransform: 'none' }}>Allow</Button>
+                  <Button aria-label="Allow notifications" onClick={requestNotif} size="small" variant="outlined" sx={{ textTransform: 'none', fontSize: { xs: '12px', sm: '13px' }, padding: { xs: '4px 12px', sm: '6px 16px' } }}>Allow</Button>
                 </ListItemSecondaryAction>
               </ListItem>
             </List>
           </Paper>
 
           {/* Granted states */}
-          <Box className="mt-3 space-y-2">
-            <Box className="flex items-center gap-2">{mic ? <CheckCircleRoundedIcon sx={{ color: EV.green }} /> : <RadioButtonUncheckedRoundedIcon sx={{ color: 'text.secondary' }} />}<Typography variant="body2" sx={{ color: 'text.primary' }}>Microphone {mic ? 'granted' : 'required'}</Typography></Box>
-            <Box className="flex items-center gap-2">{cam ? <CheckCircleRoundedIcon sx={{ color: EV.green }} /> : <RadioButtonUncheckedRoundedIcon sx={{ color: 'text.secondary' }} />}<Typography variant="body2" sx={{ color: 'text.primary' }}>Camera {cam ? 'granted' : 'optional'}</Typography></Box>
-            <Box className="flex items-center gap-2">{notif ? <CheckCircleRoundedIcon sx={{ color: EV.green }} /> : <RadioButtonUncheckedRoundedIcon sx={{ color: 'text.secondary' }} />}<Typography variant="body2" sx={{ color: 'text.primary' }}>Notifications {notif ? 'granted' : 'required'}</Typography></Box>
+          <Box className="mt-3 space-y-2" sx={{ gap: { xs: 1, sm: 1.5 } }}>
+            <Box className="flex items-center" sx={{ gap: { xs: 1, sm: 1.5 } }}>
+              {mic ? <CheckCircleRoundedIcon sx={{ color: EV.green, fontSize: { xs: 18, sm: 20 } }} /> : <RadioButtonUncheckedRoundedIcon sx={{ color: 'text.secondary', fontSize: { xs: 18, sm: 20 } }} />}
+              <Typography variant="body2" sx={{ color: 'text.primary', fontSize: { xs: '13px', sm: '14px' } }}>Microphone {mic ? 'granted' : 'required'}</Typography>
+            </Box>
+            <Box className="flex items-center" sx={{ gap: { xs: 1, sm: 1.5 } }}>
+              {cam ? <CheckCircleRoundedIcon sx={{ color: EV.green, fontSize: { xs: 18, sm: 20 } }} /> : <RadioButtonUncheckedRoundedIcon sx={{ color: 'text.secondary', fontSize: { xs: 18, sm: 20 } }} />}
+              <Typography variant="body2" sx={{ color: 'text.primary', fontSize: { xs: '13px', sm: '14px' } }}>Camera {cam ? 'granted' : 'optional'}</Typography>
+            </Box>
+            <Box className="flex items-center" sx={{ gap: { xs: 1, sm: 1.5 } }}>
+              {notif ? <CheckCircleRoundedIcon sx={{ color: EV.green, fontSize: { xs: 18, sm: 20 } }} /> : <RadioButtonUncheckedRoundedIcon sx={{ color: 'text.secondary', fontSize: { xs: 18, sm: 20 } }} />}
+              <Typography variant="body2" sx={{ color: 'text.primary', fontSize: { xs: '13px', sm: '14px' } }}>Notifications {notif ? 'granted' : 'required'}</Typography>
+            </Box>
           </Box>
 
           {/* Consents */}
-          <Typography variant="subtitle1" className="font-semibold mt-4 mb-2" sx={{ color: 'text.primary' }}>Consents</Typography>
+          <Typography variant="subtitle1" className="font-semibold mt-4 mb-2" sx={{ color: 'text.primary', fontSize: { xs: '15px', sm: '16px' } }}>Consents</Typography>
           <Paper elevation={0} sx={{ border: `1px solid ${muiTheme.palette.divider}`, borderRadius: 2, bgcolor: 'background.paper' }}>
             <List>
               <ListItem
@@ -213,10 +224,10 @@ export default function OnboardingPermissionsFinal({ onClose, onContinue, requir
             </List>
           </Paper>
 
-          <Button disabled={busy} onClick={allowAll} fullWidth variant="outlined" sx={{ mt: 3, textTransform: 'none' }}>Allow all</Button>
-          <Button disabled={!canContinue || busy} onClick={() => onContinue?.({ granted: { mic, cam, notif }, consents: { recordingConsent, sensitiveConsent } })} fullWidth variant="contained" size="large" sx={{ mt: 1.5, textTransform: 'none' }}>Continue</Button>
+          <Button disabled={busy} onClick={allowAll} fullWidth variant="outlined" sx={{ mt: 3, textTransform: 'none', fontSize: { xs: '14px', sm: '15px' }, py: { xs: 1, sm: 1.25 } }}>Allow all</Button>
+          <Button disabled={!canContinue || busy} onClick={() => onContinue?.({ granted: { mic, cam, notif }, consents: { recordingConsent, sensitiveConsent } })} fullWidth variant="contained" size="large" sx={{ mt: 1.5, textTransform: 'none', fontSize: { xs: '15px', sm: '16px' }, py: { xs: 1.25, sm: 1.5 } }}>Continue</Button>
 
-          <Typography variant="caption" className="mt-2 block" sx={{ color: 'text.secondary' }}>By continuing, you agree to EVzone Terms & Privacy.</Typography>
+          <Typography variant="caption" className="mt-2 block" sx={{ color: 'text.secondary', fontSize: { xs: '11px', sm: '12px' } }}>By continuing, you agree to EVzone Terms & Privacy.</Typography>
         </Box>
       </Box>
     </>

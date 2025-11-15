@@ -60,69 +60,71 @@ export default function NotificationsPrivacy({ onBack }) {
 
       <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.default' }}>
         <AppBar elevation={0} position="static" sx={{ bgcolor: 'background.paper', color: 'text.primary', borderBottom:`1px solid ${muiTheme.palette.divider}` }}>
-          <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary' }}><ArrowBackRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>Notifications & Privacy</Typography>
+          <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary', padding: { xs: '6px', sm: '8px' } }}>
+              <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+            </IconButton>
+            <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 }, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Notifications & Privacy</Typography>
           </Toolbar>
         </AppBar>
 
-        <Box className="flex-1 p-3 no-scrollbar" sx={{ overflowY:'auto' }}>
+        <Box sx={{ p: { xs: 2, sm: 3 }, flex: 1, overflowY: 'auto' }} className="no-scrollbar">
           {/* Module select */}
           <FormControl fullWidth size="small">
-            <InputLabel>Module</InputLabel>
-            <Select label="Module" value={module} onChange={(e)=>setModule(e.target.value)}>
-              {MODULES.map(m => (<MenuItem key={m} value={m}>{m}</MenuItem>))}
+            <InputLabel sx={{ fontSize: { xs: '13px', sm: '14px' } }}>Module</InputLabel>
+            <Select label="Module" value={module} onChange={(e)=>setModule(e.target.value)} sx={{ fontSize: { xs: '13px', sm: '14px' } }}>
+              {MODULES.map(m => (<MenuItem key={m} value={m} sx={{ fontSize: { xs: '13px', sm: '14px' } }}>{m}</MenuItem>))}
             </Select>
           </FormControl>
 
           {/* Notifications */}
-          <Box className="rounded-2xl p-3 mt-3" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
-            <div className="text-sm font-semibold mb-1" style={{ color: muiTheme.palette.text.primary }}>Notifications</div>
+          <Box className="rounded-2xl" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper', p: { xs: 2, sm: 3 }, mt: { xs: 2, sm: 3 } }}>
+            <div className="font-semibold mb-1" style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Notifications</div>
             <FormGroup>
-              <FormControlLabel control={<Switch checked={push} onChange={(e)=>setPush(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary }}>Push notifications</span>} />
-              <FormControlLabel control={<Switch checked={inapp} onChange={(e)=>setInapp(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary }}>In‑app banners</span>} />
-              <FormControlLabel control={<Switch checked={email} onChange={(e)=>setEmail(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary }}>Email digests</span>} />
-              <FormControlLabel control={<Switch checked={mentions} onChange={(e)=>setMentions(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary }}>Only when mentioned</span>} />
-              <FormControlLabel control={<Switch checked={reactions} onChange={(e)=>setReactions(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary }}>Reactions & emoji</span>} />
+              <FormControlLabel control={<Switch checked={push} onChange={(e)=>setPush(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Push notifications</span>} />
+              <FormControlLabel control={<Switch checked={inapp} onChange={(e)=>setInapp(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>In‑app banners</span>} />
+              <FormControlLabel control={<Switch checked={email} onChange={(e)=>setEmail(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Email digests</span>} />
+              <FormControlLabel control={<Switch checked={mentions} onChange={(e)=>setMentions(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Only when mentioned</span>} />
+              <FormControlLabel control={<Switch checked={reactions} onChange={(e)=>setReactions(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Reactions & emoji</span>} />
             </FormGroup>
           </Box>
 
           {/* Privacy */}
-          <Box className="rounded-2xl p-3 mt-3" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
-            <div className="text-sm font-semibold mb-1" style={{ color: muiTheme.palette.text.primary }}>Privacy</div>
+          <Box className="rounded-2xl" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper', p: { xs: 2, sm: 3 }, mt: { xs: 2, sm: 3 } }}>
+            <div className="font-semibold mb-1" style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Privacy</div>
             <FormGroup>
-              <FormControlLabel control={<Switch checked={readReceipts} onChange={(e)=>setReadReceipts(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary }}>Show read receipts</span>} />
-              <FormControlLabel control={<Switch checked={lastSeen} onChange={(e)=>setLastSeen(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary }}>Show last seen</span>} />
-              <FormControlLabel control={<Switch checked={typing} onChange={(e)=>setTyping(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary }}>Show typing indicator</span>} />
+              <FormControlLabel control={<Switch checked={readReceipts} onChange={(e)=>setReadReceipts(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Show read receipts</span>} />
+              <FormControlLabel control={<Switch checked={lastSeen} onChange={(e)=>setLastSeen(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Show last seen</span>} />
+              <FormControlLabel control={<Switch checked={typing} onChange={(e)=>setTyping(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Show typing indicator</span>} />
             </FormGroup>
           </Box>
 
           {/* Quiet hours */}
-          <Box className="rounded-2xl p-3 mt-3" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
-            <div className="text-sm font-semibold mb-1" style={{ color: muiTheme.palette.text.primary }}>Quiet hours (Do not disturb)</div>
-            <div className="grid grid-cols-2 gap-2">
-              <TextField size="small" label="From" type="time" value={quietFrom} onChange={(e)=>setQuietFrom(e.target.value)} InputLabelProps={{ shrink: true }} />
-              <TextField size="small" label="To" type="time" value={quietTo} onChange={(e)=>setQuietTo(e.target.value)} InputLabelProps={{ shrink: true }} />
+          <Box className="rounded-2xl" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper', p: { xs: 2, sm: 3 }, mt: { xs: 2, sm: 3 } }}>
+            <div className="font-semibold mb-1" style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Quiet hours (Do not disturb)</div>
+            <div className="grid grid-cols-2" style={{ gap: '8px' }}>
+              <TextField size="small" label="From" type="time" value={quietFrom} onChange={(e)=>setQuietFrom(e.target.value)} InputLabelProps={{ shrink: true }} sx={{ '& .MuiInputBase-input': { fontSize: { xs: '13px', sm: '14px' } } }} />
+              <TextField size="small" label="To" type="time" value={quietTo} onChange={(e)=>setQuietTo(e.target.value)} InputLabelProps={{ shrink: true }} sx={{ '& .MuiInputBase-input': { fontSize: { xs: '13px', sm: '14px' } } }} />
             </div>
-            <div className="text-xs mt-1" style={{ color: muiTheme.palette.text.secondary }}>Applies to {module.toLowerCase()}.</div>
+            <div style={{ color: muiTheme.palette.text.secondary, fontSize: '12px', marginTop: '8px' }}>Applies to {module.toLowerCase()}.</div>
           </Box>
 
           {/* Channel overrides */}
-          <Box className="rounded-2xl p-3 mt-3" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
-            <div className="text-sm font-semibold mb-1" style={{ color: muiTheme.palette.text.primary }}>Channel overrides</div>
-            <div className="flex gap-2 flex-wrap">
+          <Box className="rounded-2xl" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper', p: { xs: 2, sm: 3 }, mt: { xs: 2, sm: 3 } }}>
+            <div className="font-semibold mb-1" style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Channel overrides</div>
+            <div className="flex flex-wrap" style={{ gap: '8px' }}>
               {overrides.map(o => (
-                <Chip key={o.id} label={`${o.label}${o.mute? ' • muted':''}`} onClick={()=>toggleChannel(o.id,'mute')} sx={{ bgcolor: o.mute? '#fdecea' : 'background.default', color: 'text.primary' }} />
+                <Chip key={o.id} label={`${o.label}${o.mute? ' • muted':''}`} onClick={()=>toggleChannel(o.id,'mute')} sx={{ bgcolor: o.mute? '#fdecea' : 'background.default', color: 'text.primary', fontSize: { xs: '11px', sm: '12px' }, height: { xs: 26, sm: 28 } }} />
               ))}
             </div>
           </Box>
         </Box>
 
         {/* Footer */}
-        <Box className="px-3 pb-3">
-          <div className="grid grid-cols-2 gap-2">
-            <Button variant="outlined" sx={{ textTransform:'none' }}>Reset</Button>
-            <Button onClick={save} variant="contained" sx={{ textTransform:'none' }}>Save</Button>
+        <Box sx={{ px: { xs: 2, sm: 3 }, pb: { xs: 2, sm: 3 } }}>
+          <div className="grid grid-cols-2" style={{ gap: '8px' }}>
+            <Button variant="outlined" sx={{ textTransform:'none', fontSize: { xs: '13px', sm: '14px' }, py: { xs: 0.75, sm: 1 } }}>Reset</Button>
+            <Button onClick={save} variant="contained" sx={{ textTransform:'none', fontSize: { xs: '13px', sm: '14px' }, py: { xs: 0.75, sm: 1 } }}>Save</Button>
           </div>
         </Box>
       </Box>

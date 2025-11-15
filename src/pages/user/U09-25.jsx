@@ -88,48 +88,50 @@ export default function ProfileSelfPresence({ onBack, initial, location, onNavig
 
       <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.default' }}>
         <AppBar elevation={0} position="static" sx={{ bgcolor: 'background.paper', color: 'text.primary', borderBottom:`1px solid ${muiTheme.palette.divider}` }}>
-          <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary' }}><ArrowBackRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>{isViewingContact ? `${contactName}'s profile` : 'My profile'}</Typography>
+          <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary', padding: { xs: '6px', sm: '8px' } }}>
+              <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+            </IconButton>
+            <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 }, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{isViewingContact ? `${contactName}'s profile` : 'My profile'}</Typography>
           </Toolbar>
         </AppBar>
 
         <Box className="flex-1 no-scrollbar" sx={{ overflowY:'auto' }}>
-          <Box className="px-4 pt-4">
+          <Box sx={{ px: { xs: 2, sm: 3, md: 4 }, pt: { xs: 2, sm: 3, md: 4 } }}>
             {/* Avatar + edit */}
             <div className="relative inline-block">
-              <Avatar src={avatar} sx={{ width: 96, height: 96 }} />
-              <span className="presence-dot" style={{ background: presence==='online'? EV.green : presence==='away'? '#f0ad4e' : presence==='dnd'? '#e53935' : EV.grey }} />
+              <Avatar src={avatar} sx={{ width: { xs: 72, sm: 84, md: 96 }, height: { xs: 72, sm: 84, md: 96 } }} />
+              <span className="presence-dot" style={{ background: presence==='online'? EV.green : presence==='away'? '#f0ad4e' : presence==='dnd'? '#e53935' : EV.grey, width: { xs: 12, sm: 14 }, height: { xs: 12, sm: 14 } }} />
               {!isViewingContact && (
                 <>
-                  <Button onClick={pickPhoto} size="small" startIcon={<EditRoundedIcon/>} variant="outlined" sx={{ position:'absolute', left: 110, top: 30, textTransform:'none' }}>Change</Button>
+                  <Button onClick={pickPhoto} size="small" startIcon={<EditRoundedIcon sx={{ fontSize: { xs: 14, sm: 16 } }} />} variant="outlined" sx={{ position:'absolute', left: { xs: 85, sm: 100, md: 110 }, top: { xs: 20, sm: 25, md: 30 }, textTransform:'none', fontSize: { xs: '11px', sm: '12px' }, py: { xs: 0.25, sm: 0.5 } }}>Change</Button>
                   <input ref={fileRef} type="file" accept="image/*" onChange={onPhoto} hidden />
                 </>
               )}
             </div>
 
             {/* Name/handle/bio */}
-            <Box className="mt-3 space-y-2">
-              <TextField fullWidth label="Name" value={name} onChange={(e)=>setName(e.target.value)} disabled={isViewingContact} />
-              <TextField fullWidth label="Handle" value={handle} onChange={(e)=>setHandle(e.target.value)} helperText="Public username" disabled={isViewingContact} />
-              <TextField fullWidth multiline minRows={3} label="Bio" value={bio} onChange={(e)=>setBio(e.target.value)} disabled={isViewingContact} />
+            <Box sx={{ mt: { xs: 2, sm: 3 }, '& > * + *': { mt: { xs: 1.5, sm: 2 } } }}>
+              <TextField fullWidth label="Name" value={name} onChange={(e)=>setName(e.target.value)} disabled={isViewingContact} sx={{ '& .MuiInputBase-input': { fontSize: { xs: '14px', sm: '16px' } } }} />
+              <TextField fullWidth label="Handle" value={handle} onChange={(e)=>setHandle(e.target.value)} helperText="Public username" disabled={isViewingContact} sx={{ '& .MuiInputBase-input': { fontSize: { xs: '14px', sm: '16px' } }, '& .MuiFormHelperText-root': { fontSize: { xs: '11px', sm: '12px' } } }} />
+              <TextField fullWidth multiline minRows={3} label="Bio" value={bio} onChange={(e)=>setBio(e.target.value)} disabled={isViewingContact} sx={{ '& .MuiInputBase-input': { fontSize: { xs: '14px', sm: '16px' } } }} />
             </Box>
 
             {/* Presence */}
             {!isViewingContact && (
-              <Box className="mt-4">
-                <div className="text-sm font-semibold mb-1" style={{ color: muiTheme.palette.text.primary }}>Presence</div>
-                <div className="flex gap-2 flex-wrap">
+              <Box sx={{ mt: { xs: 3, sm: 4 } }}>
+                <div className="font-semibold mb-1" style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Presence</div>
+                <div className="flex flex-wrap" style={{ gap: '8px' }}>
                   {statuses.map(s => (
-                    <Chip key={s.key} label={s.label} onClick={()=>setPresence(s.key)} sx={{ bgcolor: presence===s.key? EV.green: 'background.default', color: presence===s.key? '#fff': 'text.primary', '&:hover':{ bgcolor: presence===s.key? '#02b37b': 'action.hover' } }} />
+                    <Chip key={s.key} label={s.label} onClick={()=>setPresence(s.key)} sx={{ bgcolor: presence===s.key? EV.green: 'background.default', color: presence===s.key? '#fff': 'text.primary', fontSize: { xs: '12px', sm: '13px' }, height: { xs: 28, sm: 32 }, '&:hover':{ bgcolor: presence===s.key? '#02b37b': 'action.hover' } }} />
                   ))}
                 </div>
                 {presence==='custom' && (
-                  <TextField fullWidth size="small" label="Custom status" value={custom} onChange={(e)=>setCustom(e.target.value)} sx={{ mt: 1 }} />
+                  <TextField fullWidth size="small" label="Custom status" value={custom} onChange={(e)=>setCustom(e.target.value)} sx={{ mt: 1, '& .MuiInputBase-input': { fontSize: { xs: '13px', sm: '14px' } } }} />
                 )}
                 <FormControlLabel 
                   control={<Switch checked={share} onChange={(e)=>setShare(e.target.checked)} />} 
-                  label={<span style={{ color: muiTheme.palette.text.primary }}>Share my status across modules</span>} 
+                  label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Share my status across modules</span>} 
                   sx={{ mt: 1 }} 
                 />
               </Box>
@@ -138,42 +140,55 @@ export default function ProfileSelfPresence({ onBack, initial, location, onNavig
 
           {/* Settings links - Only show for own profile */}
           {!isViewingContact && (
-            <Box className="px-4 mt-4">
+            <Box sx={{ px: { xs: 2, sm: 3, md: 4 }, mt: { xs: 3, sm: 4 } }}>
               <Box className="rounded-2xl" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
                 <List sx={{ py: 0 }}>
                   <ListItem 
                     button 
                     onClick={() => onNavigate?.('/settings')}
-                    sx={{ borderRadius: '8px 8px 0 0' }}
+                    sx={{ borderRadius: '8px 8px 0 0', px: { xs: 2, sm: 3 }, py: { xs: 1, sm: 1.25 } }}
                   >
                     <ListItemIcon>
-                      <SettingsRoundedIcon sx={{ color: 'text.primary' }} />
+                      <SettingsRoundedIcon sx={{ color: 'text.primary', fontSize: { xs: 20, sm: 24 } }} />
                     </ListItemIcon>
-                    <ListItemText primary="Settings" secondary="Language, Accessibility & Storage" sx={{ color: 'text.primary' }} />
-                    <ChevronRightRoundedIcon sx={{ color: 'text.secondary' }} />
+                    <ListItemText 
+                      primary={<span style={{ fontSize: '15px' }}>Settings</span>} 
+                      secondary={<span style={{ fontSize: '13px' }}>Language, Accessibility & Storage</span>} 
+                      sx={{ color: 'text.primary' }} 
+                    />
+                    <ChevronRightRoundedIcon sx={{ color: 'text.secondary', fontSize: { xs: 18, sm: 20 } }} />
                   </ListItem>
                   <Divider />
                   <ListItem 
                     button 
                     onClick={() => onNavigate?.('/security')}
+                    sx={{ px: { xs: 2, sm: 3 }, py: { xs: 1, sm: 1.25 } }}
                   >
                     <ListItemIcon>
-                      <SecurityRoundedIcon sx={{ color: 'text.primary' }} />
+                      <SecurityRoundedIcon sx={{ color: 'text.primary', fontSize: { xs: 20, sm: 24 } }} />
                     </ListItemIcon>
-                    <ListItemText primary="Security" secondary="Sessions & 2FA" sx={{ color: 'text.primary' }} />
-                    <ChevronRightRoundedIcon sx={{ color: 'text.secondary' }} />
+                    <ListItemText 
+                      primary={<span style={{ fontSize: '15px' }}>Security</span>} 
+                      secondary={<span style={{ fontSize: '13px' }}>Sessions & 2FA</span>} 
+                      sx={{ color: 'text.primary' }} 
+                    />
+                    <ChevronRightRoundedIcon sx={{ color: 'text.secondary', fontSize: { xs: 18, sm: 20 } }} />
                   </ListItem>
                   <Divider />
                   <ListItem 
                     button 
                     onClick={() => onNavigate?.('/theme')}
-                    sx={{ borderRadius: '0 0 8px 8px' }}
+                    sx={{ borderRadius: '0 0 8px 8px', px: { xs: 2, sm: 3 }, py: { xs: 1, sm: 1.25 } }}
                   >
                     <ListItemIcon>
-                      <BrushRoundedIcon sx={{ color: 'text.primary' }} />
+                      <BrushRoundedIcon sx={{ color: 'text.primary', fontSize: { xs: 20, sm: 24 } }} />
                     </ListItemIcon>
-                    <ListItemText primary="Theme" secondary="Light · Dark · System" sx={{ color: 'text.primary' }} />
-                    <ChevronRightRoundedIcon sx={{ color: 'text.secondary' }} />
+                    <ListItemText 
+                      primary={<span style={{ fontSize: '15px' }}>Theme</span>} 
+                      secondary={<span style={{ fontSize: '13px' }}>Light · Dark · System</span>} 
+                      sx={{ color: 'text.primary' }} 
+                    />
+                    <ChevronRightRoundedIcon sx={{ color: 'text.secondary', fontSize: { xs: 18, sm: 20 } }} />
                   </ListItem>
                 </List>
               </Box>
@@ -183,10 +198,10 @@ export default function ProfileSelfPresence({ onBack, initial, location, onNavig
 
         {/* Footer */}
         {!isViewingContact && (
-          <Box className="px-4 pb-4 pt-2 border-t" sx={{ borderColor: muiTheme.palette.divider }}>
-            <div className="grid grid-cols-2 gap-2">
-              <Button variant="outlined" sx={{ textTransform:'none' }}>Cancel</Button>
-              <Button onClick={save} variant="contained" sx={{ textTransform:'none' }}>Save</Button>
+          <Box sx={{ px: { xs: 2, sm: 3, md: 4 }, pb: { xs: 2, sm: 3, md: 4 }, pt: 2, borderTop: `1px solid ${muiTheme.palette.divider}` }}>
+            <div className="grid grid-cols-2" style={{ gap: '8px' }}>
+              <Button variant="outlined" sx={{ textTransform:'none', fontSize: { xs: '13px', sm: '14px' }, py: { xs: 0.75, sm: 1 } }}>Cancel</Button>
+              <Button onClick={save} variant="contained" sx={{ textTransform:'none', fontSize: { xs: '13px', sm: '14px' }, py: { xs: 0.75, sm: 1 } }}>Save</Button>
             </div>
           </Box>
         )}

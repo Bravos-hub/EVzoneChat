@@ -69,77 +69,102 @@ export default function LTASettings({ onBack, onNavigate }) {
 
       <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.default' }}>
         <AppBar elevation={0} position="static" sx={{ bgcolor: 'background.paper', color: 'text.primary', borderBottom:`1px solid ${muiTheme.palette.divider}` }}>
-          <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary' }}><ArrowBackRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>Language, Accessibility & Storage</Typography>
+          <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary', padding: { xs: '6px', sm: '8px' } }}>
+              <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+            </IconButton>
+            <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 }, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Language, Accessibility & Storage</Typography>
           </Toolbar>
         </AppBar>
 
         <Tabs value={tab} onChange={(e,v)=>setTab(v)} textColor="inherit" TabIndicatorProps={{ style:{ background: EV.green } }} sx={{ bgcolor: 'background.paper', borderBottom: `1px solid ${muiTheme.palette.divider}` }}>
-          <Tab label="Language" sx={{ color: 'text.primary' }}/>
-          <Tab label="Accessibility" sx={{ color: 'text.primary' }}/>
-          <Tab label="Storage" sx={{ color: 'text.primary' }}/>
+          <Tab label="Language" sx={{ color: 'text.primary', fontSize: { xs: '13px', sm: '14px' }, minHeight: { xs: 44, sm: 48 } }}/>
+          <Tab label="Accessibility" sx={{ color: 'text.primary', fontSize: { xs: '13px', sm: '14px' }, minHeight: { xs: 44, sm: 48 } }}/>
+          <Tab label="Storage" sx={{ color: 'text.primary', fontSize: { xs: '13px', sm: '14px' }, minHeight: { xs: 44, sm: 48 } }}/>
         </Tabs>
 
-        <Box className="flex-1 p-3 space-y-3 no-scrollbar" sx={{ overflowY:'auto' }}>
+        <Box sx={{ p: { xs: 2, sm: 3 }, flex: 1, overflowY: 'auto' }} className="no-scrollbar">
           {/* Settings navigation links */}
-          <Box className="rounded-2xl" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper', mb: 2 }}>
+          <Box className="rounded-2xl" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper', mb: { xs: 2, sm: 2 } }}>
             <List sx={{ py: 0 }}>
               <ListItem 
                 button 
                 onClick={() => onNavigate?.('/theme')}
-                sx={{ borderRadius: '8px 8px 0 0' }}
+                sx={{ borderRadius: '8px 8px 0 0', px: { xs: 2, sm: 3 }, py: { xs: 1, sm: 1.25 } }}
               >
                 <ListItemIcon>
-                  <BrushRoundedIcon sx={{ color: 'text.primary' }} />
+                  <BrushRoundedIcon sx={{ color: 'text.primary', fontSize: { xs: 20, sm: 24 } }} />
                 </ListItemIcon>
-                <ListItemText primary="Theme" secondary="Light · Dark · System" sx={{ color: 'text.primary' }} />
-                <ChevronRightRoundedIcon sx={{ color: 'text.secondary' }} />
+                <ListItemText 
+                  primary={<span style={{ fontSize: '15px' }}>Theme</span>} 
+                  secondary={<span style={{ fontSize: '13px' }}>Light · Dark · System</span>} 
+                  sx={{ color: 'text.primary' }} 
+                />
+                <ChevronRightRoundedIcon sx={{ color: 'text.secondary', fontSize: { xs: 18, sm: 20 } }} />
               </ListItem>
               <Divider />
               <ListItem 
                 button 
                 onClick={() => onNavigate?.('/security')}
+                sx={{ px: { xs: 2, sm: 3 }, py: { xs: 1, sm: 1.25 } }}
               >
                 <ListItemIcon>
-                  <SecurityRoundedIcon sx={{ color: 'text.primary' }} />
+                  <SecurityRoundedIcon sx={{ color: 'text.primary', fontSize: { xs: 20, sm: 24 } }} />
                 </ListItemIcon>
-                <ListItemText primary="Security" secondary="Sessions & 2FA" sx={{ color: 'text.primary' }} />
-                <ChevronRightRoundedIcon sx={{ color: 'text.secondary' }} />
+                <ListItemText 
+                  primary={<span style={{ fontSize: '15px' }}>Security</span>} 
+                  secondary={<span style={{ fontSize: '13px' }}>Sessions & 2FA</span>} 
+                  sx={{ color: 'text.primary' }} 
+                />
+                <ChevronRightRoundedIcon sx={{ color: 'text.secondary', fontSize: { xs: 18, sm: 20 } }} />
               </ListItem>
               <Divider />
               <ListItem 
                 button 
                 onClick={() => onNavigate?.('/profile')}
+                sx={{ px: { xs: 2, sm: 3 }, py: { xs: 1, sm: 1.25 } }}
               >
                 <ListItemIcon>
-                  <PersonRoundedIcon sx={{ color: 'text.primary' }} />
+                  <PersonRoundedIcon sx={{ color: 'text.primary', fontSize: { xs: 20, sm: 24 } }} />
                 </ListItemIcon>
-                <ListItemText primary="Profile" secondary="Edit your profile" sx={{ color: 'text.primary' }} />
-                <ChevronRightRoundedIcon sx={{ color: 'text.secondary' }} />
+                <ListItemText 
+                  primary={<span style={{ fontSize: '15px' }}>Profile</span>} 
+                  secondary={<span style={{ fontSize: '13px' }}>Edit your profile</span>} 
+                  sx={{ color: 'text.primary' }} 
+                />
+                <ChevronRightRoundedIcon sx={{ color: 'text.secondary', fontSize: { xs: 18, sm: 20 } }} />
               </ListItem>
               <Divider />
               <ListItem 
                 button 
                 onClick={() => onNavigate?.('/meetings/book')}
+                sx={{ px: { xs: 2, sm: 3 }, py: { xs: 1, sm: 1.25 } }}
               >
                 <ListItemIcon>
-                  <EventAvailableRoundedIcon sx={{ color: 'text.primary' }} />
+                  <EventAvailableRoundedIcon sx={{ color: 'text.primary', fontSize: { xs: 20, sm: 24 } }} />
                 </ListItemIcon>
-                <ListItemText primary="Schedule meeting" secondary="Create a new meeting" sx={{ color: 'text.primary' }} />
-                <ChevronRightRoundedIcon sx={{ color: 'text.secondary' }} />
+                <ListItemText 
+                  primary={<span style={{ fontSize: '15px' }}>Schedule meeting</span>} 
+                  secondary={<span style={{ fontSize: '13px' }}>Create a new meeting</span>} 
+                  sx={{ color: 'text.primary' }} 
+                />
+                <ChevronRightRoundedIcon sx={{ color: 'text.secondary', fontSize: { xs: 18, sm: 20 } }} />
               </ListItem>
               <Divider />
               <ListItem 
                 button 
                 onClick={() => onNavigate?.('/meetings')}
-                sx={{ borderRadius: '0 0 8px 8px' }}
+                sx={{ borderRadius: '0 0 8px 8px', px: { xs: 2, sm: 3 }, py: { xs: 1, sm: 1.25 } }}
               >
                 <ListItemIcon>
-                  <EventAvailableRoundedIcon sx={{ color: 'text.primary', opacity: 0.7 }} />
+                  <EventAvailableRoundedIcon sx={{ color: 'text.primary', opacity: 0.7, fontSize: { xs: 20, sm: 24 } }} />
                 </ListItemIcon>
-                <ListItemText primary="My meetings" secondary="View all meetings" sx={{ color: 'text.primary' }} />
-                <ChevronRightRoundedIcon sx={{ color: 'text.secondary' }} />
+                <ListItemText 
+                  primary={<span style={{ fontSize: '15px' }}>My meetings</span>} 
+                  secondary={<span style={{ fontSize: '13px' }}>View all meetings</span>} 
+                  sx={{ color: 'text.primary' }} 
+                />
+                <ChevronRightRoundedIcon sx={{ color: 'text.secondary', fontSize: { xs: 18, sm: 20 } }} />
               </ListItem>
             </List>
           </Box>
@@ -147,31 +172,31 @@ export default function LTASettings({ onBack, onNavigate }) {
           {tab===0 && (
             <>
               <FormControl fullWidth size="small">
-                <InputLabel>App language</InputLabel>
-                <Select label="App language" value={uiLang} onChange={(e)=>setUiLang(e.target.value)}>
-                  <MenuItem value="en">English</MenuItem>
-                  <MenuItem value="fr">Français</MenuItem>
-                  <MenuItem value="zh">中文</MenuItem>
-                  <MenuItem value="sw">Swahili</MenuItem>
+                <InputLabel sx={{ fontSize: { xs: '13px', sm: '14px' } }}>App language</InputLabel>
+                <Select label="App language" value={uiLang} onChange={(e)=>setUiLang(e.target.value)} sx={{ fontSize: { xs: '13px', sm: '14px' } }}>
+                  <MenuItem value="en" sx={{ fontSize: { xs: '13px', sm: '14px' } }}>English</MenuItem>
+                  <MenuItem value="fr" sx={{ fontSize: { xs: '13px', sm: '14px' } }}>Français</MenuItem>
+                  <MenuItem value="zh" sx={{ fontSize: { xs: '13px', sm: '14px' } }}>中文</MenuItem>
+                  <MenuItem value="sw" sx={{ fontSize: { xs: '13px', sm: '14px' } }}>Swahili</MenuItem>
                 </Select>
               </FormControl>
 
-              <TextField fullWidth size="small" label="Content languages (comma‑separated)" value={contentLangs.join(', ')} onChange={(e)=>setContentLangs(e.target.value.split(',').map(s=>s.trim()).filter(Boolean))} helperText="Used for suggestions and search results" />
+              <TextField fullWidth size="small" label="Content languages (comma‑separated)" value={contentLangs.join(', ')} onChange={(e)=>setContentLangs(e.target.value.split(',').map(s=>s.trim()).filter(Boolean))} helperText="Used for suggestions and search results" sx={{ '& .MuiInputBase-input': { fontSize: { xs: '13px', sm: '14px' } }, '& .MuiFormHelperText-root': { fontSize: { xs: '11px', sm: '12px' } } }} />
 
               <FormGroup>
-                <FormControlLabel control={<Switch checked={autoTranslate} onChange={(e)=>setAutoTranslate(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary }}>Auto‑translate incoming messages (when available)</span>} />
+                <FormControlLabel control={<Switch checked={autoTranslate} onChange={(e)=>setAutoTranslate(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Auto‑translate incoming messages (when available)</span>} />
               </FormGroup>
             </>
           )}
 
           {tab===1 && (
             <>
-              <div className="text-sm font-semibold" style={{ color: muiTheme.palette.text.primary }}>Text size</div>
-              <Slider value={fontScale} onChange={(e,v)=>setFontScale(v)} valueLabelDisplay="auto" min={80} max={140} marks={[{value:80,label:'80%'},{value:100,label:'100%'},{value:140,label:'140%'}]} />
+              <div className="font-semibold" style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Text size</div>
+              <Slider value={fontScale} onChange={(e,v)=>setFontScale(v)} valueLabelDisplay="auto" min={80} max={140} marks={[{value:80,label:'80%'},{value:100,label:'100%'},{value:140,label:'140%'}]} sx={{ mt: 1, mb: 2 }} />
               <FormGroup>
-                <FormControlLabel control={<Switch checked={highContrast} onChange={(e)=>setHighContrast(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary }}>High contrast mode</span>} />
-                <FormControlLabel control={<Switch checked={reduceMotion} onChange={(e)=>setReduceMotion(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary }}>Reduce motion/animations</span>} />
-                <FormControlLabel control={<Switch checked={captionsDefault} onChange={(e)=>setCaptionsDefault(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary }}>Captions on by default in meetings</span>} />
+                <FormControlLabel control={<Switch checked={highContrast} onChange={(e)=>setHighContrast(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>High contrast mode</span>} />
+                <FormControlLabel control={<Switch checked={reduceMotion} onChange={(e)=>setReduceMotion(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Reduce motion/animations</span>} />
+                <FormControlLabel control={<Switch checked={captionsDefault} onChange={(e)=>setCaptionsDefault(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Captions on by default in meetings</span>} />
               </FormGroup>
             </>
           )}
@@ -179,24 +204,24 @@ export default function LTASettings({ onBack, onNavigate }) {
           {tab===2 && (
             <>
               <FormGroup>
-                <FormControlLabel control={<Switch checked={autoDownload} onChange={(e)=>setAutoDownload(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary }}>Auto‑download media</span>} />
-                <FormControlLabel control={<Switch checked={wifiOnly} onChange={(e)=>setWifiOnly(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary }}>Wi‑Fi only for downloads</span>} />
+                <FormControlLabel control={<Switch checked={autoDownload} onChange={(e)=>setAutoDownload(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Auto‑download media</span>} />
+                <FormControlLabel control={<Switch checked={wifiOnly} onChange={(e)=>setWifiOnly(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Wi‑Fi only for downloads</span>} />
               </FormGroup>
-              <Divider sx={{ borderColor: muiTheme.palette.divider }} />
-              <div className="text-sm font-semibold" style={{ color: muiTheme.palette.text.primary }}>Cache</div>
-              <div className="text-sm" style={{ color: muiTheme.palette.text.primary }}>App cache: <strong>{cacheSize} MB</strong></div>
-              <div className="grid grid-cols-2 gap-2 mt-2">
-                <Button variant="outlined" sx={{ textTransform:'none' }} onClick={()=>setCacheSize(cacheSize + 50)}>Simulate +50MB</Button>
-                <Button variant="contained" sx={{ textTransform:'none' }} onClick={clearCache}>Clear cache</Button>
+              <Divider sx={{ borderColor: muiTheme.palette.divider, my: { xs: 2, sm: 3 } }} />
+              <div className="font-semibold" style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Cache</div>
+              <div style={{ color: muiTheme.palette.text.primary, fontSize: '13px', marginTop: '4px' }}>App cache: <strong>{cacheSize} MB</strong></div>
+              <div className="grid grid-cols-2 mt-2" style={{ gap: '8px' }}>
+                <Button variant="outlined" sx={{ textTransform:'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 } }} onClick={()=>setCacheSize(cacheSize + 50)}>Simulate +50MB</Button>
+                <Button variant="contained" sx={{ textTransform:'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 } }} onClick={clearCache}>Clear cache</Button>
               </div>
             </>
           )}
         </Box>
 
-        <Box className="px-3 pb-3">
-          <div className="grid grid-cols-2 gap-2">
-            <Button variant="outlined" sx={{ textTransform:'none' }}>Cancel</Button>
-            <Button onClick={save} variant="contained" sx={{ textTransform:'none' }}>Save</Button>
+        <Box sx={{ px: { xs: 2, sm: 3 }, pb: { xs: 2, sm: 3 } }}>
+          <div className="grid grid-cols-2" style={{ gap: '8px' }}>
+            <Button variant="outlined" sx={{ textTransform:'none', fontSize: { xs: '13px', sm: '14px' }, py: { xs: 0.75, sm: 1 } }}>Cancel</Button>
+            <Button onClick={save} variant="contained" sx={{ textTransform:'none', fontSize: { xs: '13px', sm: '14px' }, py: { xs: 0.75, sm: 1 } }}>Save</Button>
           </div>
         </Box>
       </Box>

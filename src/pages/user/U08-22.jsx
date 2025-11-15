@@ -65,13 +65,15 @@ export default function GroupChannelCreate({ onBack, onCreated }) {
 
       <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.paper' }}>
         <AppBar elevation={0} position="static" sx={{ bgcolor:'background.paper', color:'text.primary', borderBottom:`1px solid ${muiTheme.palette.divider}` }}>
-          <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary' }}><ArrowBackRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>Create group/channel</Typography>
+          <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary', padding: { xs: '6px', sm: '8px' } }}>
+              <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+            </IconButton>
+            <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 } }}>Create group/channel</Typography>
           </Toolbar>
         </AppBar>
 
-        <Box className="p-3 space-y-3 flex-1 no-scrollbar" sx={{ overflowY:'auto' }}>
+        <Box sx={{ p: { xs: 2, sm: 3 }, '& > * + *': { mt: { xs: 2, sm: 3 } }, flex: 1, overflowY: 'auto' }} className="no-scrollbar">
           <TextField 
             fullWidth 
             label="Name" 
@@ -81,6 +83,7 @@ export default function GroupChannelCreate({ onBack, onCreated }) {
             sx={{
               '& .MuiInputBase-input': {
                 color: 'text.primary',
+                fontSize: { xs: '14px', sm: '16px' },
               },
             }}
           />
@@ -95,22 +98,23 @@ export default function GroupChannelCreate({ onBack, onCreated }) {
             sx={{
               '& .MuiInputBase-input': {
                 color: 'text.primary',
+                fontSize: { xs: '14px', sm: '16px' },
               },
             }}
           />
 
           {/* module */}
           <FormControl size="small" fullWidth>
-            <InputLabel>Module</InputLabel>
-            <Select label="Module" value={module} onChange={(e)=>setModule(e.target.value)}>
-              {MODULES.map(m => (<MenuItem key={m} value={m}>{m}</MenuItem>))}
+            <InputLabel sx={{ fontSize: { xs: '13px', sm: '14px' } }}>Module</InputLabel>
+            <Select label="Module" value={module} onChange={(e)=>setModule(e.target.value)} sx={{ fontSize: { xs: '13px', sm: '14px' } }}>
+              {MODULES.map(m => (<MenuItem key={m} value={m} sx={{ fontSize: { xs: '13px', sm: '14px' } }}>{m}</MenuItem>))}
             </Select>
           </FormControl>
 
           {/* type */}
           <Box>
-            <div className="text-sm font-semibold mb-1" style={{ color: muiTheme.palette.text.primary }}>Type</div>
-            <div className="flex gap-2 flex-wrap">
+            <div className="font-semibold mb-1" style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Type</div>
+            <div className="flex flex-wrap" style={{ gap: '8px' }}>
               {['Open','Private','Announcement'].map(t => (
                 <Chip 
                   key={t} 
@@ -119,6 +123,8 @@ export default function GroupChannelCreate({ onBack, onCreated }) {
                   sx={{ 
                     bgcolor: type===t?EV.green:'background.default', 
                     color: type===t?'#fff':'text.primary', 
+                    fontSize: { xs: '12px', sm: '13px' },
+                    height: { xs: 28, sm: 32 },
                     '&:hover':{ bgcolor: type===t?'#02b37b':'action.hover' } 
                   }} 
                 />
@@ -128,8 +134,8 @@ export default function GroupChannelCreate({ onBack, onCreated }) {
 
           {/* posting mode */}
           <Box>
-            <div className="text-sm font-semibold mb-1" style={{ color: muiTheme.palette.text.primary }}>Posting mode</div>
-            <div className="flex gap-2 flex-wrap">
+            <div className="font-semibold mb-1" style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Posting mode</div>
+            <div className="flex flex-wrap" style={{ gap: '8px' }}>
               {['Auto-approve','Pre-approval','Admin-only'].map(pm => (
                 <Chip 
                   key={pm} 
@@ -139,6 +145,8 @@ export default function GroupChannelCreate({ onBack, onCreated }) {
                   sx={{ 
                     bgcolor: posting===pm?EV.green:'background.default', 
                     color: posting===pm?'#fff':'text.primary', 
+                    fontSize: { xs: '12px', sm: '13px' },
+                    height: { xs: 28, sm: 32 },
                     opacity: type==='Announcement' && pm!=='Admin-only'?0.5:1, 
                     '&:hover':{ bgcolor: posting===pm?'#02b37b':'action.hover' } 
                   }} 
@@ -146,41 +154,44 @@ export default function GroupChannelCreate({ onBack, onCreated }) {
               ))}
             </div>
             {type==='Announcement' && (
-              <div className="text-xs mt-1 flex items-center gap-1" style={{ color: muiTheme.palette.text.secondary }}><InfoRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} /> Announcement channels require Admin-only posting.</div>
+              <div className="mt-1 flex items-center" style={{ gap: '4px', color: muiTheme.palette.text.secondary, fontSize: '12px' }}>
+                <InfoRoundedIcon sx={{ fontSize: { xs: 14, sm: 16 }, color: 'text.secondary' }} /> 
+                <span>Announcement channels require Admin-only posting.</span>
+              </div>
             )}
           </Box>
 
           <Divider />
 
           {/* options */}
-          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper' }}>
-            <div className="text-sm font-semibold mb-1" style={{ color: muiTheme.palette.text.primary }}>Options</div>
+          <Box className="rounded-2xl" sx={{ border:`1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper', p: { xs: 2, sm: 3 } }}>
+            <div className="font-semibold mb-1" style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Options</div>
             <FormGroup>
               <FormControlLabel 
                 control={<Switch checked={allowMedia} onChange={(e)=>setAllowMedia(e.target.checked)} />} 
-                label={<span style={{ color: muiTheme.palette.text.primary }}>Allow media & files</span>} 
+                label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Allow media & files</span>} 
               />
               <FormControlLabel 
                 control={<Switch checked={allowMentions} onChange={(e)=>setAllowMentions(e.target.checked)} />} 
-                label={<span style={{ color: muiTheme.palette.text.primary }}>Allow @mentions</span>} 
+                label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Allow @mentions</span>} 
               />
               <FormControlLabel 
                 control={<Switch checked={joinApproval} onChange={(e)=>setJoinApproval(e.target.checked)} />} 
-                label={<span style={{ color: muiTheme.palette.text.primary }}>Require approval to join</span>} 
+                label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Require approval to join</span>} 
               />
               <FormControlLabel 
                 control={<Switch checked={listDirectory} onChange={(e)=>setListDirectory(e.target.checked)} />} 
-                label={<span style={{ color: muiTheme.palette.text.primary }}>List in directory (discoverable)</span>} 
+                label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>List in directory (discoverable)</span>} 
               />
             </FormGroup>
           </Box>
         </Box>
 
         {/* footer */}
-        <Box className="px-3 pb-3">
-            <div className="grid grid-cols-2 gap-2">
-            <Button variant="outlined" sx={{ textTransform:'none' }} onClick={()=>{ setName(''); setDesc(''); setType('Open'); setPosting('Auto-approve'); setAllowMedia(true); setAllowMentions(true); setJoinApproval(false); setListDirectory(true); }}>Reset</Button>
-            <Button disabled={disabled} variant="contained" sx={{ textTransform:'none' }} onClick={save}>Create</Button>
+        <Box sx={{ px: { xs: 2, sm: 3 }, pb: { xs: 2, sm: 3 } }}>
+            <div className="grid grid-cols-2" style={{ gap: '8px' }}>
+            <Button variant="outlined" sx={{ textTransform:'none', fontSize: { xs: '13px', sm: '14px' }, py: { xs: 0.75, sm: 1 } }} onClick={()=>{ setName(''); setDesc(''); setType('Open'); setPosting('Auto-approve'); setAllowMedia(true); setAllowMentions(true); setJoinApproval(false); setListDirectory(true); }}>Reset</Button>
+            <Button disabled={disabled} variant="contained" sx={{ textTransform:'none', fontSize: { xs: '13px', sm: '14px' }, py: { xs: 0.75, sm: 1 } }} onClick={save}>Create</Button>
           </div>
         </Box>
       </Box>

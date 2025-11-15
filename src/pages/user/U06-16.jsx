@@ -45,9 +45,11 @@ export default function InCallReactions({ onBack, remote = { name:'Group Call' }
       <Box className="w-full h-full mx-auto bg-black text-white flex flex-col relative">
         {/* Header */}
         <AppBar elevation={0} position="static" sx={{ bgcolor:'rgba(0,0,0,0.55)', color:'#fff' }}>
-          <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back" sx={{ color:'#fff' }}><ArrowBackRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold">Reactions</Typography>
+          <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ color:'#fff', padding: { xs: '6px', sm: '8px' } }}>
+              <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+            </IconButton>
+            <Typography variant="h6" className="font-bold" sx={{ fontSize: { xs: '16px', sm: '18px' } }}>Reactions</Typography>
           </Toolbar>
         </AppBar>
 
@@ -64,16 +66,16 @@ export default function InCallReactions({ onBack, remote = { name:'Group Call' }
 
         {/* Bottom bar */}
         <Box className="fixed inset-x-0 bottom-0 z-10 flex justify-center" sx={{ pb: 'env(safe-area-inset-bottom)' }}>
-          <Box className="w-full mx-auto px-3 pb-3">
-            <div className="bg-white/10 rounded-2xl px-3 py-2 backdrop-blur text-white">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
+          <Box className="w-full mx-auto" sx={{ px: { xs: 2, sm: 3 }, pb: { xs: 2, sm: 3 } }}>
+            <div className="bg-white/10 rounded-2xl backdrop-blur text-white" style={{ padding: '8px 12px' }}>
+              <div className="flex items-center justify-between" style={{ gap: '8px', flexWrap: 'wrap' }}>
+                <div className="flex items-center" style={{ gap: '8px', flexWrap: 'wrap' }}>
                   {emojis.map(em => (
-                    <Button key={em} onClick={()=>send(em)} variant="outlined" sx={{ minWidth: 44, borderColor: EV.orange, color: '#fff', '&:hover':{ borderColor: '#e06f00', bgcolor:'rgba(0,0,0,0.1)' } }}>{em}</Button>
+                    <Button key={em} onClick={()=>send(em)} variant="outlined" sx={{ minWidth: { xs: 40, sm: 44 }, borderColor: EV.orange, color: '#fff', fontSize: { xs: '18px', sm: '20px' }, padding: { xs: '4px 8px', sm: '6px 12px' }, '&:hover':{ borderColor: '#e06f00', bgcolor:'rgba(0,0,0,0.1)' } }}>{em}</Button>
                   ))}
                 </div>
-                <Button onClick={toggleRaise} startIcon={<PanToolAltRoundedIcon/>} variant={raised? 'contained':'outlined'}
-                        sx={{ bgcolor: raised? EV.orange: 'transparent', color:'#fff', borderColor: EV.orange, textTransform:'none', '&:hover':{ bgcolor: raised? '#e06f00':'rgba(0,0,0,0.1)' } }}>
+                <Button onClick={toggleRaise} startIcon={<PanToolAltRoundedIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />} variant={raised? 'contained':'outlined'}
+                        sx={{ bgcolor: raised? EV.orange: 'transparent', color:'#fff', borderColor: EV.orange, textTransform:'none', fontSize: { xs: '12px', sm: '14px' }, py: { xs: 0.5, sm: 0.75 }, '&:hover':{ bgcolor: raised? '#e06f00':'rgba(0,0,0,0.1)' } }}>
                   {raised? 'Lower hand' : 'Raise hand'}
                 </Button>
               </div>

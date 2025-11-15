@@ -49,16 +49,20 @@ export default function GroupCallParticipants({ onBack }) {
 
       <Box className="w-full h-full max-w-sm mx-auto bg-black flex flex-col">
         <AppBar elevation={0} position="static" sx={{ bgcolor:'rgba(0,0,0,0.55)', color:'#fff' }}>
-          <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back" sx={{ color:'#fff' }}><ArrowBackRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold">Group Call</Typography>
+          <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ color:'#fff', padding: { xs: '6px', sm: '8px' } }}>
+              <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+            </IconButton>
+            <Typography variant="h6" className="font-bold" sx={{ fontSize: { xs: '16px', sm: '18px' } }}>Group Call</Typography>
             <Box sx={{ flexGrow:1 }} />
-            <IconButton aria-label="Participants" onClick={()=>setOpen(true)} sx={{ color:'#fff' }}><PeopleAltRoundedIcon /></IconButton>
+            <IconButton aria-label="Participants" onClick={()=>setOpen(true)} sx={{ color:'#fff', padding: { xs: '6px', sm: '8px' } }}>
+              <PeopleAltRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+            </IconButton>
           </Toolbar>
         </AppBar>
 
         {/* grid area */}
-        <Box className="flex-1 grid grid-cols-2 gap-2 p-2">
+        <Box className="flex-1 grid grid-cols-2" sx={{ gap: { xs: 1, sm: 1.5, md: 2 }, p: { xs: 1, sm: 1.5, md: 2 } }}>
           {people.map((p)=> (
             <div key={p.id} className={`relative rounded-xl overflow-hidden bg-black border ${p.active? 'ring-2': ''}`} style={{ borderColor:'rgba(255,255,255,0.15)', boxShadow: p.active? `0 0 0 2px ${accentColor}`: undefined }}>
               <img src={`https://images.unsplash.com/photo-1526178611301-1e3f6dc1f1ae?q=80&w=600&auto=format&fit=crop`} alt="feed" className="w-full h-full object-cover" />
@@ -67,12 +71,12 @@ export default function GroupCallParticipants({ onBack }) {
                   <Avatar src={p.avatar} sx={{ width: 56, height: 56 }} />
                 </div>
               )}
-              <div className="absolute left-2 bottom-2 right-2 flex items-center gap-1 text-white">
-                <Avatar src={p.avatar} sx={{ width: 20, height: 20 }} />
-                <span className="text-[11px] truncate">{p.name}</span>
-                {p.muted && <MicOffRoundedIcon sx={{ fontSize: 14 }} />}
-                {!p.video && <VideocamOffRoundedIcon sx={{ fontSize: 14 }} />}
-                {p.role!=='member' && <Chip size="small" label={p.role} sx={{ height: 18, bgcolor: accentColor, color:'#fff', ml: 'auto' }} />}
+              <div className="absolute left-2 bottom-2 right-2 flex items-center text-white" style={{ gap: '4px' }}>
+                <Avatar src={p.avatar} sx={{ width: { xs: 18, sm: 20 }, height: { xs: 18, sm: 20 } }} />
+                <span className="truncate" style={{ fontSize: '11px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{p.name}</span>
+                {p.muted && <MicOffRoundedIcon sx={{ fontSize: { xs: 12, sm: 14 } }} />}
+                {!p.video && <VideocamOffRoundedIcon sx={{ fontSize: { xs: 12, sm: 14 } }} />}
+                {p.role!=='member' && <Chip size="small" label={p.role} sx={{ height: { xs: 16, sm: 18 }, fontSize: { xs: '9px', sm: '10px' }, bgcolor: accentColor, color:'#fff', ml: 'auto' }} />}
               </div>
             </div>
           ))}
@@ -80,24 +84,27 @@ export default function GroupCallParticipants({ onBack }) {
 
         {/* participants drawer */}
         <Drawer anchor="bottom" open={open} onClose={()=>setOpen(false)} PaperProps={{ sx:{ borderTopLeftRadius:16, borderTopRightRadius:16 } }}>
-          <Box className="p-3">
+          <Box sx={{ p: { xs: 2, sm: 3 } }}>
             <div className="w-12 h-1 rounded-full mx-auto mb-2" style={{ background: EV.light }} />
             <div className="flex items-center justify-between mb-2">
-              <Typography variant="subtitle1" className="font-semibold">Participants</Typography>
-              <Chip size="small" label={people.length} sx={{ bgcolor: EV.light }} />
+              <Typography variant="subtitle1" className="font-semibold" sx={{ fontSize: { xs: '15px', sm: '16px' } }}>Participants</Typography>
+              <Chip size="small" label={people.length} sx={{ bgcolor: EV.light, fontSize: { xs: '11px', sm: '12px' }, height: { xs: 22, sm: 24 } }} />
             </div>
-            <List className="no-scrollbar" sx={{ maxHeight: 360, overflowY:'auto' }}>
+            <List className="no-scrollbar" sx={{ maxHeight: { xs: 300, sm: 360 }, overflowY:'auto' }}>
               {people.map((p)=> (
                 <ListItem key={p.id} secondaryAction={
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center" style={{ gap: '4px', flexWrap: 'wrap' }}>
                     {p.role==='member' && (
-                      <Button size="small" onClick={()=>promote(p.id)} startIcon={<StarRoundedIcon/>} variant="outlined" sx={{ borderColor: accentColor, color: accentColor, textTransform:'none' }}>Promote</Button>
+                      <Button size="small" onClick={()=>promote(p.id)} startIcon={<StarRoundedIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />} variant="outlined" sx={{ borderColor: accentColor, color: accentColor, textTransform:'none', fontSize: { xs: '11px', sm: '12px' }, py: { xs: 0.25, sm: 0.5 } }}>Promote</Button>
                     )}
-                    <Button size="small" onClick={()=>remove(p.id)} startIcon={<RemoveCircleOutlineRoundedIcon/>} variant="outlined" sx={{ borderColor: accentColor, color: accentColor, textTransform:'none' }}>Remove</Button>
+                    <Button size="small" onClick={()=>remove(p.id)} startIcon={<RemoveCircleOutlineRoundedIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />} variant="outlined" sx={{ borderColor: accentColor, color: accentColor, textTransform:'none', fontSize: { xs: '11px', sm: '12px' }, py: { xs: 0.25, sm: 0.5 } }}>Remove</Button>
                   </div>
-                }>
-                  <ListItemAvatar><Avatar src={p.avatar} /></ListItemAvatar>
-                  <ListItemText primary={<span className="font-semibold">{p.name}</span>} secondary={`${p.role}${p.muted?' • muted':''}${!p.video?' • video off':''}`} />
+                } sx={{ px: { xs: 2, sm: 3 }, py: { xs: 1, sm: 1.25 } }}>
+                  <ListItemAvatar><Avatar src={p.avatar} sx={{ width: { xs: 36, sm: 40 }, height: { xs: 36, sm: 40 } }} /></ListItemAvatar>
+                  <ListItemText 
+                    primary={<span className="font-semibold" style={{ fontSize: '14px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</span>} 
+                    secondary={<span style={{ fontSize: '12px' }}>{p.role}{p.muted?' • muted':''}{!p.video?' • video off':''}</span>} 
+                  />
                 </ListItem>
               ))}
             </List>

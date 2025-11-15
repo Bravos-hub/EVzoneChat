@@ -83,27 +83,31 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
 
       <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.paper' }}>
         <AppBar elevation={0} position="static" sx={{ bgcolor:'background.paper', color:'text.primary', borderBottom:`1px solid ${muiTheme.palette.divider}` }}>
-          <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary' }}><ArrowBackRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold ml-1" sx={{ color: 'text.primary' }}>Search</Typography>
+          <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary', padding: { xs: '6px', sm: '8px' } }}>
+              <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+            </IconButton>
+            <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 } }}>Search</Typography>
           </Toolbar>
         </AppBar>
 
-        <Tabs value={tab} onChange={(e,v)=>setTab(v)} textColor="inherit" TabIndicatorProps={{ style:{ background: EV.green } }}>
+        <Tabs value={tab} onChange={(e,v)=>setTab(v)} textColor="inherit" TabIndicatorProps={{ style:{ background: EV.green } }} sx={{ '& .MuiTab-root': { fontSize: { xs: '13px', sm: '14px' }, minHeight: { xs: 44, sm: 48 }, px: { xs: 1.5, sm: 2 } } }}>
           <Tab label="Global"/>
           <Tab label="In Thread"/>
         </Tabs>
 
         {/* Search input */}
-        <Box className="px-3 py-2">
+        <Box sx={{ px: { xs: 2, sm: 3 }, py: { xs: 1.5, sm: 2 } }}>
           <TextField
             fullWidth size="small" value={q} onChange={(e)=>setQ(e.target.value)} placeholder="Search people, channels, groups, messages"
             InputProps={{ 
-              startAdornment:(<InputAdornment position="start"><SearchRoundedIcon sx={{ color: 'text.secondary' }} /></InputAdornment>) 
+              startAdornment:(<InputAdornment position="start"><SearchRoundedIcon sx={{ color: 'text.secondary', fontSize: { xs: 18, sm: 20 } }} /></InputAdornment>) 
             }}
             sx={{
               '& .MuiInputBase-input': {
                 color: 'text.primary',
+                fontSize: { xs: '14px', sm: '15px' },
+                py: { xs: 1.25, sm: 1.5 }
               },
               '& .MuiInputBase-input::placeholder': {
                 color: 'text.secondary',
@@ -118,7 +122,9 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
           {tab === 0 && (
             <>
               {/* People */}
-              <div className="px-3 py-2 text-xs" style={{ color: muiTheme.palette.text.secondary }}>People</div>
+              <Box sx={{ px: { xs: 2, sm: 3 }, py: { xs: 1.5, sm: 2 } }}>
+                <Typography variant="caption" sx={{ fontSize: { xs: '10px', sm: '12px' }, color: 'text.secondary', textTransform: 'uppercase', fontWeight: 600 }}>People</Typography>
+              </Box>
               <List>
                 {globalResults.people.map((p, idx)=> (
                   <React.Fragment key={p.id}>
@@ -126,13 +132,16 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
                       button 
                       onClick={()=>onOpenResult?.({ type:'person', id:p.id })}
                       sx={{
+                        px: { xs: 2, sm: 3 },
+                        py: { xs: 1, sm: 1.25 },
                         '& .MuiListItemText-primary': {
                           color: 'text.primary',
+                          fontSize: { xs: '14px', sm: '15px' },
                         },
                       }}
                     >
-                      <ListItemAvatar><Avatar src={p.avatar} /></ListItemAvatar>
-                      <ListItemText primary={<span className="font-semibold">{highlight(p.name, q, muiTheme)}</span>} />
+                      <ListItemAvatar><Avatar src={p.avatar} sx={{ width: { xs: 36, sm: 40 }, height: { xs: 36, sm: 40 } }} /></ListItemAvatar>
+                      <ListItemText primary={<span className="font-semibold" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{highlight(p.name, q, muiTheme)}</span>} />
                     </ListItem>
                     {idx < globalResults.people.length - 1 && <Divider component="li" />}
                   </React.Fragment>
@@ -140,7 +149,9 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
               </List>
 
               {/* Channels */}
-              <div className="px-3 py-2 text-xs" style={{ color: muiTheme.palette.text.secondary }}>Channels</div>
+              <Box sx={{ px: { xs: 2, sm: 3 }, py: { xs: 1.5, sm: 2 } }}>
+                <Typography variant="caption" sx={{ fontSize: { xs: '10px', sm: '12px' }, color: 'text.secondary', textTransform: 'uppercase', fontWeight: 600 }}>Channels</Typography>
+              </Box>
               <List>
                 {globalResults.channels.map((c, idx)=> (
                   <React.Fragment key={c.id}>
@@ -148,13 +159,16 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
                       button 
                       onClick={()=>onOpenResult?.({ type:'channel', id:c.id })}
                       sx={{
+                        px: { xs: 2, sm: 3 },
+                        py: { xs: 1, sm: 1.25 },
                         '& .MuiListItemText-primary': {
                           color: 'text.primary',
+                          fontSize: { xs: '14px', sm: '15px' },
                         },
                       }}
                     >
-                      <ListItemAvatar><Avatar sx={{ bgcolor: 'background.default', color: 'text.primary' }}>#</Avatar></ListItemAvatar>
-                      <ListItemText primary={<span className="font-semibold">{highlight(c.name, q, muiTheme)}</span>} />
+                      <ListItemAvatar><Avatar sx={{ bgcolor: 'background.default', color: 'text.primary', width: { xs: 36, sm: 40 }, height: { xs: 36, sm: 40 } }}>#</Avatar></ListItemAvatar>
+                      <ListItemText primary={<span className="font-semibold" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{highlight(c.name, q, muiTheme)}</span>} />
                     </ListItem>
                     {idx < globalResults.channels.length - 1 && <Divider component="li" />}
                   </React.Fragment>
@@ -162,7 +176,9 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
               </List>
 
               {/* Groups */}
-              <div className="px-3 py-2 text-xs" style={{ color: muiTheme.palette.text.secondary }}>Groups</div>
+              <Box sx={{ px: { xs: 2, sm: 3 }, py: { xs: 1.5, sm: 2 } }}>
+                <Typography variant="caption" sx={{ fontSize: { xs: '10px', sm: '12px' }, color: 'text.secondary', textTransform: 'uppercase', fontWeight: 600 }}>Groups</Typography>
+              </Box>
               <List>
                 {globalResults.groups.map((g, idx)=> (
                   <React.Fragment key={g.id}>
@@ -170,18 +186,22 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
                       button 
                       onClick={()=>onOpenResult?.({ type:'group', id:g.id })}
                       sx={{
+                        px: { xs: 2, sm: 3 },
+                        py: { xs: 1, sm: 1.25 },
                         '& .MuiListItemText-primary': {
                           color: 'text.primary',
+                          fontSize: { xs: '14px', sm: '15px' },
                         },
                         '& .MuiListItemText-secondary': {
                           color: 'text.secondary',
+                          fontSize: { xs: '11px', sm: '12px' },
                         },
                       }}
                     >
-                      <ListItemAvatar><Avatar src={g.avatar} /></ListItemAvatar>
+                      <ListItemAvatar><Avatar src={g.avatar} sx={{ width: { xs: 36, sm: 40 }, height: { xs: 36, sm: 40 } }} /></ListItemAvatar>
                       <ListItemText 
-                        primary={<span className="font-semibold">{highlight(g.name, q, muiTheme)}</span>} 
-                        secondary={<span className="text-[12px]">{g.members} members</span>}
+                        primary={<span className="font-semibold" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{highlight(g.name, q, muiTheme)}</span>} 
+                        secondary={<span>{g.members} members</span>}
                       />
                     </ListItem>
                     {idx < globalResults.groups.length - 1 && <Divider component="li" />}
@@ -190,7 +210,9 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
               </List>
 
               {/* Messages */}
-              <div className="px-3 py-2 text-xs" style={{ color: muiTheme.palette.text.secondary }}>Messages</div>
+              <Box sx={{ px: { xs: 2, sm: 3 }, py: { xs: 1.5, sm: 2 } }}>
+                <Typography variant="caption" sx={{ fontSize: { xs: '10px', sm: '12px' }, color: 'text.secondary', textTransform: 'uppercase', fontWeight: 600 }}>Messages</Typography>
+              </Box>
               <List>
                 {globalResults.messages.map((m, idx)=> (
                   <React.Fragment key={m.id}>
@@ -198,17 +220,24 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
                       button 
                       onClick={()=>onOpenResult?.({ type:'message', id:m.id })}
                       sx={{
+                        px: { xs: 2, sm: 3 },
+                        py: { xs: 1, sm: 1.25 },
                         '& .MuiListItemText-primary': {
                           color: 'text.primary',
+                          fontSize: { xs: '14px', sm: '15px' },
                         },
                         '& .MuiListItemText-secondary': {
                           color: 'text.secondary',
+                          fontSize: { xs: '11px', sm: '12px' },
                         },
                       }}
                     >
-                      <ListItemAvatar><Avatar src={m.who.avatar} /></ListItemAvatar>
-                      <ListItemText primary={<span className="font-semibold">{highlight(m.who.name, q, muiTheme)}</span>} secondary={<span className="text-[12px]">{highlight(m.snippet, q, muiTheme)}</span>} />
-                      <span className="text-[11px] ml-2" style={{ color: muiTheme.palette.text.secondary }}>{m.time}</span>
+                      <ListItemAvatar><Avatar src={m.who.avatar} sx={{ width: { xs: 36, sm: 40 }, height: { xs: 36, sm: 40 } }} /></ListItemAvatar>
+                      <ListItemText 
+                        primary={<span className="font-semibold" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{highlight(m.who.name, q, muiTheme)}</span>} 
+                        secondary={<span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>{highlight(m.snippet, q, muiTheme)}</span>} 
+                      />
+                      <Typography variant="caption" sx={{ fontSize: { xs: '10px', sm: '11px' }, color: 'text.secondary', ml: { xs: 1, sm: 2 }, flexShrink: 0 }}>{m.time}</Typography>
                     </ListItem>
                     {idx < globalResults.messages.length - 1 && <Divider component="li" />}
                   </React.Fragment>
@@ -223,17 +252,24 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
                 <React.Fragment key={t.id}>
                   <ListItem
                     sx={{
+                      px: { xs: 2, sm: 3 },
+                      py: { xs: 1, sm: 1.25 },
                       '& .MuiListItemText-primary': {
                         color: 'text.primary',
+                        fontSize: { xs: '14px', sm: '15px' },
                       },
                       '& .MuiListItemText-secondary': {
                         color: 'text.secondary',
+                        fontSize: { xs: '11px', sm: '12px' },
                       },
                     }}
                   >
-                    <ListItemAvatar><Avatar src={t.who.avatar} /></ListItemAvatar>
-                    <ListItemText primary={<span className="font-semibold">{t.who.name}</span>} secondary={<span className="text-[12px]">{highlight(t.text, q, muiTheme)}</span>} />
-                    <span className="text-[11px] ml-2" style={{ color: muiTheme.palette.text.secondary }}>{t.time}</span>
+                    <ListItemAvatar><Avatar src={t.who.avatar} sx={{ width: { xs: 36, sm: 40 }, height: { xs: 36, sm: 40 } }} /></ListItemAvatar>
+                    <ListItemText 
+                      primary={<span className="font-semibold" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.who.name}</span>} 
+                      secondary={<span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>{highlight(t.text, q, muiTheme)}</span>} 
+                    />
+                    <Typography variant="caption" sx={{ fontSize: { xs: '10px', sm: '11px' }, color: 'text.secondary', ml: { xs: 1, sm: 2 }, flexShrink: 0 }}>{t.time}</Typography>
                   </ListItem>
                   {idx < threadResults.length - 1 && <Divider component="li" />}
                 </React.Fragment>
@@ -244,12 +280,12 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
 
         {/* quick filters */}
         {tab===0 && (
-          <Box className="px-3 pb-3 pt-2">
-            <div className="flex gap-2 flex-wrap">
+          <Box sx={{ px: { xs: 2, sm: 3 }, pb: { xs: 2, sm: 3 }, pt: { xs: 1.5, sm: 2 } }}>
+            <div className="flex gap-2 flex-wrap" style={{ gap: '8px' }}>
               {['people','channels','groups','messages'].map(k => (
-                <Chip key={k} label={`Filter: ${k}`} sx={{ border:`1px solid ${accentColor}`, color: accentColor }} variant="outlined" />
+                <Chip key={k} label={`Filter: ${k}`} sx={{ border:`1px solid ${accentColor}`, color: accentColor, fontSize: { xs: '11px', sm: '12px' }, height: { xs: 24, sm: 28 } }} variant="outlined" />
               ))}
-              <Button variant="contained" sx={{ bgcolor: accentColor, textTransform:'none', '&:hover':{ bgcolor: accentColor, opacity: 0.9 } }}>Apply</Button>
+              <Button variant="contained" sx={{ bgcolor: accentColor, textTransform:'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 }, '&:hover':{ bgcolor: accentColor, opacity: 0.9 } }}>Apply</Button>
             </div>
           </Box>
         )}

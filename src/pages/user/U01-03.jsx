@@ -113,18 +113,18 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
             boxShadow: 'none'
           }}
         >
-          <Toolbar className="!min-h-[56px] !px-3">
+          <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
             <IconButton 
               aria-label="Back" 
               onClick={onBack}
-              sx={{ color: '#fff', mr: 1 }}
+              sx={{ color: '#fff', mr: { xs: 0.75, sm: 1 }, padding: { xs: '6px', sm: '8px' } }}
             >
-              <ArrowBackRoundedIcon />
+              <ArrowBackRoundedIcon sx={{ fontSize: { xs: '20px', sm: '24px' } }} />
             </IconButton>
             <Typography 
               variant="h6" 
               sx={{ 
-                fontSize: '18px',
+                fontSize: { xs: '16px', sm: '18px' },
                 fontWeight: 700,
                 color: '#fff',
                 flexGrow: 1
@@ -135,7 +135,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
             <IconButton 
               aria-label="Notifications" 
               onClick={() => navigate('/dnd')}
-              sx={{ color: '#fff' }}
+              sx={{ color: '#fff', padding: { xs: '6px', sm: '8px' } }}
             >
               <Badge 
                 variant="dot" 
@@ -160,8 +160,8 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
           sx={{ 
             bgcolor: isDark ? '#2a2a2a' : '#4a4a4a',
             color: '#fff',
-            px: 2,
-            py: 1.5
+            px: { xs: 1.5, sm: 2 },
+            py: { xs: 1.25, sm: 1.5 }
           }}
         >
           <Typography 

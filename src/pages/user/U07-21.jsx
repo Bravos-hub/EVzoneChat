@@ -36,41 +36,45 @@ export default function CallSummary({ onBack, meta = { title:'Leslie Alexander',
 
       <Box className="w-full h-full mx-auto bg-white flex flex-col">
         <AppBar elevation={0} position="static" sx={{ bgcolor:'#fff', color:'#111', borderBottom:`1px solid ${EV.light}` }}>
-          <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back"><ArrowBackRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold ml-1">Call summary</Typography>
+          <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ padding: { xs: '6px', sm: '8px' } }}>
+              <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+            </IconButton>
+            <Typography variant="h6" className="font-bold" sx={{ fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 } }}>Call summary</Typography>
           </Toolbar>
         </AppBar>
 
-        <Box className="p-3 space-y-3 flex-1 no-scrollbar" sx={{ overflowY:'auto' }}>
+        <Box sx={{ p: { xs: 2, sm: 3 }, '& > * + *': { mt: { xs: 2, sm: 3 } }, flex: 1, overflowY: 'auto' }} className="no-scrollbar">
           {/* meta */}
-          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${EV.light}` }}>
-            <div className="font-semibold">{meta.title}</div>
-            <div className="text-sm text-gray-700">{meta.when} • {meta.type} • {meta.duration}</div>
-            <div className="mt-1"><Chip size="small" label={meta.outcome} sx={{ bgcolor: EV.green, color:'#fff' }} /></div>
+          <Box className="rounded-2xl" sx={{ border:`1px solid ${EV.light}`, p: { xs: 2, sm: 3 } }}>
+            <div className="font-semibold" style={{ fontSize: '15px' }}>{meta.title}</div>
+            <div style={{ fontSize: '13px', color: '#666', marginTop: '4px' }}>{meta.when} • {meta.type} • {meta.duration}</div>
+            <div style={{ marginTop: '8px' }}>
+              <Chip size="small" label={meta.outcome} sx={{ bgcolor: EV.green, color:'#fff', fontSize: { xs: '11px', sm: '12px' }, height: { xs: 22, sm: 24 } }} />
+            </div>
           </Box>
 
           {/* quality rating */}
-          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${EV.light}` }}>
-            <div className="font-semibold mb-1">Rate call quality</div>
-            <Rating value={rating} onChange={(e,val)=>setRating(val)} sx={{ color: EV.orange }} />
+          <Box className="rounded-2xl" sx={{ border:`1px solid ${EV.light}`, p: { xs: 2, sm: 3 } }}>
+            <div className="font-semibold mb-1" style={{ fontSize: '15px' }}>Rate call quality</div>
+            <Rating value={rating} onChange={(e,val)=>setRating(val)} sx={{ color: EV.orange, fontSize: { xs: '28px', sm: '32px' } }} />
           </Box>
 
           {/* note */}
-          <Box className="rounded-2xl p-3" sx={{ border:`1px solid ${EV.light}` }}>
-            <div className="font-semibold mb-1">Add a note</div>
-            <TextField fullWidth multiline minRows={3} value={note} onChange={(e)=>setNote(e.target.value)} placeholder="Notes, decisions, follow‑ups…" />
+          <Box className="rounded-2xl" sx={{ border:`1px solid ${EV.light}`, p: { xs: 2, sm: 3 } }}>
+            <div className="font-semibold mb-1" style={{ fontSize: '15px' }}>Add a note</div>
+            <TextField fullWidth multiline minRows={3} value={note} onChange={(e)=>setNote(e.target.value)} placeholder="Notes, decisions, follow‑ups…" sx={{ '& .MuiInputBase-input': { fontSize: { xs: '13px', sm: '14px' } } }} />
           </Box>
 
           {/* quick actions */}
-          <div className="grid grid-cols-2 gap-2">
-            <Button startIcon={<MessageRoundedIcon/>} onClick={()=>act('Opening chat')} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Message</Button>
-            <Button startIcon={<EventAvailableRoundedIcon/>} onClick={()=>act('Scheduling next meeting')} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Schedule next</Button>
-            <Button startIcon={<NoteAltRoundedIcon/>} onClick={()=>act('Saving note')} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>Save note</Button>
-            <Button startIcon={<BugReportRoundedIcon/>} onClick={()=>act('Reporting issue')} variant="contained" sx={{ bgcolor: '#e53935', textTransform:'none', '&:hover':{ bgcolor:'#c62828' } }}>Report issue</Button>
+          <div className="grid grid-cols-2" style={{ gap: '8px' }}>
+            <Button startIcon={<MessageRoundedIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />} onClick={()=>act('Opening chat')} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 } }}>Message</Button>
+            <Button startIcon={<EventAvailableRoundedIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />} onClick={()=>act('Scheduling next meeting')} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 } }}>Schedule next</Button>
+            <Button startIcon={<NoteAltRoundedIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />} onClick={()=>act('Saving note')} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 }, '&:hover':{ bgcolor:'#e06f00' } }}>Save note</Button>
+            <Button startIcon={<BugReportRoundedIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />} onClick={()=>act('Reporting issue')} variant="contained" sx={{ bgcolor: '#e53935', textTransform:'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 }, '&:hover':{ bgcolor:'#c62828' } }}>Report issue</Button>
           </div>
 
-          <Button fullWidth variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>View full meeting summary</Button>
+          <Button fullWidth variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', fontSize: { xs: '13px', sm: '14px' }, py: { xs: 0.75, sm: 1 }, '&:hover':{ bgcolor:'#e06f00' } }}>View full meeting summary</Button>
         </Box>
       </Box>
 

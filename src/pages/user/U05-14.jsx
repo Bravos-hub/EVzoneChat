@@ -58,9 +58,11 @@ export default function CaptionsRecording({ onBack }) {
 
       <Box className="w-full h-full mx-auto bg-black text-white flex flex-col">
         <AppBar elevation={0} position="static" sx={{ bgcolor:'rgba(0,0,0,0.55)', color:'#fff' }}>
-          <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={onBack} aria-label="Back" sx={{ color:'#fff' }}><ArrowBackRoundedIcon /></IconButton>
-            <Typography variant="h6" className="font-bold">Captions & Recording</Typography>
+          <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ color:'#fff', padding: { xs: '6px', sm: '8px' } }}>
+              <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+            </IconButton>
+            <Typography variant="h6" className="font-bold" sx={{ fontSize: { xs: '16px', sm: '18px' } }}>Captions & Recording</Typography>
           </Toolbar>
         </AppBar>
 
@@ -87,23 +89,23 @@ export default function CaptionsRecording({ onBack }) {
 
         {/* Controls */}
         <Box className="fixed inset-x-0 bottom-0 z-10 flex justify-center" sx={{ pb: 'env(safe-area-inset-bottom)' }}>
-          <Box className="w-full mx-auto px-3 pb-3">
-            <div className="bg-white/10 rounded-2xl px-3 py-2 backdrop-blur text-white">
-              <div className="grid grid-cols-2 gap-2">
+          <Box className="w-full mx-auto" sx={{ px: { xs: 2, sm: 3 }, pb: { xs: 2, sm: 3 } }}>
+            <div className="bg-white/10 rounded-2xl backdrop-blur text-white" style={{ padding: '8px 12px' }}>
+              <div className="grid grid-cols-2" style={{ gap: '8px' }}>
                 <FormControl size="small" fullWidth sx={{ '& .MuiOutlinedInput-root': { color:'#fff' }, '& .MuiSvgIcon-root': { color:'#fff' } }}>
-                  <InputLabel sx={{ color:'#fff' }}>Captions</InputLabel>
-                  <Select label="Captions" value={lang} onChange={(e)=>setLang(e.target.value)} disabled={!captions} sx={{ color:'#fff' }}>
-                    <MenuItem value="en">English</MenuItem>
-                    <MenuItem value="fr">Français</MenuItem>
-                    <MenuItem value="zh">中文</MenuItem>
-                    <MenuItem value="sw">Swahili</MenuItem>
+                  <InputLabel sx={{ color:'#fff', fontSize: { xs: '12px', sm: '14px' } }}>Captions</InputLabel>
+                  <Select label="Captions" value={lang} onChange={(e)=>setLang(e.target.value)} disabled={!captions} sx={{ color:'#fff', fontSize: { xs: '12px', sm: '14px' } }}>
+                    <MenuItem value="en" sx={{ fontSize: { xs: '12px', sm: '14px' } }}>English</MenuItem>
+                    <MenuItem value="fr" sx={{ fontSize: { xs: '12px', sm: '14px' } }}>Français</MenuItem>
+                    <MenuItem value="zh" sx={{ fontSize: { xs: '12px', sm: '14px' } }}>中文</MenuItem>
+                    <MenuItem value="sw" sx={{ fontSize: { xs: '12px', sm: '14px' } }}>Swahili</MenuItem>
                   </Select>
                 </FormControl>
-                <Button onClick={()=>setCaptions(c=>!c)} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>{captions? 'Hide captions' : 'Show captions'}</Button>
+                <Button onClick={()=>setCaptions(c=>!c)} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none', fontSize: { xs: '11px', sm: '12px' }, py: { xs: 0.5, sm: 0.75 } }}>{captions? 'Hide captions' : 'Show captions'}</Button>
                 {!recording ? (
-                  <Button onClick={startRecording} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>Start recording</Button>
+                  <Button onClick={startRecording} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', fontSize: { xs: '11px', sm: '12px' }, py: { xs: 0.5, sm: 0.75 }, '&:hover':{ bgcolor:'#e06f00' } }}>Start recording</Button>
                 ) : (
-                  <Button onClick={stopRecording} variant="contained" sx={{ bgcolor:'#e53935', textTransform:'none', '&:hover':{ bgcolor:'#c62828' } }}>Stop recording</Button>
+                  <Button onClick={stopRecording} variant="contained" sx={{ bgcolor:'#e53935', textTransform:'none', fontSize: { xs: '11px', sm: '12px' }, py: { xs: 0.5, sm: 0.75 }, '&:hover':{ bgcolor:'#c62828' } }}>Stop recording</Button>
                 )}
                 <div />
               </div>
@@ -113,15 +115,15 @@ export default function CaptionsRecording({ onBack }) {
       </Box>
 
       {/* Consent dialog */}
-      <Dialog open={consentOpen} onClose={()=>setConsentOpen(false)} fullWidth maxWidth="xs">
-        <DialogTitle>Recording consent</DialogTitle>
-        <DialogContent dividers>
-          <Alert severity="info" sx={{ mb: 1 }}>Starting a recording will notify all participants and show a banner in the meeting.</Alert>
-          <Typography variant="body2">By continuing, you confirm that you have obtained necessary permissions and agree to EVzone policies.</Typography>
+      <Dialog open={consentOpen} onClose={()=>setConsentOpen(false)} fullWidth maxWidth="xs" PaperProps={{ sx: { m: { xs: 2, sm: 3 } } }}>
+        <DialogTitle sx={{ fontSize: { xs: '16px', sm: '18px' }, px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 3 } }}>Recording consent</DialogTitle>
+        <DialogContent dividers sx={{ px: { xs: 2, sm: 3 } }}>
+          <Alert severity="info" sx={{ mb: 1, fontSize: { xs: '12px', sm: '14px' } }}>Starting a recording will notify all participants and show a banner in the meeting.</Alert>
+          <Typography variant="body2" sx={{ fontSize: { xs: '12px', sm: '14px' } }}>By continuing, you confirm that you have obtained necessary permissions and agree to EVzone policies.</Typography>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={()=>setConsentOpen(false)} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none' }}>Cancel</Button>
-          <Button onClick={confirmRecording} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', '&:hover':{ bgcolor:'#e06f00' } }}>Confirm & start</Button>
+        <DialogActions sx={{ px: { xs: 2, sm: 3 }, pb: { xs: 2, sm: 3 } }}>
+          <Button onClick={()=>setConsentOpen(false)} variant="outlined" sx={{ borderColor: EV.orange, color: EV.orange, textTransform:'none', fontSize: { xs: '12px', sm: '14px' }, py: { xs: 0.5, sm: 0.75 } }}>Cancel</Button>
+          <Button onClick={confirmRecording} variant="contained" sx={{ bgcolor: EV.orange, textTransform:'none', fontSize: { xs: '12px', sm: '14px' }, py: { xs: 0.5, sm: 0.75 }, '&:hover':{ bgcolor:'#e06f00' } }}>Confirm & start</Button>
         </DialogActions>
       </Dialog>
     </>

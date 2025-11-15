@@ -82,8 +82,8 @@ function MeetingCard({ meeting, kind, onNavigate }) {
     <Paper
       variant="outlined"
       sx={{
-        mb: 1.5,
-        p: { xs: 1, sm: 1.5 },
+        mb: { xs: 1, sm: 1.5 },
+        p: { xs: 1.25, sm: 1.5 },
         borderRadius: 2,
         borderColor: muiTheme.palette.divider,
         bgcolor: 'background.paper',
@@ -140,18 +140,23 @@ function MeetingCard({ meeting, kind, onNavigate }) {
             <Button 
               size="small" 
               variant="outlined" 
-              sx={{ textTransform: "none" }}
+              sx={{ textTransform: "none", fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 } }}
               onClick={() => onNavigate?.(`/meetings/${meeting.id}`)}
             >
               View
             </Button>
-            <Button size="small" variant="outlined" sx={{ textTransform: "none" }}>
+            <Button 
+              size="small" 
+              variant="outlined" 
+              sx={{ textTransform: "none", fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 } }}
+              onClick={() => onNavigate?.(`/meetings/${meeting.id}/reschedule`)}
+            >
               Reschedule
             </Button>
             <Button 
               size="small" 
               variant="contained" 
-              sx={{ textTransform: "none", bgcolor: accentColor, "&:hover": { bgcolor: accent === 'green' ? '#02b87a' : accent === 'orange' ? '#e06f00' : '#8a8a8a' } }}
+              sx={{ textTransform: "none", bgcolor: accentColor, fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 }, "&:hover": { bgcolor: accent === 'green' ? '#02b87a' : accent === 'orange' ? '#e06f00' : '#8a8a8a' } }}
               onClick={() => onNavigate?.(`/meetings/live/${meeting.id}`)}
             >
               Join
@@ -215,43 +220,63 @@ export default function MyMeetingsList({ onBack, onNavigate }) {
               sx={{ 
                 minHeight: { xs: '56px', md: '64px' },
                 width: "100%",
-                px: { xs: 1.5, sm: 2, md: 3, lg: 4 }
+                px: { xs: 1.5, sm: 2, md: 3 }
               }}
             >
               <IconButton
                 onClick={onBack}
                 aria-label="Back"
-                sx={{ color: "#fff", mr: 1 }}
+                sx={{ color: "#fff", mr: 1, padding: { xs: '6px', sm: '8px' } }}
               >
-                <ArrowBackRoundedIcon />
+                <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
               </IconButton>
-              <EventAvailableRoundedIcon sx={{ mr: 1 }} />
               <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                <Typography variant="subtitle1" className="font-semibold" noWrap>
+                <Typography variant="subtitle1" className="font-semibold" noWrap sx={{ fontSize: { xs: '15px', sm: '16px' } }}>
                   My meetings
                 </Typography>
-                <Typography variant="caption" sx={{ opacity: 0.9 }}>
+                <Typography variant="caption" sx={{ opacity: 0.9, fontSize: { xs: '11px', sm: '12px' } }}>
                   Upcoming, past and booking requests
                 </Typography>
               </Box>
               <IconButton
                 onClick={() => onNavigate?.('/meetings/book')}
                 aria-label="Create new meeting"
-                sx={{ color: "#fff" }}
+                sx={{ color: "#fff", padding: { xs: '6px', sm: '8px' } }}
               >
-                <EventAvailableRoundedIcon />
+                <EventAvailableRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
               </IconButton>
             </Toolbar>
           </AppBar>
 
+          {/* Title above tabs */}
+          <Box sx={{ pt: { xs: "60px", md: "68px" }, bgcolor: 'background.paper', width: '100%', px: { xs: 1.5, sm: 2, md: 3 }, pb: { xs: 0.5, sm: 1 } }}>
+            <Typography 
+              variant="h5" 
+              sx={{ 
+                fontWeight: 600, 
+                color: 'text.primary',
+                fontSize: { xs: '18px', sm: '20px', md: '22px' }
+              }}
+            >
+              My Meetings
+            </Typography>
+          </Box>
+
           {/* Tabs */}
-          <Box sx={{ pt: { xs: "56px", md: "64px" }, bgcolor: "#fff", width: '100%' }}>
+          <Box sx={{ bgcolor: 'background.paper', width: '100%' }}>
             <Tabs
               value={tab}
               onChange={(_, v) => setTab(v)}
               variant="fullWidth"
               textColor="primary"
               indicatorColor="primary"
+              sx={{
+                '& .MuiTab-root': {
+                  fontSize: { xs: '13px', sm: '14px' },
+                  minHeight: { xs: 44, sm: 48 },
+                  textTransform: 'none'
+                }
+              }}
             >
               <Tab value="upcoming" label="Upcoming" />
               <Tab value="past" label="Past" />
@@ -262,25 +287,12 @@ export default function MyMeetingsList({ onBack, onNavigate }) {
           {/* List content */}
           <Box className="no-scrollbar" sx={{ 
             flex: 1, 
-            px: { xs: 1.5, sm: 2, md: 3, lg: 4 }, 
-            pt: 1, 
-            pb: { xs: 2, md: 3 }, 
+            px: { xs: 1.5, sm: 2, md: 3 }, 
+            pt: { xs: 1, sm: 1.5 }, 
+            pb: { xs: 2, sm: 3 }, 
             overflowY: "auto",
             width: '100%'
           }}>
-            {/* Page Title */}
-            <Typography 
-              variant="h5" 
-              sx={{ 
-                fontWeight: 600, 
-                mt: 1.5, 
-                mb: 1, 
-                color: 'text.primary',
-                fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' }
-              }}
-            >
-              My Meetings
-            </Typography>
             
             {data.length === 0 ? (
               <Box className="h-full flex items-center justify-center">
