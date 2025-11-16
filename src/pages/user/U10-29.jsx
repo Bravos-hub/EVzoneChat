@@ -31,6 +31,7 @@ import SecurityRoundedIcon from "@mui/icons-material/SecurityRounded";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import EventAvailableRoundedIcon from "@mui/icons-material/EventAvailableRounded";
+import ImageRoundedIcon from "@mui/icons-material/ImageRounded";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
@@ -73,15 +74,9 @@ export default function LTASettings({ onBack, onNavigate }) {
             <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary', padding: { xs: '6px', sm: '8px' } }}>
               <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
             </IconButton>
-            <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 }, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Language, Accessibility & Storage</Typography>
+            <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 }, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Settings</Typography>
           </Toolbar>
         </AppBar>
-
-        <Tabs value={tab} onChange={(e,v)=>setTab(v)} textColor="inherit" TabIndicatorProps={{ style:{ background: EV.green } }} sx={{ bgcolor: 'background.paper', borderBottom: `1px solid ${muiTheme.palette.divider}` }}>
-          <Tab label="Language" sx={{ color: 'text.primary', fontSize: { xs: '13px', sm: '14px' }, minHeight: { xs: 44, sm: 48 } }}/>
-          <Tab label="Accessibility" sx={{ color: 'text.primary', fontSize: { xs: '13px', sm: '14px' }, minHeight: { xs: 44, sm: 48 } }}/>
-          <Tab label="Storage" sx={{ color: 'text.primary', fontSize: { xs: '13px', sm: '14px' }, minHeight: { xs: 44, sm: 48 } }}/>
-        </Tabs>
 
         <Box sx={{ p: { xs: 2, sm: 3 }, flex: 1, overflowY: 'auto' }} className="no-scrollbar">
           {/* Settings navigation links */}
@@ -154,7 +149,7 @@ export default function LTASettings({ onBack, onNavigate }) {
               <ListItem 
                 button 
                 onClick={() => onNavigate?.('/meetings')}
-                sx={{ borderRadius: '0 0 8px 8px', px: { xs: 2, sm: 3 }, py: { xs: 1, sm: 1.25 } }}
+                sx={{ px: { xs: 2, sm: 3 }, py: { xs: 1, sm: 1.25 } }}
               >
                 <ListItemIcon>
                   <EventAvailableRoundedIcon sx={{ color: 'text.primary', opacity: 0.7, fontSize: { xs: 20, sm: 24 } }} />
@@ -166,11 +161,75 @@ export default function LTASettings({ onBack, onNavigate }) {
                 />
                 <ChevronRightRoundedIcon sx={{ color: 'text.secondary', fontSize: { xs: 18, sm: 20 } }} />
               </ListItem>
+              <Divider />
+              <ListItem 
+                button 
+                onClick={() => onNavigate?.('/media')}
+                sx={{ borderRadius: '0 0 8px 8px', px: { xs: 2, sm: 3 }, py: { xs: 1, sm: 1.25 } }}
+              >
+                <ListItemIcon>
+                  <ImageRoundedIcon sx={{ color: 'text.primary', fontSize: { xs: 20, sm: 24 } }} />
+                </ListItemIcon>
+                <ListItemText 
+                  primary={<span style={{ fontSize: '15px' }}>Media</span>} 
+                  secondary={<span style={{ fontSize: '13px' }}>Photos, videos & files</span>} 
+                  sx={{ color: 'text.primary' }} 
+                />
+                <ChevronRightRoundedIcon sx={{ color: 'text.secondary', fontSize: { xs: 18, sm: 20 } }} />
+              </ListItem>
             </List>
           </Box>
 
+          {/* Language, Accessibility & Storage Tabs */}
+          <Tabs 
+            value={tab} 
+            onChange={(e,v)=>setTab(v)} 
+            textColor="inherit" 
+            TabIndicatorProps={{ style:{ background: EV.green } }} 
+            sx={{ 
+              bgcolor: 'background.paper', 
+              border: `1px solid ${muiTheme.palette.divider}`,
+              borderRadius: '8px',
+              mb: { xs: 2, sm: 2 },
+              '& .MuiTabs-flexContainer': {
+                px: { xs: 1, sm: 2 }
+              }
+            }}
+          >
+            <Tab 
+              label="LANGUAGE" 
+              sx={{ 
+                color: 'text.primary', 
+                fontSize: { xs: '12px', sm: '13px' }, 
+                minHeight: { xs: 44, sm: 48 },
+                textTransform: 'uppercase',
+                fontWeight: tab === 0 ? 600 : 500
+              }}
+            />
+            <Tab 
+              label="ACCESSIBILITY" 
+              sx={{ 
+                color: 'text.primary', 
+                fontSize: { xs: '12px', sm: '13px' }, 
+                minHeight: { xs: 44, sm: 48 },
+                textTransform: 'uppercase',
+                fontWeight: tab === 1 ? 600 : 500
+              }}
+            />
+            <Tab 
+              label="STORAGE" 
+              sx={{ 
+                color: 'text.primary', 
+                fontSize: { xs: '12px', sm: '13px' }, 
+                minHeight: { xs: 44, sm: 48 },
+                textTransform: 'uppercase',
+                fontWeight: tab === 2 ? 600 : 500
+              }}
+            />
+          </Tabs>
+
           {tab===0 && (
-            <>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <FormControl fullWidth size="small">
                 <InputLabel sx={{ fontSize: { xs: '13px', sm: '14px' } }}>App language</InputLabel>
                 <Select label="App language" value={uiLang} onChange={(e)=>setUiLang(e.target.value)} sx={{ fontSize: { xs: '13px', sm: '14px' } }}>
@@ -186,11 +245,11 @@ export default function LTASettings({ onBack, onNavigate }) {
               <FormGroup>
                 <FormControlLabel control={<Switch checked={autoTranslate} onChange={(e)=>setAutoTranslate(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Auto‑translate incoming messages (when available)</span>} />
               </FormGroup>
-            </>
+            </Box>
           )}
 
           {tab===1 && (
-            <>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <div className="font-semibold" style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Text size</div>
               <Slider value={fontScale} onChange={(e,v)=>setFontScale(v)} valueLabelDisplay="auto" min={80} max={140} marks={[{value:80,label:'80%'},{value:100,label:'100%'},{value:140,label:'140%'}]} sx={{ mt: 1, mb: 2 }} />
               <FormGroup>
@@ -198,23 +257,23 @@ export default function LTASettings({ onBack, onNavigate }) {
                 <FormControlLabel control={<Switch checked={reduceMotion} onChange={(e)=>setReduceMotion(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Reduce motion/animations</span>} />
                 <FormControlLabel control={<Switch checked={captionsDefault} onChange={(e)=>setCaptionsDefault(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Captions on by default in meetings</span>} />
               </FormGroup>
-            </>
+            </Box>
           )}
 
           {tab===2 && (
-            <>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <FormGroup>
                 <FormControlLabel control={<Switch checked={autoDownload} onChange={(e)=>setAutoDownload(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Auto‑download media</span>} />
                 <FormControlLabel control={<Switch checked={wifiOnly} onChange={(e)=>setWifiOnly(e.target.checked)} />} label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Wi‑Fi only for downloads</span>} />
               </FormGroup>
-              <Divider sx={{ borderColor: muiTheme.palette.divider, my: { xs: 2, sm: 3 } }} />
+              <Divider sx={{ borderColor: muiTheme.palette.divider, my: { xs: 1, sm: 1 } }} />
               <div className="font-semibold" style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Cache</div>
               <div style={{ color: muiTheme.palette.text.primary, fontSize: '13px', marginTop: '4px' }}>App cache: <strong>{cacheSize} MB</strong></div>
               <div className="grid grid-cols-2 mt-2" style={{ gap: '8px' }}>
                 <Button variant="outlined" sx={{ textTransform:'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 } }} onClick={()=>setCacheSize(cacheSize + 50)}>Simulate +50MB</Button>
                 <Button variant="contained" sx={{ textTransform:'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 } }} onClick={clearCache}>Clear cache</Button>
               </div>
-            </>
+            </Box>
           )}
         </Box>
 

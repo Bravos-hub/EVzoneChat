@@ -76,6 +76,17 @@ export default function OneToOneCall({
     return params.get('live') !== null;
   }, [location]);
 
+  // Check if this is a group call (based on contact name or URL parameter)
+  const isGroupCall = useMemo(() => {
+    const params = new URLSearchParams(location?.search || '');
+    const groupParam = params.get('group');
+    const contact = contactName || remote.name;
+    // Check if it's explicitly marked as group, or if contact name suggests group call
+    return groupParam === 'true' || 
+           contact?.toLowerCase().includes('group') || 
+           contact?.toLowerCase().includes('chat');
+  }, [location, contactName, remote.name]);
+
   const actualType = callType === 'voice' ? 'voice' : 'video';
   const actualRemote = { ...remote, name: contactName };
 
@@ -172,6 +183,7 @@ export default function OneToOneCall({
   // Control bar height + padding (approximately 5.5rem = 88px from bottom)
   const CONTROL_BAR_HEIGHT = 88;
   
+  
   const onPipDown = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -246,16 +258,20 @@ export default function OneToOneCall({
 
   // Derived label
   const status = useMemo(() => {
+    const callTypeLabel = isGroupCall 
+      ? (actualType === "video" ? "Group Video Call" : "Group Voice Call")
+      : (actualType === "video" ? "Video Call" : "Voice Call");
+    
     switch (callState) {
-      case "incoming": return "Incoming call…";
+      case "incoming": return actualType === "video" ? "Incoming video call…" : "Incoming voice call…";
       case "dialing": return "Dialing…";
       case "ringing": return "Ringing…";
       case "connecting": return "Connecting…";
       case "reconnecting": return "Reconnecting…";
-      case "connected": return (actualType === "voice" ? `Voice • ${hhmmss}` : `Video • ${hhmmss}`);
+      case "connected": return `${callTypeLabel} • ${hhmmss}`;
       default: return "";
     }
-  }, [callState, actualType, hhmmss]);
+  }, [callState, actualType, hhmmss, isGroupCall]);
 
   // If showing calls list, render list view (after all hooks)
   if (showCallList) {
@@ -360,42 +376,104 @@ export default function OneToOneCall({
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none`}</style>
 
       {/* Call interface - Always dark background regardless of theme */}
-      <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: '#000 !important', color: '#fff', position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1300 }}>
+      <Box 
+        className="w-full h-full mx-auto flex flex-col" 
+        sx={{ 
+          bgcolor: '#000 !important', 
+          color: '#fff', 
+          position: 'fixed', 
+          top: 0, 
+          left: 0, 
+          right: 0, 
+          bottom: 0, 
+          zIndex: 1300,
+          height: '100dvh', // Dynamic viewport height for mobile (fallback to 100vh for older browsers)
+          minHeight: '100vh',
+          maxHeight: '100%',
+          overflow: 'hidden'
+        }}
+      >
         {/* Header */}
-        <AppBar elevation={0} position="static" sx={{ bgcolor: "rgba(0,0,0,0.55) !important", color: "#fff" }}>
-          <Toolbar className="!min-h-[56px]">
-            <IconButton onClick={() => {
-              // Don't end call, just navigate back - call banner will appear
+        <AppBar 
+          elevation={0} 
+          position="static" 
+          sx={{ 
+            bgcolor: "rgba(0,0,0,0.55) !important", 
+            color: "#fff",
+            pt: 'env(safe-area-inset-top)',
+            minHeight: { xs: '56px', sm: '64px' }
+          }}
+        >
+          <Toolbar 
+            sx={{ 
+              minHeight: { xs: '56px !important', sm: '64px !important' },
+              px: { xs: 1, sm: 2 },
+              py: { xs: 0.5, sm: 1 }
+            }}
+          >
+            <IconButton 
+              onClick={() => {
               onBack?.();
-            }} aria-label="Back" sx={{ color: "#fff" }}>
-              <ArrowBackRoundedIcon />
+              }} 
+              aria-label="Back" 
+              sx={{ 
+                color: "#fff",
+                padding: { xs: '8px', sm: '12px' },
+                mr: { xs: 0.5, sm: 1 }
+              }}
+            >
+              <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
             </IconButton>
-            <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
-              <Typography variant="subtitle1" sx={{ color: "#fff", fontWeight: 600, fontSize: '1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, mr: { xs: 0.5, sm: 1 } }}>
+              <Typography 
+                variant="subtitle1" 
+                sx={{ 
+                  color: "#fff", 
+                  fontWeight: 600, 
+                  fontSize: { xs: '0.875rem', sm: '1rem' }, 
+                  whiteSpace: 'nowrap', 
+                  overflow: 'hidden', 
+                  textOverflow: 'ellipsis',
+                  lineHeight: 1.2
+                }}
+              >
                 {actualRemote.name}
               </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.25 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.25, sm: 0.5 }, mt: { xs: 0.125, sm: 0.25 }, flexWrap: 'wrap' }}>
                 {callModule && (
                   <Chip 
                     label={callModule} 
                     size="small" 
                     sx={{ 
-                      height: 18, 
-                      fontSize: '10px', 
+                      height: { xs: 16, sm: 18 }, 
+                      fontSize: { xs: '9px', sm: '10px' }, 
                       bgcolor: 'rgba(255,255,255,0.15)', 
                       color: '#fff',
-                      '& .MuiChip-label': { px: 0.75, py: 0 }
+                      '& .MuiChip-label': { px: { xs: 0.5, sm: 0.75 }, py: 0 }
                     }} 
                   />
                 )}
-              <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.8)", fontSize: '0.6875rem' }}>
+                <Typography 
+                  variant="caption" 
+                  sx={{ 
+                    color: "rgba(255,255,255,0.8)", 
+                    fontSize: { xs: '0.625rem', sm: '0.6875rem' },
+                    lineHeight: 1.2
+                  }}
+                >
                 {status}
               </Typography>
               </Box>
             </Box>
-            <Box sx={{ flexGrow: 1 }} />
-            <IconButton aria-label="More" onClick={(e)=>setMenuEl(e.currentTarget)} sx={{ color: "#fff" }}>
-              <MoreVertRoundedIcon />
+            <IconButton 
+              aria-label="More" 
+              onClick={(e)=>setMenuEl(e.currentTarget)} 
+              sx={{ 
+                color: "#fff",
+                padding: { xs: '8px', sm: '12px' }
+              }}
+            >
+              <MoreVertRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
             </IconButton>
           </Toolbar>
         </AppBar>
@@ -433,10 +511,15 @@ export default function OneToOneCall({
           {actualType === 'video' && (
           <MenuItem onClick={()=>{ 
             setMenuEl(null); 
-              // For 1:1 calls, this could show call info instead
-              // For now, only navigate to group call if it's actually a group call
-              // In a real app, you'd check if call has multiple participants
+            if (isGroupCall) {
+              const params = new URLSearchParams(location?.search || '');
+              const module = params.get('module');
+              const moduleParam = module ? `&module=${encodeURIComponent(module)}` : '';
+              onNavigate?.(`/group-call?type=${actualType}&contact=${encodeURIComponent(contactName)}${moduleParam}`);
+            } else {
+              // For 1:1 calls, show info message
               alert('This is a one-to-one call. View participants is only available for group calls.');
+            }
           }}>
             <ListItemIcon><PeopleAltRoundedIcon fontSize="small" sx={{ color: 'text.primary' }}/></ListItemIcon>
             <ListItemText primary="View participants" />
@@ -492,8 +575,8 @@ export default function OneToOneCall({
                   ref={pipRef}
                   sx={{
                     position: 'absolute',
-                    width: '7rem',
-                    height: '10rem',
+                    width: { xs: '6rem', sm: '7rem', md: '8rem' },
+                    height: { xs: '8rem', sm: '10rem', md: '12rem' },
                     top: `${pip.y}px`,
                     left: `${pip.x}px`,
                     borderRadius: 2,
@@ -503,7 +586,9 @@ export default function OneToOneCall({
                     cursor: 'move',
                     zIndex: 100,
                     userSelect: 'none',
-                    touchAction: 'none'
+                    touchAction: 'none',
+                    maxWidth: { xs: '30%', sm: '25%' },
+                    maxHeight: { xs: '25%', sm: '30%' }
                   }}
                   onMouseDown={onPipDown}
                   onTouchStart={onPipDown}
@@ -521,8 +606,8 @@ export default function OneToOneCall({
                   ref={pipRef}
                   sx={{
                     position: 'absolute',
-                    width: '7rem',
-                    height: '10rem',
+                    width: { xs: '6rem', sm: '7rem', md: '8rem' },
+                    height: { xs: '8rem', sm: '10rem', md: '12rem' },
                     top: `${pip.y}px`,
                     left: `${pip.x}px`,
                     borderRadius: 2,
@@ -536,13 +621,65 @@ export default function OneToOneCall({
                     cursor: 'move',
                     zIndex: 100,
                     userSelect: 'none',
-                    touchAction: 'none'
+                    touchAction: 'none',
+                    maxWidth: { xs: '30%', sm: '25%' },
+                    maxHeight: { xs: '25%', sm: '30%' }
                   }}
                   onMouseDown={onPipDown}
                   onTouchStart={onPipDown}
                   aria-label="Camera off - Drag to move"
                 >
-                  <Avatar src="https://i.pravatar.cc/100?img=20" sx={{ width: '4rem', height: '4rem' }} />
+                  <Avatar src="https://i.pravatar.cc/100?img=20" sx={{ width: { xs: '3rem', sm: '4rem', md: '4.5rem' }, height: { xs: '3rem', sm: '4rem', md: '4.5rem' } }} />
+                </Box>
+              )}
+
+              {/* Incoming call overlay */}
+              {callState === "incoming" && (
+                <Box className="absolute inset-0 grid place-items-center" sx={{ bgcolor: 'rgba(0,0,0,0.7)', zIndex: 10 }}>
+                  <Box className="flex flex-col items-center gap-4" sx={{ zIndex: 1 }}>
+                    {/* Pulsing animation for incoming call */}
+                    <Box className="relative" sx={{ width: '5rem', height: '5rem' }}>
+                      <Box className="absolute inset-0 rounded-full call-pulse" sx={{ bgcolor: 'rgba(255,255,255,0.2)' }} />
+                      <Box className="absolute inset-0 rounded-full call-pulse-delayed" sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
+                      <Avatar 
+                        src={actualRemote.avatar} 
+                        sx={{ 
+                          width: '5rem', 
+                          height: '5rem',
+                          position: 'relative',
+                          zIndex: 1,
+                          border: '3px solid rgba(255,255,255,0.3)'
+                        }} 
+                      />
+                    </Box>
+                    <Box sx={{ 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      alignItems: 'center', 
+                      gap: 0.5,
+                      mt: 1
+                    }}>
+                      <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 600, fontSize: '1rem' }}>
+                        {actualRemote.name}
+                      </Typography>
+                      {callModule && (
+                        <Chip 
+                          label={callModule} 
+                          size="small" 
+                          sx={{ 
+                            height: 20, 
+                            fontSize: '11px', 
+                            bgcolor: 'rgba(255,255,255,0.15)', 
+                            color: '#fff',
+                            '& .MuiChip-label': { px: 1 }
+                          }} 
+                        />
+                      )}
+                      <Box className="px-4 py-2 rounded-full backdrop-blur" sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: '0.875rem', fontWeight: 500 }}>
+                        {status}
+                      </Box>
+                    </Box>
+                  </Box>
                 </Box>
               )}
 
@@ -604,7 +741,52 @@ export default function OneToOneCall({
           ) : (
             <Box className="absolute inset-0 grid place-items-center" sx={{ bgcolor: '#000', width: '100%', height: '100%' }}>
               <Box className="flex flex-col items-center gap-4" sx={{ zIndex: 1 }}>
-                {callState !== "connected" && callState !== "incoming" ? (
+                {callState === "incoming" ? (
+                  <>
+                    {/* Pulsing animation for incoming voice call */}
+                    <Box className="relative" sx={{ width: '6.5rem', height: '6.5rem' }}>
+                      <Box className="absolute inset-0 rounded-full call-pulse" sx={{ bgcolor: 'rgba(255,255,255,0.2)' }} />
+                      <Box className="absolute inset-0 rounded-full call-pulse-delayed" sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
+                      <Avatar 
+                        src={actualRemote.avatar} 
+                        sx={{ 
+                          width: '6.5rem', 
+                          height: '6.5rem',
+                          position: 'relative',
+                          zIndex: 1,
+                          border: '3px solid rgba(255,255,255,0.3)'
+                        }} 
+                      />
+                    </Box>
+                    <Box sx={{ 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      alignItems: 'center', 
+                      gap: 0.5,
+                      mt: 1
+                    }}>
+                      <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 600, fontSize: '1rem' }}>
+                        {actualRemote.name}
+                      </Typography>
+                      {callModule && (
+                        <Chip 
+                          label={callModule} 
+                          size="small" 
+                          sx={{ 
+                            height: 20, 
+                            fontSize: '11px', 
+                            bgcolor: 'rgba(255,255,255,0.15)', 
+                            color: '#fff',
+                            '& .MuiChip-label': { px: 1 }
+                          }} 
+                        />
+                      )}
+                      <Box className="px-4 py-2 rounded-full backdrop-blur" sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: '0.875rem', fontWeight: 500 }}>
+                        {status}
+                      </Box>
+                    </Box>
+                  </>
+                ) : callState !== "connected" ? (
                   <>
                     {/* Pulsing animation for voice call dialing */}
                     <Box className="relative" sx={{ width: '6.5rem', height: '6.5rem' }}>
@@ -681,7 +863,7 @@ export default function OneToOneCall({
                         />
                       )}
                       <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.875rem' }}>
-                        {callState === "connected" ? `Connected • ${hhmmss}` : status}
+                        Connected • {hhmmss}
                       </Typography>
                     </Box>
                   </>
@@ -713,20 +895,45 @@ export default function OneToOneCall({
           )}
         </Box>
 
-        {/* Controls (glass) - Always visible at bottom */}
-        <Box className="fixed inset-x-0 bottom-0 z-10 flex justify-center" sx={{ pb: "env(safe-area-inset-bottom)" }}>
-          <Box className="w-full px-3 pb-3">
+        {/* Controls (glass) - Positioned just above bottom navigation */}
+        <Box 
+          sx={{ 
+            position: 'fixed',
+            // Position directly above bottom nav with small gap
+            bottom: { 
+              xs: 'calc(4.5rem + 1.5rem + env(safe-area-inset-bottom) + 8px)', 
+              sm: 'calc(4.5rem + 1.5rem + env(safe-area-inset-bottom) + 10px)',
+              md: 'calc(4.5rem + 1.5rem + env(safe-area-inset-bottom) + 12px)'
+            },
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 1200, // Above bottom nav (zIndex 1100)
+            width: { 
+              xs: 'calc(100% - 32px)', 
+              sm: 'calc(100% - 32px)', 
+              md: 'auto' 
+            },
+            maxWidth: { xs: '100%', sm: '600px', md: '700px' },
+            px: { xs: 1, sm: 1.5, md: 2 }
+          }}
+        >
             <Box sx={{ 
               display: 'flex', 
               alignItems: 'center', 
-              justifyContent: 'space-between', 
-              bgcolor: 'rgba(255,255,255,0.1)', 
-              borderRadius: 2, 
-              px: 3, 
-              py: 2, 
-              backdropFilter: 'blur(12px)',
-              gap: 1,
-              flexWrap: 'wrap'
+            justifyContent: 'center', 
+            bgcolor: 'rgba(0,0,0,0.85)', 
+            borderRadius: { xs: 2.5, sm: 3 }, 
+            px: { xs: 1, sm: 1.5, md: 2 }, 
+            py: { xs: 0.75, sm: 1, md: 1.5 }, 
+            backdropFilter: 'blur(20px)',
+            gap: { xs: 0.5, sm: 0.75, md: 1 },
+            flexWrap: 'nowrap',
+            overflowX: 'auto',
+            '&::-webkit-scrollbar': { display: 'none' },
+            scrollbarWidth: 'none',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.7)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            WebkitOverflowScrolling: 'touch' // Smooth scrolling on iOS
             }}>
               {/* mic - Always visible */}
               <IconButton 
@@ -737,10 +944,16 @@ export default function OneToOneCall({
                 sx={{ 
                   color:"#fff", 
                   flexShrink: 0,
-                  bgcolor: muted ? 'rgba(255,255,255,0.2)' : 'transparent'
+                  bgcolor: muted ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.1)',
+                  width: { xs: "40px", sm: "44px", md: "48px" },
+                  height: { xs: "40px", sm: "44px", md: "48px" },
+                  minWidth: { xs: "40px", sm: "44px", md: "48px" },
+                  padding: { xs: '8px', sm: '10px', md: '12px' },
+                  "&:hover": { bgcolor: "rgba(255,255,255,0.2)" },
+                  "&:active": { transform: 'scale(0.95)' }
                 }}
               >
-                {muted ? <MicOffRoundedIcon/> : <MicNoneRoundedIcon/>}
+                {muted ? <MicOffRoundedIcon sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} /> : <MicNoneRoundedIcon sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} />}
               </IconButton>
 
               {/* camera (video) - Always visible for video calls */}
@@ -753,10 +966,16 @@ export default function OneToOneCall({
                   sx={{ 
                     color:"#fff", 
                     flexShrink: 0,
-                    bgcolor: !camOn ? 'rgba(255,255,255,0.2)' : 'transparent'
+                  bgcolor: !camOn ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.1)',
+                  width: { xs: "40px", sm: "44px", md: "48px" },
+                  height: { xs: "40px", sm: "44px", md: "48px" },
+                  minWidth: { xs: "40px", sm: "44px", md: "48px" },
+                  padding: { xs: '8px', sm: '10px', md: '12px' },
+                  "&:hover": { bgcolor: "rgba(255,255,255,0.2)" },
+                  "&:active": { transform: 'scale(0.95)' }
                   }}
                 >
-                  {camOn ? <VideocamRoundedIcon/> : <VideocamOffRoundedIcon/>}
+                  {camOn ? <VideocamRoundedIcon sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} /> : <VideocamOffRoundedIcon sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} />}
                 </IconButton>
               )}
 
@@ -767,9 +986,19 @@ export default function OneToOneCall({
                     alert('Camera flipped');
                   }} 
                   aria-label="Flip camera" 
-                  sx={{ color:"#fff", flexShrink: 0 }}
+                  sx={{ 
+                    color:"#fff", 
+                    flexShrink: 0,
+                    bgcolor: "rgba(255,255,255,0.1)",
+                    width: { xs: "40px", sm: "44px", md: "48px" },
+                    height: { xs: "40px", sm: "44px", md: "48px" },
+                    minWidth: { xs: "40px", sm: "44px", md: "48px" },
+                    padding: { xs: '8px', sm: '10px', md: '12px' },
+                    "&:hover": { bgcolor: "rgba(255,255,255,0.2)" },
+                    "&:active": { transform: 'scale(0.95)' }
+                  }}
                 >
-                  <FlipCameraAndroidRoundedIcon/>
+                  <FlipCameraAndroidRoundedIcon sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} />
                 </IconButton>
               )}
 
@@ -782,10 +1011,16 @@ export default function OneToOneCall({
                 sx={{ 
                   color:"#fff", 
                   flexShrink: 0,
-                  bgcolor: speakerMode === 'loud' ? 'rgba(255,255,255,0.2)' : 'transparent'
+                  bgcolor: speakerMode === 'loud' ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.1)',
+                  width: { xs: "40px", sm: "44px", md: "48px" },
+                  height: { xs: "40px", sm: "44px", md: "48px" },
+                  minWidth: { xs: "40px", sm: "44px", md: "48px" },
+                  padding: { xs: '8px', sm: '10px', md: '12px' },
+                  "&:hover": { bgcolor: "rgba(255,255,255,0.2)" },
+                  "&:active": { transform: 'scale(0.95)' }
                 }}
               >
-                {speakerMode === 'loud' ? <VolumeUpRoundedIcon/> : <VolumeDownRoundedIcon/>}
+                {speakerMode === 'loud' ? <VolumeUpRoundedIcon sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} /> : <VolumeDownRoundedIcon sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} />}
               </IconButton>
 
               {/* share (video) */}
@@ -798,10 +1033,16 @@ export default function OneToOneCall({
                   sx={{ 
                     color:"#fff", 
                     flexShrink: 0,
-                    bgcolor: sharing ? 'rgba(255,255,255,0.2)' : 'transparent'
+                    bgcolor: sharing ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.1)',
+                    width: { xs: "40px", sm: "44px", md: "48px" },
+                    height: { xs: "40px", sm: "44px", md: "48px" },
+                    minWidth: { xs: "40px", sm: "44px", md: "48px" },
+                    padding: { xs: '8px', sm: '10px', md: '12px' },
+                    "&:hover": { bgcolor: "rgba(255,255,255,0.2)" },
+                    "&:active": { transform: 'scale(0.95)' }
                   }}
                 >
-                  <ScreenShareRoundedIcon/>
+                  <ScreenShareRoundedIcon sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} />
                 </IconButton>
               )}
 
@@ -814,10 +1055,16 @@ export default function OneToOneCall({
                 sx={{ 
                   color:"#fff", 
                   flexShrink: 0,
-                  bgcolor: captions ? 'rgba(255,255,255,0.2)' : 'transparent'
+                  bgcolor: captions ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.1)',
+                  width: { xs: "40px", sm: "44px", md: "48px" },
+                  height: { xs: "40px", sm: "44px", md: "48px" },
+                  minWidth: { xs: "40px", sm: "44px", md: "48px" },
+                  padding: { xs: '8px', sm: '10px', md: '12px' },
+                  "&:hover": { bgcolor: "rgba(255,255,255,0.2)" },
+                  "&:active": { transform: 'scale(0.95)' }
                 }}
               >
-                <ClosedCaptionRoundedIcon/>
+                <ClosedCaptionRoundedIcon sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} />
               </IconButton>
 
               {/* open chat */}
@@ -827,17 +1074,37 @@ export default function OneToOneCall({
                   onOpenChat?.();
                 }} 
                 aria-label="Open chat" 
-                sx={{ color:"#fff", flexShrink: 0 }}
+                sx={{ 
+                  color:"#fff", 
+                  flexShrink: 0,
+                  bgcolor: "rgba(255,255,255,0.1)",
+                  width: { xs: "40px", sm: "44px", md: "48px" },
+                  height: { xs: "40px", sm: "44px", md: "48px" },
+                  minWidth: { xs: "40px", sm: "44px", md: "48px" },
+                  padding: { xs: '8px', sm: '10px', md: '12px' },
+                  "&:hover": { bgcolor: "rgba(255,255,255,0.2)" },
+                  "&:active": { transform: 'scale(0.95)' }
+                }}
               >
-                <ChatBubbleOutlineRoundedIcon/>
+                <ChatBubbleOutlineRoundedIcon sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} />
               </IconButton>
 
               {/* network quality (static demo) */}
               <IconButton 
                 aria-label="Network quality: Good"
-                sx={{ color:"#fff", flexShrink: 0 }}
+                sx={{ 
+                  color:"#fff", 
+                  flexShrink: 0,
+                  bgcolor: "rgba(255,255,255,0.1)",
+                  width: { xs: "40px", sm: "44px", md: "48px" },
+                  height: { xs: "40px", sm: "44px", md: "48px" },
+                  minWidth: { xs: "40px", sm: "44px", md: "48px" },
+                  padding: { xs: '8px', sm: '10px', md: '12px' },
+                  "&:hover": { bgcolor: "rgba(255,255,255,0.2)" },
+                  "&:active": { transform: 'scale(0.95)' }
+                }}
               >
-                <SignalCellularAltRoundedIcon/>
+                <SignalCellularAltRoundedIcon sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} />
               </IconButton>
 
               {/* end call - Always visible and prominent - MUST end call */}
@@ -864,8 +1131,14 @@ export default function OneToOneCall({
                   // Call onEnd callback
                   onEnd?.();
                   
-                  // Navigate back immediately
+                  // Navigate to the conversation/chat for this contact
+                  const contact = contactName || actualRemote.name;
+                  if (contact) {
+                    onNavigate?.(`/conversation/${encodeURIComponent(contact)}`);
+                  } else {
+                    // Fallback: navigate back if no contact name
                     onNavigate?.(-1);
+                  }
                 }} 
                 aria-label="End call" 
                 sx={{ 
@@ -873,18 +1146,20 @@ export default function OneToOneCall({
                   bgcolor:"#e53935", 
                   "&:hover":{ bgcolor:"#c62828" },
                   "&:active":{ bgcolor:"#b71c1c", transform: 'scale(0.95)' },
-                  width: '3rem',
-                  height: '3rem',
+                  width: { xs: '44px', sm: '52px', md: '56px' },
+                  height: { xs: '44px', sm: '52px', md: '56px' },
+                  minWidth: { xs: '44px', sm: '52px', md: '56px' },
                   flexShrink: 0,
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 2px 8px rgba(229,57,53,0.4)'
                 }}
               >
-                <CallEndRoundedIcon sx={{ fontSize: 24 }} />
+                <CallEndRoundedIcon sx={{ fontSize: { xs: 22, sm: 26, md: 28 } }} />
               </IconButton>
             </Box>
           </Box>
         </Box>
-      </Box>
+
     </>
   );
 }

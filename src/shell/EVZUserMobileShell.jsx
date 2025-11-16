@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 import { useCall } from "../context/CallContext";
@@ -19,11 +19,13 @@ import {
   ListItemText,
   Divider
 } from "@mui/material";
+import MicOffRoundedIcon from "@mui/icons-material/MicOffRounded";
 import ChatBubbleOutlineRoundedIcon from "@mui/icons-material/ChatBubbleOutlineRounded";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import PhoneRoundedIcon from "@mui/icons-material/PhoneRounded";
 import ImageRoundedIcon from "@mui/icons-material/ImageRounded";
 import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
+import ShoppingBagRoundedIcon from "@mui/icons-material/ShoppingBagRounded";
 import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
 import AddCommentRoundedIcon from "@mui/icons-material/AddCommentRounded";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
@@ -72,7 +74,7 @@ function useTabFromLocation(){
   const { pathname } = useLocation();
   if (pathname.startsWith('/search')) return 'search';
   if (pathname.startsWith('/call')) return 'call';
-  if (pathname.startsWith('/media')) return 'media';
+  if (pathname.startsWith('/dealz')) return 'dealz';
   if (pathname.startsWith('/settings')) return 'settings';
   return 'inbox';
 }
@@ -137,6 +139,13 @@ function ShellFrame({ children }){
       html.style.colorScheme = '';
     };
   }, [actualMode, accentColor]);
+
+  // Format time
+  const hhmmss = useMemo(() => {
+    const minutes = Math.floor(callDuration / 60);
+    const seconds = callDuration % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  }, [callDuration]);
 
   return (
     <Box sx={{ 
@@ -292,6 +301,7 @@ function ShellFrame({ children }){
         {children}
       </Box>
 
+
       {/* Bottom nav (mobile frame) - always visible for consistent mobile navigation */}
         <Box sx={{ 
           position:'fixed', 
@@ -352,7 +362,7 @@ function MobileBottomNav(){
   return (
     <BottomNavigation
       value={value}
-      onChange={(_, v)=>{ const map={ inbox:'/inbox', search:'/search', call:'/call', media:'/media', settings:'/settings' }; if(map[v]) nav(map[v]); }}
+      onChange={(_, v)=>{ const map={ inbox:'/inbox', call:'/call', dealz:'/dealz', search:'/search', settings:'/settings' }; if(map[v]) nav(map[v]); }}
       showLabels
       sx={{ 
         height: '4.5rem', 
@@ -385,9 +395,9 @@ function MobileBottomNav(){
       }}
     >
       <BottomNavigationAction value="inbox" label="Inbox" icon={<ChatBubbleOutlineRoundedIcon/>} />
-      <BottomNavigationAction value="search" label="Search" icon={<SearchRoundedIcon/>} />
       <BottomNavigationAction value="call" label="Calls" icon={<PhoneRoundedIcon/>} />
-      <BottomNavigationAction value="media" label="Media" icon={<ImageRoundedIcon/>} />
+      <BottomNavigationAction value="dealz" label="Dealz" icon={<ShoppingBagRoundedIcon/>} />
+      <BottomNavigationAction value="search" label="Search" icon={<SearchRoundedIcon/>} />
       <BottomNavigationAction value="settings" label="Settings" icon={<SettingsRoundedIcon/>} />
     </BottomNavigation>
   );
@@ -616,6 +626,7 @@ export default function MobileUserShell({ registry: externalRegistry = {} }){
   const Call = getComponent(registry, 'U04-10', () => <Screen title="Calls"/>);
   const GroupCallParticipants = getComponent(registry, 'U04-11', () => <Screen title="Group Call Participants"/>);
   const Media = getComponent(registry, 'U03-08', () => <Screen title="Media"/>);
+  const Dealz = getComponent(registry, 'U11-31', () => <Screen title="Dealz"/>);
   const Settings = getComponent(registry, 'U10-29', () => <Screen title="Settings"/>);
   const Security = getComponent(registry, 'U10-28', () => <Screen title="Security"/>);
   const CreateChannel = getComponent(registry, 'U08-22', () => <Screen title="Create group / channel"/>);
@@ -647,6 +658,7 @@ export default function MobileUserShell({ registry: externalRegistry = {} }){
           <Route path="/call" element={<RouteWrapper Component={Call} />} />
           <Route path="/group-call" element={<RouteWrapper Component={GroupCallParticipants} />} />
           <Route path="/call/participants" element={<RouteWrapper Component={GroupCallParticipants} />} />
+          <Route path="/dealz" element={<RouteWrapper Component={Dealz} />} />
           <Route path="/media" element={<RouteWrapper Component={Media} />} />
           <Route path="/settings" element={<RouteWrapper Component={Settings} />} />
           <Route path="/security" element={<RouteWrapper Component={Security} />} />
