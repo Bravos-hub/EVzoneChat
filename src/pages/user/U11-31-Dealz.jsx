@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
 import { useTheme } from "../../context/ThemeContext";
 import {
@@ -28,6 +28,9 @@ import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
 import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import AddRoundedIcon from "@mui/icons-material/AddRounded";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
@@ -129,34 +132,43 @@ const DEMO_DEALZ = [
   },
 ];
 
-// Build a WhatsApp-like segmented ring: one arc per promo with small gaps,
+// Build a WhatsApp-like segmented ring: one arc per ACTIVE promo with small gaps,
 // unseen promos in accent color, seen promos in light grey. Fully viewed = full grey ring.
-// For single promo: solid accent color ring
-// For multiple promos: broken/dashed segments (one per promo)
+// For single active promo: solid accent color ring
+// For multiple active promos: broken/dashed segments (one per active promo)
+// Only counts active promos (Promo Ads and Live Sessions that are not seen)
 function buildRingGradient(promos, accentColor) {
-  const total = promos.length;
-  if (!total) return "none";
+  // Filter to only active (unseen) promos - both Promo Ads and Live Sessions count
+  const activePromos = promos.filter((p) => !p.seen);
+  const totalActive = activePromos.length;
+  const totalPromos = promos.length;
+  
+  // No promos at all
+  if (!totalPromos) return "none";
 
   // If all promos seen, full grey ring
   if (promos.every((p) => p.seen)) {
     return `conic-gradient(${EV.grey} 0deg 360deg)`;
   }
 
-  // Single promo: solid accent color ring (full circle)
-  if (total === 1 && !promos[0].seen) {
+  // Single active promo: solid accent color ring (full circle) - like WhatsApp status
+  if (totalActive === 1) {
     return `conic-gradient(${accentColor} 0deg 360deg)`;
   }
 
-  // Multiple promos: broken/dashed segments
-  // Each promo gets a segment, with gaps between them
-  const baseArc = 360 / total;
-  const segArc = baseArc * 0.75; // 75% segment, 25% gap for broken effect
+  // Multiple active promos: broken/dashed segments
+  // Each active promo gets a segment, with gaps between them
+  // This creates the "broken ring" effect matching the number of active promos
+  // The number of segments = number of active promos (both Promo Ads and Live Sessions)
+  const baseArc = 360 / totalActive;
+  const segArc = baseArc * 0.65; // 65% segment, 35% gap for clear broken effect
   const gapArc = baseArc - segArc;
   let currentAngle = 0;
   const parts = [];
 
-  promos.forEach((promo) => {
-    const color = promo.seen ? "rgba(166,166,166,0.6)" : accentColor;
+  activePromos.forEach((promo) => {
+    // All active promos use accent color (green)
+    const color = accentColor;
     const start = currentAngle;
     const end = start + segArc;
     parts.push(`${color} ${start}deg ${end}deg`);
@@ -181,8 +193,14 @@ function getPrimaryModule(entity) {
 
 function PromoRingAvatar({ entity, accentColor }) {
   const promos = entity.promos || [];
-  const hasPromos = promos.length > 0;
-  const gradient = hasPromos ? buildRingGradient(promos, accentColor) : "none";
+  // Count active promos (both Promo Ads and Live Sessions that are not seen)
+  const activePromos = promos.filter((p) => !p.seen);
+  const hasActivePromos = activePromos.length > 0;
+  const hasAnyPromos = promos.length > 0;
+  
+  // Show ring if there are any active promos OR if all are seen (grey ring)
+  const showRing = hasActivePromos || (hasAnyPromos && promos.every((p) => p.seen));
+  const gradient = showRing ? buildRingGradient(promos, accentColor) : "none";
 
   return (
     <Box
@@ -194,15 +212,16 @@ function PromoRingAvatar({ entity, accentColor }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        p: hasPromos ? 0.8 : 0,
+        p: showRing ? 0.8 : 0,
+        transition: "all 0.2s ease",
       }}
     >
       <Avatar
         src={entity.avatar}
         sx={{
-          width: hasPromos ? 38 : 48,
-          height: hasPromos ? 38 : 48,
-          border: hasPromos ? "2px solid #000" : "none",
+          width: showRing ? 38 : 48,
+          height: showRing ? 38 : 48,
+          border: showRing ? "2px solid #000" : "none",
           opacity: entity.muted ? 0.4 : 1,
         }}
       />
@@ -221,6 +240,10 @@ export default function DealzPromoStatusFeed({ onBack }) {
   const [promoFilter, setPromoFilter] = useState("new"); // 'new' | 'all' | 'archived'
   const [activePromo, setActivePromo] = useState(null); // { entityId, promoId }
   const [autoAdvance, setAutoAdvance] = useState(true);
+  const [createPromoOpen, setCreatePromoOpen] = useState(false);
+  const [newPromoType, setNewPromoType] = useState("promo-ad"); // 'promo-ad' | 'live'
+  const [newPromoTitle, setNewPromoTitle] = useState("");
+  const [newPromoModule, setNewPromoModule] = useState("E-Commerce");
 
   const selected = useMemo(
     () => data.find((e) => e.id === selectedId) || null,
@@ -240,13 +263,40 @@ export default function DealzPromoStatusFeed({ onBack }) {
     const mine = base.find((e) => e.isMe);
     const others = base.filter((e) => !e.isMe && !e.muted);
 
+    // Ranking logic:
+    // 1. Entities with active promos (unseen) are always ranked first
+    // 2. Among entities with active promos, followed ones come first
+    // 3. Among entities without active promos, followed ones come first
+    // 4. Then alphabetical by name
     const sortedOthers = [...others].sort((a, b) => {
-      const aActive = a.promos.some((p) => !p.seen) ? 1 : 0;
-      const bActive = b.promos.some((p) => !p.seen) ? 1 : 0;
-      if (bActive !== aActive) return bActive - aActive;
+      // Count active promos (both Promo Ads and Live Sessions that are unseen)
+      const aActiveCount = a.promos.filter((p) => !p.seen).length;
+      const bActiveCount = b.promos.filter((p) => !p.seen).length;
+      const aHasActive = aActiveCount > 0;
+      const bHasActive = bActiveCount > 0;
+
+      // Priority 1: Entities with active promos always rank higher
+      if (bHasActive !== aHasActive) {
+        return bHasActive ? 1 : -1;
+      }
+
+      // Priority 2: If both have active promos, rank by:
+      //   - Followed status first
+      //   - Then by number of active promos (more active = higher rank)
+      if (aHasActive && bHasActive) {
       const aFollow = a.followed ? 1 : 0;
       const bFollow = b.followed ? 1 : 0;
       if (bFollow !== aFollow) return bFollow - aFollow;
+        // More active promos = higher rank
+        if (bActiveCount !== aActiveCount) return bActiveCount - aActiveCount;
+      }
+
+      // Priority 3: Followed entities rank higher (for entities without active promos)
+      const aFollow = a.followed ? 1 : 0;
+      const bFollow = b.followed ? 1 : 0;
+      if (bFollow !== aFollow) return bFollow - aFollow;
+
+      // Priority 4: Alphabetical by name
       return a.name.localeCompare(b.name);
     });
 
@@ -299,8 +349,50 @@ export default function DealzPromoStatusFeed({ onBack }) {
   };
 
   const openEntityDrawer = (entity) => {
+    // If it's "My Dealz" and has no promos, open create dialog instead
+    if (entity.isMe && !entity.promos.length) {
+      setCreatePromoOpen(true);
+      return;
+    }
     if (!entity.promos.length) return;
     setSelectedId(entity.id);
+  };
+
+  const handleCreatePromo = () => {
+    if (!newPromoTitle.trim()) return;
+    
+    const mine = data.find((e) => e.isMe);
+    if (!mine) return;
+
+    const newPromo = {
+      id: `p${Date.now()}`,
+      type: newPromoType,
+      title: newPromoTitle,
+      module: newPromoModule,
+      live: newPromoType === "live",
+      createdAt: "Now",
+      seen: false,
+    };
+
+    setData((prev) =>
+      prev.map((e) =>
+        e.isMe
+          ? {
+              ...e,
+              promos: [...e.promos, newPromo],
+            }
+          : e
+      )
+    );
+
+    // Reset form and close dialog
+    setNewPromoTitle("");
+    setNewPromoType("promo-ad");
+    setNewPromoModule("E-Commerce");
+    setCreatePromoOpen(false);
+    
+    // Open the drawer to show the new promo
+    setSelectedId(mine.id);
   };
 
   const openSettingsForEntity = (id) => {
@@ -326,14 +418,14 @@ export default function DealzPromoStatusFeed({ onBack }) {
 
   const closePromoDetail = () => setActivePromo(null);
 
-  const getActivePromo = () => {
+  const getActivePromo = useCallback(() => {
     if (!activePromo) return null;
     const entity = data.find((e) => e.id === activePromo.entityId);
     if (!entity) return null;
     const promo = entity.promos.find((p) => p.id === activePromo.promoId);
     if (!promo) return null;
     return { entity, promo };
-  };
+  }, [activePromo, data]);
 
   // Auto-advance while in promo detail
   useEffect(() => {
@@ -364,7 +456,7 @@ export default function DealzPromoStatusFeed({ onBack }) {
       setActivePromo({ entityId: entity.id, promoId: next.id });
     }, 6000);
     return () => clearTimeout(timer);
-  }, [activePromo, autoAdvance, data]);
+  }, [activePromo, autoAdvance, getActivePromo]);
 
   const mine = sortedEntities.find((e) => e.isMe) || null;
 
@@ -772,12 +864,12 @@ export default function DealzPromoStatusFeed({ onBack }) {
                 startIcon={<FavoriteRoundedIcon sx={{ fontSize: 16 }} />}
                 sx={{
                   textTransform: "none",
-                  bgcolor: selected.followed ? EV.orange : "transparent",
-                  color: selected.followed ? "#fff" : EV.orange,
-                  borderColor: EV.orange,
+                  bgcolor: selected.followed ? accentColor : "transparent",
+                  color: selected.followed ? "#fff" : accentColor,
+                  borderColor: accentColor,
                   "&:hover": selected.followed
-                    ? { bgcolor: "#e06f00" }
-                    : { borderColor: EV.orange, bgcolor: "rgba(247,127,0,0.08)" },
+                    ? { bgcolor: accentColor, opacity: 0.9 }
+                    : { borderColor: accentColor, bgcolor: actualMode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)' },
                 }}
                 onClick={() => handleToggleFollow(selected.id)}
               >
@@ -827,6 +919,30 @@ export default function DealzPromoStatusFeed({ onBack }) {
 
             <Divider sx={{ mb: 1 }} />
 
+            {/* Create Promo button for "My Dealz" */}
+            {selected?.isMe && (
+              <Button
+                fullWidth
+                variant="contained"
+                startIcon={<AddRoundedIcon />}
+                onClick={() => {
+                  setSelectedId(null);
+                  setCreatePromoOpen(true);
+                }}
+                sx={{
+                  mb: 2,
+                  textTransform: "none",
+                  bgcolor: accentColor,
+                  color: "#fff",
+                  borderRadius: 2,
+                  py: 1.5,
+                  "&:hover": { bgcolor: accentColor, opacity: 0.9 },
+                }}
+              >
+                Create Promo
+              </Button>
+            )}
+
             {filteredPromos.length === 0 ? (
               <Typography variant="caption" sx={{ color: muiTheme.palette.text.secondary }}>
                 No {promoFilter === "archived" ? "archived" : "new"} promos for this channel.
@@ -852,7 +968,7 @@ export default function DealzPromoStatusFeed({ onBack }) {
                         variant="contained"
                         sx={{
                           textTransform: "none",
-                          bgcolor: p.live ? accentColor : EV.orange,
+                          bgcolor: accentColor,
                         }}
                         onClick={() => markPromoSeenAndOpenDetail(selected.id, p)}
                       >
@@ -862,7 +978,7 @@ export default function DealzPromoStatusFeed({ onBack }) {
                   >
                     <ListItemAvatar>
                       <Avatar
-                        sx={{ bgcolor: p.type === "live" ? accentColor : EV.orange }}
+                        sx={{ bgcolor: accentColor }}
                       >
                         {p.type === "live" ? (
                           <PlayCircleFilledWhiteRoundedIcon />
@@ -1049,7 +1165,7 @@ export default function DealzPromoStatusFeed({ onBack }) {
                     <Chip
                       label="LIVE"
                       size="small"
-                      sx={{ bgcolor: EV.orange, color: "#fff", fontWeight: 700 }}
+                      sx={{ bgcolor: accentColor, color: "#fff", fontWeight: 700 }}
                     />
                   )}
                 </Toolbar>
@@ -1081,7 +1197,7 @@ export default function DealzPromoStatusFeed({ onBack }) {
                       />
                     ) : (
                       <CampaignRoundedIcon
-                        sx={{ fontSize: 72, color: EV.orange }}
+                        sx={{ fontSize: 72, color: accentColor }}
                       />
                     )}
                   </Box>
@@ -1111,10 +1227,10 @@ export default function DealzPromoStatusFeed({ onBack }) {
                     fullWidth
                     variant="contained"
                     sx={{
-                      bgcolor: isLive ? accentColor : EV.orange,
+                      bgcolor: accentColor,
                       textTransform: "none",
                       borderRadius: 999,
-                      "&:hover": { bgcolor: isLive ? accentColor : "#e06f00", opacity: 0.9 },
+                      "&:hover": { bgcolor: accentColor, opacity: 0.9 },
                     }}
                   >
                     {isLive ? "Join live session" : "Open promo"}
@@ -1124,6 +1240,126 @@ export default function DealzPromoStatusFeed({ onBack }) {
             </Box>
           );
         })()}
+      </Dialog>
+
+      {/* Create Promo Dialog */}
+      <Dialog
+        open={createPromoOpen}
+        onClose={() => {
+          setCreatePromoOpen(false);
+          setNewPromoTitle("");
+          setNewPromoType("promo-ad");
+          setNewPromoModule("E-Commerce");
+        }}
+        PaperProps={{
+          sx: {
+            maxWidth: 390,
+            width: "90vw",
+            borderRadius: 3,
+            bgcolor: muiTheme.palette.background.paper,
+          },
+        }}
+      >
+        <Box sx={{ p: 3 }}>
+          <Typography variant="h6" className="font-semibold" sx={{ mb: 2, color: muiTheme.palette.text.primary }}>
+            Create Promo
+          </Typography>
+
+          <Stack spacing={2}>
+            <TextField
+              select
+              label="Promo Type"
+              value={newPromoType}
+              onChange={(e) => setNewPromoType(e.target.value)}
+              fullWidth
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  color: muiTheme.palette.text.primary,
+                },
+                "& .MuiInputLabel-root": {
+                  color: muiTheme.palette.text.secondary,
+                },
+              }}
+            >
+              <MenuItem value="promo-ad">Promo Ad</MenuItem>
+              <MenuItem value="live">Live Session</MenuItem>
+            </TextField>
+
+            <TextField
+              label="Title"
+              value={newPromoTitle}
+              onChange={(e) => setNewPromoTitle(e.target.value)}
+              placeholder="Enter promo title..."
+              fullWidth
+              required
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  color: muiTheme.palette.text.primary,
+                },
+                "& .MuiInputLabel-root": {
+                  color: muiTheme.palette.text.secondary,
+                },
+              }}
+            />
+
+            <TextField
+              select
+              label="Module"
+              value={newPromoModule}
+              onChange={(e) => setNewPromoModule(e.target.value)}
+              fullWidth
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  color: muiTheme.palette.text.primary,
+                },
+                "& .MuiInputLabel-root": {
+                  color: muiTheme.palette.text.secondary,
+                },
+              }}
+            >
+              <MenuItem value="E-Commerce">E-Commerce</MenuItem>
+              <MenuItem value="Charging">Charging</MenuItem>
+              <MenuItem value="Rides">Rides</MenuItem>
+              <MenuItem value="School">School</MenuItem>
+              <MenuItem value="Marketplace">Marketplace</MenuItem>
+            </TextField>
+
+            <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={() => {
+                  setCreatePromoOpen(false);
+                  setNewPromoTitle("");
+                  setNewPromoType("promo-ad");
+                  setNewPromoModule("E-Commerce");
+                }}
+                sx={{
+                  textTransform: "none",
+                  borderColor: muiTheme.palette.divider,
+                  color: muiTheme.palette.text.primary,
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                fullWidth
+                variant="contained"
+                onClick={handleCreatePromo}
+                disabled={!newPromoTitle.trim()}
+                sx={{
+                  textTransform: "none",
+                  bgcolor: accentColor,
+                  color: "#fff",
+                  "&:hover": { bgcolor: accentColor, opacity: 0.9 },
+                  "&:disabled": { opacity: 0.5 },
+                }}
+              >
+                Create
+              </Button>
+            </Stack>
+          </Stack>
+        </Box>
       </Dialog>
     </>
   );
