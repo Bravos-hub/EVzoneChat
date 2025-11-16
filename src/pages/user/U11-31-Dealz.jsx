@@ -1,4 +1,6 @@
 import React, { useMemo, useState, useEffect } from "react";
+import { useTheme as useMuiTheme } from "@mui/material/styles";
+import { useTheme } from "../../context/ThemeContext";
 import {
   AppBar,
   Toolbar,
@@ -128,10 +130,10 @@ const DEMO_DEALZ = [
 ];
 
 // Build a WhatsApp-like segmented ring: one arc per promo with small gaps,
-// unseen promos in EV green, seen promos in light grey. Fully viewed = full grey ring.
-// For single promo: solid green ring
+// unseen promos in accent color, seen promos in light grey. Fully viewed = full grey ring.
+// For single promo: solid accent color ring
 // For multiple promos: broken/dashed segments (one per promo)
-function buildRingGradient(promos) {
+function buildRingGradient(promos, accentColor) {
   const total = promos.length;
   if (!total) return "none";
 
@@ -140,9 +142,9 @@ function buildRingGradient(promos) {
     return `conic-gradient(${EV.grey} 0deg 360deg)`;
   }
 
-  // Single promo: solid green ring (full circle)
+  // Single promo: solid accent color ring (full circle)
   if (total === 1 && !promos[0].seen) {
-    return `conic-gradient(${EV.green} 0deg 360deg)`;
+    return `conic-gradient(${accentColor} 0deg 360deg)`;
   }
 
   // Multiple promos: broken/dashed segments
@@ -154,7 +156,7 @@ function buildRingGradient(promos) {
   const parts = [];
 
   promos.forEach((promo) => {
-    const color = promo.seen ? "rgba(166,166,166,0.6)" : EV.green;
+    const color = promo.seen ? "rgba(166,166,166,0.6)" : accentColor;
     const start = currentAngle;
     const end = start + segArc;
     parts.push(`${color} ${start}deg ${end}deg`);
@@ -177,10 +179,10 @@ function getPrimaryModule(entity) {
   return promos[0]?.module || null;
 }
 
-function PromoRingAvatar({ entity }) {
+function PromoRingAvatar({ entity, accentColor }) {
   const promos = entity.promos || [];
   const hasPromos = promos.length > 0;
-  const gradient = hasPromos ? buildRingGradient(promos) : "none";
+  const gradient = hasPromos ? buildRingGradient(promos, accentColor) : "none";
 
   return (
     <Box
@@ -209,6 +211,8 @@ function PromoRingAvatar({ entity }) {
 }
 
 export default function DealzPromoStatusFeed({ onBack }) {
+  const muiTheme = useMuiTheme();
+  const { accentColor, actualMode } = useTheme();
   const [viewFilter, setViewFilter] = useState("contacts"); // 'contacts' | 'all'
   const [data, setData] = useState(DEMO_DEALZ);
   const [selectedId, setSelectedId] = useState(null); // entity in drawer
@@ -368,10 +372,16 @@ export default function DealzPromoStatusFeed({ onBack }) {
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none`}</style>
 
-      <Box className="w-full h-full bg-[var(--ev-light)] flex justify-center">
+      <Box 
+        className="w-full h-full flex justify-center"
+        sx={{ 
+          bgcolor: actualMode === 'dark' ? '#121212' : EV.light,
+          minHeight: '100vh'
+        }}
+      >
         <Box className="w-full max-w-[390px] flex flex-col">
           {/* Header */}
-          <AppBar elevation={0} position="fixed" sx={{ bgcolor: EV.green, color: "#fff" }}>
+          <AppBar elevation={0} position="fixed" sx={{ bgcolor: accentColor, color: "#fff" }}>
             <Toolbar
               className="!min-h-[56px]"
               sx={{ width: "100%", maxWidth: 390, mx: "auto", px: 1 }}
@@ -408,7 +418,14 @@ export default function DealzPromoStatusFeed({ onBack }) {
           {/* Content */}
           <Box
             className="no-scrollbar"
-            sx={{ flex: 1, overflowY: "auto", pt: "56px", pb: 10, px: 2 }}
+            sx={{ 
+              flex: 1, 
+              overflowY: "auto", 
+              pt: "56px", 
+              pb: 10, 
+              px: 2,
+              bgcolor: actualMode === 'dark' ? '#121212' : EV.light
+            }}
           >
             {/* Filter row */}
             <Box className="flex items-center justify-between mt-2 mb-2">
@@ -416,14 +433,26 @@ export default function DealzPromoStatusFeed({ onBack }) {
                 <Chip
                   label="Contacts"
                   size="small"
-                  color={viewFilter === "contacts" ? "primary" : "default"}
                   onClick={() => setViewFilter("contacts")}
+                  sx={{
+                    bgcolor: viewFilter === "contacts" ? accentColor : (actualMode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'),
+                    color: viewFilter === "contacts" ? "#fff" : muiTheme.palette.text.primary,
+                    "&:hover": {
+                      bgcolor: viewFilter === "contacts" ? accentColor : (actualMode === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)'),
+                    }
+                  }}
                 />
                 <Chip
                   label="All"
                   size="small"
-                  color={viewFilter === "all" ? "primary" : "default"}
                   onClick={() => setViewFilter("all")}
+                  sx={{
+                    bgcolor: viewFilter === "all" ? accentColor : (actualMode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'),
+                    color: viewFilter === "all" ? "#fff" : muiTheme.palette.text.primary,
+                    "&:hover": {
+                      bgcolor: viewFilter === "all" ? accentColor : (actualMode === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)'),
+                    }
+                  }}
                 />
               </Stack>
             </Box>
@@ -433,25 +462,34 @@ export default function DealzPromoStatusFeed({ onBack }) {
               <>
                 <Typography
                   variant="caption"
-                  sx={{ color: EV.grey, mb: 0.5, display: "block" }}
+                  sx={{ color: muiTheme.palette.text.secondary, mb: 0.5, display: "block" }}
                 >
                   My Dealz
                 </Typography>
                 <ListItem
                   button
                   onClick={() => openEntityDrawer(mine)}
+                  sx={{
+                    bgcolor: actualMode === 'dark' ? 'rgba(255,255,255,0.03)' : muiTheme.palette.background.paper,
+                    borderRadius: 1,
+                    mb: 0.5,
+                    color: muiTheme.palette.text.primary,
+                    "&:hover": {
+                      bgcolor: actualMode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
+                    }
+                  }}
                 >
                   <ListItemAvatar>
-                    <PromoRingAvatar entity={mine} />
+                    <PromoRingAvatar entity={mine} accentColor={accentColor} />
                   </ListItemAvatar>
                   <ListItemText
                     primary={
-                      <Typography variant="body2" className="font-semibold">
+                      <Typography variant="body2" className="font-semibold" sx={{ color: muiTheme.palette.text.primary }}>
                         {mine.name}
                       </Typography>
                     }
                     secondary={
-                      <Typography variant="caption" sx={{ color: EV.grey }}>
+                      <Typography variant="caption" sx={{ color: muiTheme.palette.text.secondary }}>
                         {mine.promos.length
                           ? `${mine.promos.length} promo${mine.promos.length > 1 ? "s" : ""}`
                           : "Tap to add your promo"}
@@ -465,11 +503,12 @@ export default function DealzPromoStatusFeed({ onBack }) {
                       e.stopPropagation();
                       openSettingsForEntity(mine.id);
                     }}
+                    sx={{ color: muiTheme.palette.text.secondary }}
                   >
                     <MoreHorizRoundedIcon sx={{ fontSize: 18 }} />
                   </IconButton>
                 </ListItem>
-                <Divider sx={{ my: 1 }} />
+                <Divider sx={{ my: 1, borderColor: muiTheme.palette.divider }} />
               </>
             )}
 
@@ -478,11 +517,11 @@ export default function DealzPromoStatusFeed({ onBack }) {
               <>
                 <Typography
                   variant="caption"
-                  sx={{ color: EV.grey, mb: 0.5, display: "block" }}
+                  sx={{ color: muiTheme.palette.text.secondary, mb: 0.5, display: "block" }}
                 >
                   New Dealz
                 </Typography>
-                <List className="no-scrollbar">
+                <List className="no-scrollbar" sx={{ bgcolor: 'transparent' }}>
                   {newEntities.map((entity) => {
                     const unseen = entity.promos.filter((p) => !p.seen).length;
                     const subtitle = `${unseen} new promo${unseen > 1 ? "s" : ""}`;
@@ -492,6 +531,15 @@ export default function DealzPromoStatusFeed({ onBack }) {
                         key={entity.id}
                         button
                         onClick={() => openEntityDrawer(entity)}
+                        sx={{
+                          bgcolor: actualMode === 'dark' ? 'rgba(255,255,255,0.03)' : muiTheme.palette.background.paper,
+                          borderRadius: 1,
+                          mb: 0.5,
+                          color: muiTheme.palette.text.primary,
+                          "&:hover": {
+                            bgcolor: actualMode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
+                          }
+                        }}
                         secondaryAction={
                           <IconButton
                             edge="end"
@@ -500,13 +548,14 @@ export default function DealzPromoStatusFeed({ onBack }) {
                               e.stopPropagation();
                               openSettingsForEntity(entity.id);
                             }}
+                            sx={{ color: muiTheme.palette.text.secondary }}
                           >
                             <MoreHorizRoundedIcon sx={{ fontSize: 18 }} />
                           </IconButton>
                         }
                       >
                         <ListItemAvatar>
-                          <PromoRingAvatar entity={entity} />
+                          <PromoRingAvatar entity={entity} accentColor={accentColor} />
                         </ListItemAvatar>
                         <ListItemText
                           primary={
@@ -520,15 +569,17 @@ export default function DealzPromoStatusFeed({ onBack }) {
                                   size="small"
                                   label={primaryModule}
                                   sx={{
-                                    bgcolor: EV.light,
+                                    bgcolor: actualMode === 'dark' ? 'rgba(255,255,255,0.1)' : EV.light,
                                     fontSize: 10,
                                     height: 20,
+                                    color: muiTheme.palette.text.primary,
                                   }}
                                 />
                               )}
                               <Typography
                                 variant="body2"
                                 className="font-semibold"
+                                sx={{ color: muiTheme.palette.text.primary }}
                               >
                                 {entity.name}
                               </Typography>
@@ -537,7 +588,7 @@ export default function DealzPromoStatusFeed({ onBack }) {
                           secondary={
                             <Typography
                               variant="caption"
-                              sx={{ color: EV.green }}
+                              sx={{ color: accentColor }}
                             >
                               {subtitle}
                             </Typography>
@@ -553,14 +604,14 @@ export default function DealzPromoStatusFeed({ onBack }) {
             {/* Viewed Dealz */}
             {viewedEntities.length > 0 && (
               <>
-                <Divider sx={{ my: 1 }} />
+                <Divider sx={{ my: 1, borderColor: muiTheme.palette.divider }} />
                 <Typography
                   variant="caption"
-                  sx={{ color: EV.grey, mb: 0.5, display: "block" }}
+                  sx={{ color: muiTheme.palette.text.secondary, mb: 0.5, display: "block" }}
                 >
                   Viewed Dealz
                 </Typography>
-                <List className="no-scrollbar">
+                <List className="no-scrollbar" sx={{ bgcolor: 'transparent' }}>
                   {viewedEntities.map((entity) => {
                     const primaryModule = getPrimaryModule(entity);
                     const subtitle = `${entity.promos.length} promo${
@@ -571,6 +622,15 @@ export default function DealzPromoStatusFeed({ onBack }) {
                         key={entity.id}
                         button
                         onClick={() => openEntityDrawer(entity)}
+                        sx={{
+                          bgcolor: actualMode === 'dark' ? 'rgba(255,255,255,0.03)' : muiTheme.palette.background.paper,
+                          borderRadius: 1,
+                          mb: 0.5,
+                          color: muiTheme.palette.text.primary,
+                          "&:hover": {
+                            bgcolor: actualMode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
+                          }
+                        }}
                         secondaryAction={
                           <IconButton
                             edge="end"
@@ -579,13 +639,14 @@ export default function DealzPromoStatusFeed({ onBack }) {
                               e.stopPropagation();
                               openSettingsForEntity(entity.id);
                             }}
+                            sx={{ color: muiTheme.palette.text.secondary }}
                           >
                             <MoreHorizRoundedIcon sx={{ fontSize: 18 }} />
                           </IconButton>
                         }
                       >
                         <ListItemAvatar>
-                          <PromoRingAvatar entity={entity} />
+                          <PromoRingAvatar entity={entity} accentColor={accentColor} />
                         </ListItemAvatar>
                         <ListItemText
                           primary={
@@ -599,16 +660,17 @@ export default function DealzPromoStatusFeed({ onBack }) {
                                   size="small"
                                   label={primaryModule}
                                   sx={{
-                                    bgcolor: EV.light,
+                                    bgcolor: actualMode === 'dark' ? 'rgba(255,255,255,0.1)' : EV.light,
                                     fontSize: 10,
                                     height: 20,
+                                    color: muiTheme.palette.text.primary,
                                   }}
                                 />
                               )}
                               <Typography
                                 variant="body2"
                                 className="font-semibold"
-                                sx={{ color: EV.grey }}
+                                sx={{ color: muiTheme.palette.text.secondary }}
                               >
                                 {entity.name}
                               </Typography>
@@ -617,7 +679,7 @@ export default function DealzPromoStatusFeed({ onBack }) {
                           secondary={
                             <Typography
                               variant="caption"
-                              sx={{ color: EV.grey }}
+                              sx={{ color: muiTheme.palette.text.secondary }}
                             >
                               {subtitle}
                             </Typography>
@@ -630,7 +692,7 @@ export default function DealzPromoStatusFeed({ onBack }) {
               </>
             )}
 
-            <Typography variant="caption" sx={{ color: EV.grey, mt: 0.5 }}>
+            <Typography variant="caption" sx={{ color: muiTheme.palette.text.secondary, mt: 0.5 }}>
               Green ring = unseen promos. Grey segments = seen promos. Fully grey ring =
               all promos viewed.
             </Typography>
@@ -655,11 +717,17 @@ export default function DealzPromoStatusFeed({ onBack }) {
                 mx: "auto",
                 px: 3,
                 pb: 2.5,
-                background:
-                  "linear-gradient(to top, rgba(255,255,255,0.96), rgba(255,255,255,0.86))",
+                bgcolor: actualMode === 'dark' 
+                  ? 'rgba(30,30,30,0.95)' 
+                  : 'rgba(255,255,255,0.96)',
+                backdropFilter: 'blur(10px)',
               }}
             >
-              <Typography variant="caption" className="block text-center text-gray-600">
+              <Typography 
+                variant="caption" 
+                className="block text-center"
+                sx={{ color: muiTheme.palette.text.secondary }}
+              >
                 Follow channels or people to keep their future Dealz at the top.
               </Typography>
             </Box>
@@ -685,15 +753,15 @@ export default function DealzPromoStatusFeed({ onBack }) {
           <Box className="p-3">
             <div
               className="w-10 h-1 rounded-full mx-auto mb-2"
-              style={{ background: EV.light }}
+              style={{ background: actualMode === 'dark' ? 'rgba(255,255,255,0.2)' : EV.light }}
             />
             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
               <Avatar src={selected.avatar} sx={{ width: 40, height: 40 }} />
               <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                <Typography variant="subtitle2" className="font-semibold" noWrap>
+                <Typography variant="subtitle2" className="font-semibold" noWrap sx={{ color: muiTheme.palette.text.primary }}>
                   {selected.name}
                 </Typography>
-                <Typography variant="caption" sx={{ opacity: 0.8 }}>
+                <Typography variant="caption" sx={{ opacity: 0.8, color: muiTheme.palette.text.secondary }}>
                   {selected.promos.length} promo
                   {selected.promos.length !== 1 ? "s" : ""}
                 </Typography>
@@ -722,27 +790,45 @@ export default function DealzPromoStatusFeed({ onBack }) {
               <Chip
                 label="New"
                 size="small"
-                color={promoFilter === "new" ? "primary" : "default"}
                 onClick={() => setPromoFilter("new")}
+                sx={{
+                  bgcolor: promoFilter === "new" ? accentColor : (actualMode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'),
+                  color: promoFilter === "new" ? "#fff" : muiTheme.palette.text.primary,
+                  "&:hover": {
+                    bgcolor: promoFilter === "new" ? accentColor : (actualMode === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)'),
+                  }
+                }}
               />
               <Chip
                 label="All"
                 size="small"
-                color={promoFilter === "all" ? "primary" : "default"}
                 onClick={() => setPromoFilter("all")}
+                sx={{
+                  bgcolor: promoFilter === "all" ? accentColor : (actualMode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'),
+                  color: promoFilter === "all" ? "#fff" : muiTheme.palette.text.primary,
+                  "&:hover": {
+                    bgcolor: promoFilter === "all" ? accentColor : (actualMode === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)'),
+                  }
+                }}
               />
               <Chip
                 label="Archived"
                 size="small"
-                color={promoFilter === "archived" ? "primary" : "default"}
                 onClick={() => setPromoFilter("archived")}
+                sx={{
+                  bgcolor: promoFilter === "archived" ? accentColor : (actualMode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)'),
+                  color: promoFilter === "archived" ? "#fff" : muiTheme.palette.text.primary,
+                  "&:hover": {
+                    bgcolor: promoFilter === "archived" ? accentColor : (actualMode === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)'),
+                  }
+                }}
               />
             </Box>
 
             <Divider sx={{ mb: 1 }} />
 
             {filteredPromos.length === 0 ? (
-              <Typography variant="caption" sx={{ color: EV.grey }}>
+              <Typography variant="caption" sx={{ color: muiTheme.palette.text.secondary }}>
                 No {promoFilter === "archived" ? "archived" : "new"} promos for this channel.
               </Typography>
             ) : (
@@ -751,13 +837,22 @@ export default function DealzPromoStatusFeed({ onBack }) {
                   <ListItem
                     key={p.id}
                     alignItems="flex-start"
+                    sx={{
+                      bgcolor: actualMode === 'dark' ? 'rgba(255,255,255,0.03)' : muiTheme.palette.background.paper,
+                      borderRadius: 1,
+                      mb: 0.5,
+                      color: muiTheme.palette.text.primary,
+                      "&:hover": {
+                        bgcolor: actualMode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
+                      }
+                    }}
                     secondaryAction={
                       <Button
                         size="small"
                         variant="contained"
                         sx={{
                           textTransform: "none",
-                          bgcolor: p.live ? EV.green : EV.orange,
+                          bgcolor: p.live ? accentColor : EV.orange,
                         }}
                         onClick={() => markPromoSeenAndOpenDetail(selected.id, p)}
                       >
@@ -767,7 +862,7 @@ export default function DealzPromoStatusFeed({ onBack }) {
                   >
                     <ListItemAvatar>
                       <Avatar
-                        sx={{ bgcolor: p.type === "live" ? EV.green : EV.orange }}
+                        sx={{ bgcolor: p.type === "live" ? accentColor : EV.orange }}
                       >
                         {p.type === "live" ? (
                           <PlayCircleFilledWhiteRoundedIcon />
@@ -781,14 +876,14 @@ export default function DealzPromoStatusFeed({ onBack }) {
                         <Typography
                           variant="subtitle2"
                           className="font-semibold"
-                          sx={{ color: p.seen ? EV.grey : "inherit" }}
+                          sx={{ color: p.seen ? muiTheme.palette.text.secondary : muiTheme.palette.text.primary }}
                         >
                           {p.title}
                         </Typography>
                       }
                       secondary={
                         <>
-                          <Typography variant="caption" sx={{ display: "block" }}>
+                          <Typography variant="caption" sx={{ display: "block", color: muiTheme.palette.text.secondary }}>
                             Module: {p.module}
                           </Typography>
                           <Typography
@@ -796,7 +891,7 @@ export default function DealzPromoStatusFeed({ onBack }) {
                             sx={{
                               display: "block",
                               opacity: 0.8,
-                              color: p.seen ? EV.grey : "inherit",
+                              color: p.seen ? muiTheme.palette.text.secondary : muiTheme.palette.text.secondary,
                             }}
                           >
                             {p.type === "live" ? "Live session" : "Promo ad"} • {p.createdAt}
@@ -823,18 +918,20 @@ export default function DealzPromoStatusFeed({ onBack }) {
             borderTopRightRadius: 16,
             maxWidth: 390,
             mx: "auto",
+            bgcolor: actualMode === 'dark' ? '#1e1e1e' : muiTheme.palette.background.paper,
+            color: muiTheme.palette.text.primary,
           },
         }}
       >
         <Box className="p-3">
           <div
             className="w-10 h-1 rounded-full mx-auto mb-2"
-            style={{ background: EV.light }}
+            style={{ background: actualMode === 'dark' ? 'rgba(255,255,255,0.2)' : EV.light }}
           />
-          <Typography variant="subtitle2" className="font-semibold" sx={{ mb: 0.5 }}>
+          <Typography variant="subtitle2" className="font-semibold" sx={{ mb: 0.5, color: muiTheme.palette.text.primary }}>
             View settings
           </Typography>
-          <Typography variant="caption" sx={{ color: EV.grey, mb: 1.5, display: "block" }}>
+          <Typography variant="caption" sx={{ color: muiTheme.palette.text.secondary, mb: 1.5, display: "block" }}>
             Control how Dealz promo statuses behave for you.
           </Typography>
 
@@ -845,9 +942,10 @@ export default function DealzPromoStatusFeed({ onBack }) {
                   size="small"
                   checked={viewFilter === "contacts"}
                   onChange={(e) => setViewFilter(e.target.checked ? "contacts" : "all")}
+                  color="primary"
                 />
               }
-              label="Show only contacts in promo list"
+              label={<Typography sx={{ color: muiTheme.palette.text.primary }}>Show only contacts in promo list</Typography>}
             />
 
             {settingsEntity ? (
@@ -857,12 +955,13 @@ export default function DealzPromoStatusFeed({ onBack }) {
                     size="small"
                     checked={settingsEntity.muted}
                     onChange={() => handleToggleMute(settingsEntity.id)}
+                    color="primary"
                   />
                 }
-                label={`Mute promos from ${settingsEntity.name}`}
+                label={<Typography sx={{ color: muiTheme.palette.text.primary }}>Mute promos from {settingsEntity.name}</Typography>}
               />
             ) : (
-              <Typography variant="caption" sx={{ color: EV.grey }}>
+              <Typography variant="caption" sx={{ color: muiTheme.palette.text.secondary }}>
                 Open a channel and use its 3-dots to select it here.
               </Typography>
             )}
@@ -873,9 +972,10 @@ export default function DealzPromoStatusFeed({ onBack }) {
                   size="small"
                   checked={autoAdvance}
                   onChange={(e) => setAutoAdvance(e.target.checked)}
+                  color="primary"
                 />
               }
-              label="Auto-advance promos (cycle like statuses)"
+              label={<Typography sx={{ color: muiTheme.palette.text.primary }}>Auto-advance promos (cycle like statuses)</Typography>}
             />
 
             <Button
@@ -895,11 +995,11 @@ export default function DealzPromoStatusFeed({ onBack }) {
               onClick={() => setSettingsOpen(false)}
               sx={{
                 textTransform: "none",
-                bgcolor: EV.green,
+                bgcolor: accentColor,
                 color: "#fff",
                 borderRadius: 999,
                 px: 3,
-                "&:hover": { bgcolor: "#02b47c" },
+                "&:hover": { bgcolor: accentColor, opacity: 0.9 },
               }}
             >
               Done
@@ -977,7 +1077,7 @@ export default function DealzPromoStatusFeed({ onBack }) {
                   >
                     {isLive ? (
                       <PlayCircleFilledWhiteRoundedIcon
-                        sx={{ fontSize: 72, color: EV.green }}
+                        sx={{ fontSize: 72, color: accentColor }}
                       />
                     ) : (
                       <CampaignRoundedIcon
@@ -1011,10 +1111,10 @@ export default function DealzPromoStatusFeed({ onBack }) {
                     fullWidth
                     variant="contained"
                     sx={{
-                      bgcolor: isLive ? EV.green : EV.orange,
+                      bgcolor: isLive ? accentColor : EV.orange,
                       textTransform: "none",
                       borderRadius: 999,
-                      "&:hover": { bgcolor: isLive ? "#02b47c" : "#e06f00" },
+                      "&:hover": { bgcolor: isLive ? accentColor : "#e06f00", opacity: 0.9 },
                     }}
                   >
                     {isLive ? "Join live session" : "Open promo"}
