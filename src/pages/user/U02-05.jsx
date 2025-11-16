@@ -61,6 +61,9 @@ import TranslateRoundedIcon from "@mui/icons-material/TranslateRounded";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import ReportRoundedIcon from "@mui/icons-material/ReportRounded";
 import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
+import PromoRingAvatar from "../../components/PromoRingAvatar";
+import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
+import PlayCircleFilledWhiteRoundedIcon from "@mui/icons-material/PlayCircleFilledWhiteRounded";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 const lighten = (hex, a=0.12) => `rgba(${parseInt(hex.slice(1,3),16)},${parseInt(hex.slice(3,5),16)},${parseInt(hex.slice(5,7),16)},${a})`;
@@ -486,6 +489,8 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
   const [videoRecordingTime, setVideoRecordingTime] = useState(0);
   const [muted, setMuted] = useState(false);
   const [selectedMessages, setSelectedMessages] = useState(new Set());
+  const [ringMenuEl, setRingMenuEl] = useState(null);
+  const [ringMenuEntity, setRingMenuEntity] = useState(null);
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
   const imageInputRef = useRef(null);
@@ -632,6 +637,54 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
     if (contactNameFromUrl === 'Ada Guide') return 'https://i.pravatar.cc/100?img=1';
     return 'https://i.pravatar.cc/100?img=5'; // default
   }, [chatKind, contactNameFromUrl]);
+
+  // Demo promo data for contact
+  const contactPromos = useMemo(() => {
+    if (contactNameFromUrl === 'Leslie Alexander') {
+      return [
+        { id: 'p2', type: 'live', title: 'Math Live Session', module: 'School', seen: false },
+        { id: 'p3', type: 'promo-ad', title: 'Study Materials', module: 'School', seen: false }
+      ];
+    }
+    if (contactNameFromUrl === 'Zev Sharp') {
+      return [{ id: 'p1', type: 'promo-ad', title: 'Flash Sale', module: 'Rides', seen: false }];
+    }
+    return [];
+  }, [contactNameFromUrl]);
+
+  const contactEntity = useMemo(() => ({
+    name: title,
+    avatar: avatar,
+    promos: contactPromos
+  }), [title, avatar, contactPromos]);
+
+  // Ring menu handlers
+  const handleRingClick = (e) => {
+    e.stopPropagation();
+    if (!contactPromos || contactPromos.length === 0) return;
+    setRingMenuEntity(contactEntity);
+    setRingMenuEl(e.currentTarget);
+  };
+
+  const handleRingMenuClose = () => {
+    setRingMenuEl(null);
+    setRingMenuEntity(null);
+  };
+
+  const handleViewPromos = () => {
+    onNavigate?.('/dealz');
+    handleRingMenuClose();
+  };
+
+  const handleJoinPromo = () => {
+    const activePromo = contactPromos.find((p) => !p.seen && p.type === "live");
+    if (activePromo) {
+      onNavigate?.('/dealz');
+    } else {
+      onNavigate?.('/dealz');
+    }
+    handleRingMenuClose();
+  };
   
   const meta = useMemo(()=> chatKind==='channel'? 'Announcement channel' : (chatKind==='group'? 'Group' : 'Online'), [chatKind]);
 
@@ -1203,9 +1256,33 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
     const files = Array.from(e.target.files || []);
     if(files.length > 0) {
       files.forEach(file => {
-        const isVideo = file.type.startsWith('video/') || file.name.match(/\.(mp4|webm|mov|avi)$/i);
-        const isImage = file.type.startsWith('image/');
-        
+        if (file.type.startsWith('image/')) {
+          const imageUrl = URL.createObjectURL(file);
+          const ts = new Date();
+          const newMsg = { 
+            id:'m'+Date.now() + Math.random(), 
+            author:{ id:'me', name:'You', avatar:'https://i.pravatar.cc/100?img=2' }, 
+            text: `🖼️ ${file.name}`, 
+            time: ts.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }), 
+            mine:true, 
+            read:false,
+            imageUrl,
+            imageFile: file,
+            fileName: file.name
+          };
+          setMessages(prev=> [...prev, newMsg]);
+        }
+      });
+      requestAnimationFrame(()=>{ const el=listRef.current; if(el) el.scrollTop = el.scrollHeight; });
+    }
+    e.target.value = '';
+  };
+
+  const handleVideoSelect = (e) => {
+    const files = Array.from(e.target.files || []);
+    if(files.length > 0) {
+      files.forEach(file => {
+        const isVideo = file.type.startsWith('video/') || file.name.match(/\.(mp4|webm|mov|avi|mkv|flv|wmv|m4v)$/i);
         if (isVideo) {
           const videoUrl = URL.createObjectURL(file);
           const ts = new Date();
@@ -1218,21 +1295,6 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
             read:false,
             videoUrl,
             videoFile: file,
-            fileName: file.name
-          };
-          setMessages(prev=> [...prev, newMsg]);
-        } else if (isImage) {
-          const imageUrl = URL.createObjectURL(file);
-          const ts = new Date();
-          const newMsg = { 
-            id:'m'+Date.now() + Math.random(), 
-            author:{ id:'me', name:'You', avatar:'https://i.pravatar.cc/100?img=2' }, 
-            text: `🖼️ ${file.name}`, 
-            time: ts.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }), 
-            mine:true, 
-            read:false,
-            imageUrl,
-            imageFile: file,
             fileName: file.name
           };
           setMessages(prev=> [...prev, newMsg]);
@@ -1351,14 +1413,11 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
               >
                 <ArrowBackRoundedIcon/>
               </IconButton>
-              <Avatar 
-                src={avatar} 
-                sx={{ 
-                  width: { xs: '2rem', sm: '2.25rem' }, 
-                  height: { xs: '2rem', sm: '2.25rem' }, 
-                  mr: { xs: 1, sm: 1.5 },
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                }} 
+              <PromoRingAvatar
+                entity={contactEntity}
+                accentColor={accentColor}
+                onClick={handleRingClick}
+                size={chatKind === '1:1' ? 36 : 40}
               />
               <Box sx={{ minWidth: 0, flexGrow: 1, pr: { xs: 8, sm: 10, md: 12 }, overflow: 'hidden' }}>
                 <Typography 
@@ -1689,7 +1748,7 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
             {/* Hidden file inputs */}
             <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept=".pdf,.doc,.docx,.txt" onChange={handleFileSelect} />
             <input type="file" ref={imageInputRef} style={{ display: 'none' }} accept="image/*" multiple onChange={handleImageSelect} />
-            <input type="file" ref={videoInputRef} style={{ display: 'none' }} accept="video/*" multiple onChange={handleImageSelect} />
+            <input type="file" ref={videoInputRef} style={{ display: 'none' }} accept="video/*" multiple onChange={handleVideoSelect} />
             {/* Camera input - will open camera on mobile when clicked */}
             <input 
               type="file" 
@@ -1884,7 +1943,8 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
             {[
               { icon: <CameraAltRoundedIcon />, label: 'Camera', action: 'camera' },
               { icon: <DescriptionRoundedIcon />, label: 'Document', action: 'document' },
-              { icon: <ImageRoundedIcon />, label: 'Photos & Videos', action: 'photos' },
+              { icon: <ImageRoundedIcon />, label: 'Photos', action: 'photos' },
+              { icon: <VideocamRoundedIcon />, label: 'Videos', action: 'videos' },
               { icon: <LocationOnRoundedIcon />, label: 'Location', action: 'location' },
               { icon: <ContactsRoundedIcon />, label: 'Contact', action: 'contact' },
             ].map((item) => (
@@ -1952,6 +2012,50 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
             ))}
           </Box>
         </Popover>
+
+        {/* Ring Menu - Pull-up menu for promo rings */}
+        <Menu
+          anchorEl={ringMenuEl}
+          open={Boolean(ringMenuEl)}
+          onClose={handleRingMenuClose}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          PaperProps={{
+            sx: {
+              width: '90vw',
+              maxWidth: 300,
+              borderRadius: 3,
+              py: 0.5,
+              bgcolor: 'background.paper',
+              '& .MuiMenuItem-root': {
+                color: 'text.primary',
+              }
+            }
+          }}
+        >
+          {ringMenuEntity && (
+            <>
+              <Box sx={{ px: 2, py: 1.5, borderBottom: `1px solid ${muiTheme.palette.divider}` }}>
+                <Typography variant="subtitle2" className="font-semibold" sx={{ color: 'text.primary' }}>
+                  {ringMenuEntity.name}
+                </Typography>
+                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                  {ringMenuEntity.promos.filter((p) => !p.seen).length} active promo{ringMenuEntity.promos.filter((p) => !p.seen).length !== 1 ? 's' : ''}
+                </Typography>
+              </Box>
+              {ringMenuEntity.promos.some((p) => !p.seen && p.type === "live") && (
+                <MenuItem onClick={handleJoinPromo}>
+                  <ListItemIcon><PlayCircleFilledWhiteRoundedIcon fontSize="small" sx={{ color: accentColor }} /></ListItemIcon>
+                  <ListItemText primary="Join live session" />
+                </MenuItem>
+              )}
+              <MenuItem onClick={handleViewPromos}>
+                <ListItemIcon><VisibilityRoundedIcon fontSize="small" /></ListItemIcon>
+                <ListItemText primary="View all promos" />
+              </MenuItem>
+            </>
+          )}
+        </Menu>
       </Box>
     </>
   );

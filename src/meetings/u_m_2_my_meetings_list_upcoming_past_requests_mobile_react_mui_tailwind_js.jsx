@@ -238,13 +238,24 @@ export default function MyMeetingsList({ onBack, onNavigate }) {
                   Upcoming, past and booking requests
                 </Typography>
               </Box>
-              <IconButton
+              <Button
                 onClick={() => onNavigate?.('/meetings/book')}
-                aria-label="Create new meeting"
-                sx={{ color: "#fff", padding: { xs: '6px', sm: '8px' } }}
+                variant="contained"
+                startIcon={<EventAvailableRoundedIcon />}
+                sx={{ 
+                  bgcolor: 'rgba(255, 255, 255, 0.2)',
+                  color: '#fff',
+                  textTransform: 'none',
+                  fontSize: { xs: '12px', sm: '13px' },
+                  px: { xs: 1.5, sm: 2 },
+                  py: { xs: 0.5, sm: 0.75 },
+                  '&:hover': {
+                    bgcolor: 'rgba(255, 255, 255, 0.3)',
+                  }
+                }}
               >
-                <EventAvailableRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
-              </IconButton>
+                Book Meeting
+              </Button>
             </Toolbar>
           </AppBar>
 

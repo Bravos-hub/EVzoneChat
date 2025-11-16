@@ -19,7 +19,9 @@ import {
   Divider,
   Dialog,
   FormControlLabel,
-  Switch
+  Switch,
+  Menu,
+  ListItemIcon
 } from "@mui/material";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import CampaignRoundedIcon from "@mui/icons-material/CampaignRounded";
@@ -31,6 +33,8 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
+import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
+import PromoRingAvatar from "../../components/PromoRingAvatar";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
@@ -132,52 +136,6 @@ const DEMO_DEALZ = [
   },
 ];
 
-// Build a WhatsApp-like segmented ring: one arc per ACTIVE promo with small gaps,
-// unseen promos in accent color, seen promos in light grey. Fully viewed = full grey ring.
-// For single active promo: solid accent color ring
-// For multiple active promos: broken/dashed segments (one per active promo)
-// Only counts active promos (Promo Ads and Live Sessions that are not seen)
-function buildRingGradient(promos, accentColor) {
-  // Filter to only active (unseen) promos - both Promo Ads and Live Sessions count
-  const activePromos = promos.filter((p) => !p.seen);
-  const totalActive = activePromos.length;
-  const totalPromos = promos.length;
-  
-  // No promos at all
-  if (!totalPromos) return "none";
-
-  // If all promos seen, full grey ring
-  if (promos.every((p) => p.seen)) {
-    return `conic-gradient(${EV.grey} 0deg 360deg)`;
-  }
-
-  // Single active promo: solid accent color ring (full circle) - like WhatsApp status
-  if (totalActive === 1) {
-    return `conic-gradient(${accentColor} 0deg 360deg)`;
-  }
-
-  // Multiple active promos: broken/dashed segments
-  // Each active promo gets a segment, with gaps between them
-  // This creates the "broken ring" effect matching the number of active promos
-  // The number of segments = number of active promos (both Promo Ads and Live Sessions)
-  const baseArc = 360 / totalActive;
-  const segArc = baseArc * 0.65; // 65% segment, 35% gap for clear broken effect
-  const gapArc = baseArc - segArc;
-  let currentAngle = 0;
-  const parts = [];
-
-  activePromos.forEach((promo) => {
-    // All active promos use accent color (green)
-    const color = accentColor;
-    const start = currentAngle;
-    const end = start + segArc;
-    parts.push(`${color} ${start}deg ${end}deg`);
-    currentAngle = end + gapArc;
-  });
-
-  return `conic-gradient(${parts.join(", ")})`;
-}
-
 function sortPromosForDisplay(promos) {
   // Live, unseen first, then unseen promo-ads, then seen promos
   return [...promos].sort((a, b) => {
@@ -189,44 +147,6 @@ function sortPromosForDisplay(promos) {
 function getPrimaryModule(entity) {
   const promos = sortPromosForDisplay(entity.promos || []);
   return promos[0]?.module || null;
-}
-
-function PromoRingAvatar({ entity, accentColor }) {
-  const promos = entity.promos || [];
-  // Count active promos (both Promo Ads and Live Sessions that are not seen)
-  const activePromos = promos.filter((p) => !p.seen);
-  const hasActivePromos = activePromos.length > 0;
-  const hasAnyPromos = promos.length > 0;
-  
-  // Show ring if there are any active promos OR if all are seen (grey ring)
-  const showRing = hasActivePromos || (hasAnyPromos && promos.every((p) => p.seen));
-  const gradient = showRing ? buildRingGradient(promos, accentColor) : "none";
-
-  return (
-    <Box
-      sx={{
-        width: 52,
-        height: 52,
-        borderRadius: "999px",
-        backgroundImage: gradient,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        p: showRing ? 0.8 : 0,
-        transition: "all 0.2s ease",
-      }}
-    >
-      <Avatar
-        src={entity.avatar}
-        sx={{
-          width: showRing ? 38 : 48,
-          height: showRing ? 38 : 48,
-          border: showRing ? "2px solid #000" : "none",
-          opacity: entity.muted ? 0.4 : 1,
-        }}
-      />
-    </Box>
-  );
 }
 
 export default function DealzPromoStatusFeed({ onBack }) {
@@ -244,6 +164,8 @@ export default function DealzPromoStatusFeed({ onBack }) {
   const [newPromoType, setNewPromoType] = useState("promo-ad"); // 'promo-ad' | 'live'
   const [newPromoTitle, setNewPromoTitle] = useState("");
   const [newPromoModule, setNewPromoModule] = useState("E-Commerce");
+  const [ringMenuEl, setRingMenuEl] = useState(null);
+  const [ringMenuEntity, setRingMenuEntity] = useState(null);
 
   const selected = useMemo(
     () => data.find((e) => e.id === selectedId) || null,
@@ -358,6 +280,37 @@ export default function DealzPromoStatusFeed({ onBack }) {
     setSelectedId(entity.id);
   };
 
+  const handleRingClick = (e, entity) => {
+    e.stopPropagation();
+    if (!entity.promos || entity.promos.length === 0) return;
+    setRingMenuEntity(entity);
+    setRingMenuEl(e.currentTarget);
+  };
+
+  const handleRingMenuClose = () => {
+    setRingMenuEl(null);
+    setRingMenuEntity(null);
+  };
+
+  const handleViewPromos = () => {
+    if (ringMenuEntity) {
+      openEntityDrawer(ringMenuEntity);
+    }
+    handleRingMenuClose();
+  };
+
+  const handleJoinPromo = () => {
+    if (ringMenuEntity) {
+      const activePromo = ringMenuEntity.promos.find((p) => !p.seen && p.type === "live");
+      if (activePromo) {
+        markPromoSeenAndOpenDetail(ringMenuEntity.id, activePromo);
+      } else {
+        openEntityDrawer(ringMenuEntity);
+      }
+    }
+    handleRingMenuClose();
+  };
+
   const handleCreatePromo = () => {
     if (!newPromoTitle.trim()) return;
     
@@ -427,7 +380,7 @@ export default function DealzPromoStatusFeed({ onBack }) {
     return { entity, promo };
   }, [activePromo, data]);
 
-  // Auto-advance while in promo detail
+  // Auto-advance while in promo detail - continuous viewing across entities
   useEffect(() => {
     if (!activePromo || !autoAdvance) return;
     const timer = setTimeout(() => {
@@ -436,10 +389,9 @@ export default function DealzPromoStatusFeed({ onBack }) {
       const { entity, promo } = active;
       const promosSorted = sortPromosForDisplay(entity.promos || []);
       const idx = promosSorted.findIndex((p) => p.id === promo.id);
-      if (idx === -1 || idx + 1 >= promosSorted.length) {
-        setActivePromo(null);
-        return;
-      }
+      
+      // Check if there's a next promo in the same entity
+      if (idx !== -1 && idx + 1 < promosSorted.length) {
       const next = promosSorted[idx + 1];
       setData((prev) =>
         prev.map((e) =>
@@ -454,9 +406,42 @@ export default function DealzPromoStatusFeed({ onBack }) {
         )
       );
       setActivePromo({ entityId: entity.id, promoId: next.id });
+        return;
+      }
+      
+      // No more promos in current entity - find next entity with active promos
+      const allEntities = sortedEntities.filter((e) => 
+        !e.isMe && e.promos && e.promos.some((p) => !p.seen)
+      );
+      const currentEntityIndex = allEntities.findIndex((e) => e.id === entity.id);
+      
+      if (currentEntityIndex !== -1 && currentEntityIndex + 1 < allEntities.length) {
+        // Move to next entity
+        const nextEntity = allEntities[currentEntityIndex + 1];
+        const nextPromo = sortPromosForDisplay(nextEntity.promos || [])[0];
+        if (nextPromo) {
+          setData((prev) =>
+            prev.map((e) =>
+              e.id === nextEntity.id
+                ? {
+                    ...e,
+                    promos: e.promos.map((p) =>
+                      p.id === nextPromo.id ? { ...p, seen: true } : p
+                    ),
+                  }
+                : e
+            )
+          );
+          setActivePromo({ entityId: nextEntity.id, promoId: nextPromo.id });
+          return;
+        }
+      }
+      
+      // No more entities with active promos - close viewer
+      setActivePromo(null);
     }, 6000);
     return () => clearTimeout(timer);
-  }, [activePromo, autoAdvance, getActivePromo]);
+  }, [activePromo, autoAdvance, getActivePromo, sortedEntities]);
 
   const mine = sortedEntities.find((e) => e.isMe) || null;
 
@@ -488,7 +473,7 @@ export default function DealzPromoStatusFeed({ onBack }) {
               <CampaignRoundedIcon sx={{ mr: 1 }} />
               <Box sx={{ minWidth: 0, flexGrow: 1 }}>
                 <Typography variant="subtitle1" className="font-semibold" noWrap>
-                  Dealz promo status
+                  Dealz status
                 </Typography>
                 <Typography variant="caption" sx={{ opacity: 0.9 }}>
                   Promo Ads & Live Sessions
@@ -572,7 +557,12 @@ export default function DealzPromoStatusFeed({ onBack }) {
                   }}
                 >
                   <ListItemAvatar>
-                    <PromoRingAvatar entity={mine} accentColor={accentColor} />
+                    <PromoRingAvatar 
+                      entity={mine} 
+                      accentColor={accentColor} 
+                      onClick={(e) => handleRingClick(e, mine)}
+                      size={52}
+                    />
                   </ListItemAvatar>
                   <ListItemText
                     primary={
@@ -647,7 +637,12 @@ export default function DealzPromoStatusFeed({ onBack }) {
                         }
                       >
                         <ListItemAvatar>
-                          <PromoRingAvatar entity={entity} accentColor={accentColor} />
+                          <PromoRingAvatar 
+                            entity={entity} 
+                            accentColor={accentColor} 
+                            onClick={(e) => handleRingClick(e, entity)}
+                            size={52}
+                          />
                         </ListItemAvatar>
                         <ListItemText
                           primary={
@@ -738,7 +733,12 @@ export default function DealzPromoStatusFeed({ onBack }) {
                         }
                       >
                         <ListItemAvatar>
-                          <PromoRingAvatar entity={entity} accentColor={accentColor} />
+                          <PromoRingAvatar 
+                            entity={entity} 
+                            accentColor={accentColor} 
+                            onClick={(e) => handleRingClick(e, entity)}
+                            size={52}
+                          />
                         </ListItemAvatar>
                         <ListItemText
                           primary={
@@ -1241,6 +1241,50 @@ export default function DealzPromoStatusFeed({ onBack }) {
           );
         })()}
       </Dialog>
+
+      {/* Ring Menu - Pull-up menu for promo rings */}
+      <Menu
+        anchorEl={ringMenuEl}
+        open={Boolean(ringMenuEl)}
+        onClose={handleRingMenuClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        PaperProps={{
+          sx: {
+            width: '90vw',
+            maxWidth: 300,
+            borderRadius: 3,
+            py: 0.5,
+            bgcolor: actualMode === 'dark' ? '#1e1e1e' : muiTheme.palette.background.paper,
+            '& .MuiMenuItem-root': {
+              color: muiTheme.palette.text.primary,
+            }
+          }
+        }}
+      >
+        {ringMenuEntity && (
+          <>
+            <Box sx={{ px: 2, py: 1.5, borderBottom: `1px solid ${muiTheme.palette.divider}` }}>
+              <Typography variant="subtitle2" className="font-semibold" sx={{ color: muiTheme.palette.text.primary }}>
+                {ringMenuEntity.name}
+              </Typography>
+              <Typography variant="caption" sx={{ color: muiTheme.palette.text.secondary }}>
+                {ringMenuEntity.promos.filter((p) => !p.seen).length} active promo{ringMenuEntity.promos.filter((p) => !p.seen).length !== 1 ? 's' : ''}
+              </Typography>
+            </Box>
+            {ringMenuEntity.promos.some((p) => !p.seen && p.type === "live") && (
+              <MenuItem onClick={handleJoinPromo}>
+                <ListItemIcon><PlayCircleFilledWhiteRoundedIcon fontSize="small" sx={{ color: accentColor }} /></ListItemIcon>
+                <ListItemText primary="Join live session" />
+              </MenuItem>
+            )}
+            <MenuItem onClick={handleViewPromos}>
+              <ListItemIcon><VisibilityRoundedIcon fontSize="small" /></ListItemIcon>
+              <ListItemText primary="View all promos" />
+            </MenuItem>
+          </>
+        )}
+      </Menu>
 
       {/* Create Promo Dialog */}
       <Dialog

@@ -25,6 +25,11 @@ import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
 import SecurityRoundedIcon from "@mui/icons-material/SecurityRounded";
 import BrushRoundedIcon from "@mui/icons-material/BrushRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
+import ChatBubbleOutlineRoundedIcon from "@mui/icons-material/ChatBubbleOutlineRounded";
+import CallRoundedIcon from "@mui/icons-material/CallRounded";
+import VideocamRoundedIcon from "@mui/icons-material/VideocamRounded";
+import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
+import EventAvailableRoundedIcon from "@mui/icons-material/EventAvailableRounded";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
@@ -111,10 +116,43 @@ export default function ProfileSelfPresence({ onBack, initial, location, onNavig
             </div>
 
             {/* Name/handle/bio */}
-            <Box sx={{ mt: { xs: 2, sm: 3 }, '& > * + *': { mt: { xs: 1.5, sm: 2 } } }}>
-              <TextField fullWidth label="Name" value={name} onChange={(e)=>setName(e.target.value)} disabled={isViewingContact} sx={{ '& .MuiInputBase-input': { fontSize: { xs: '14px', sm: '16px' } } }} />
-              <TextField fullWidth label="Handle" value={handle} onChange={(e)=>setHandle(e.target.value)} helperText="Public username" disabled={isViewingContact} sx={{ '& .MuiInputBase-input': { fontSize: { xs: '14px', sm: '16px' } }, '& .MuiFormHelperText-root': { fontSize: { xs: '11px', sm: '12px' } } }} />
-              <TextField fullWidth multiline minRows={3} label="Bio" value={bio} onChange={(e)=>setBio(e.target.value)} disabled={isViewingContact} sx={{ '& .MuiInputBase-input': { fontSize: { xs: '14px', sm: '16px' } } }} />
+            <Box sx={{ mt: { xs: 2, sm: 3 } }}>
+              <TextField 
+                fullWidth 
+                label="Name" 
+                value={name} 
+                onChange={(e)=>setName(e.target.value)} 
+                disabled={isViewingContact} 
+                sx={{ 
+                  mb: { xs: 2.5, sm: 3 },
+                  '& .MuiInputBase-input': { fontSize: { xs: '14px', sm: '16px' } } 
+                }} 
+              />
+              <TextField 
+                fullWidth 
+                label="Handle" 
+                value={handle} 
+                onChange={(e)=>setHandle(e.target.value)} 
+                helperText="Public username" 
+                disabled={isViewingContact} 
+                sx={{ 
+                  mb: { xs: 2.5, sm: 3 },
+                  '& .MuiInputBase-input': { fontSize: { xs: '14px', sm: '16px' } }, 
+                  '& .MuiFormHelperText-root': { fontSize: { xs: '11px', sm: '12px' } } 
+                }} 
+              />
+              <TextField 
+                fullWidth 
+                multiline 
+                minRows={3} 
+                label="Bio" 
+                value={bio} 
+                onChange={(e)=>setBio(e.target.value)} 
+                disabled={isViewingContact} 
+                sx={{ 
+                  '& .MuiInputBase-input': { fontSize: { xs: '14px', sm: '16px' } } 
+                }} 
+              />
             </Box>
 
             {/* Presence */}
@@ -134,6 +172,55 @@ export default function ProfileSelfPresence({ onBack, initial, location, onNavig
                   label={<span style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Share my status across modules</span>} 
                   sx={{ mt: 1 }} 
                 />
+              </Box>
+            )}
+
+            {/* Quick Actions - Show for contact profiles */}
+            {isViewingContact && contactData && (
+              <Box sx={{ mt: { xs: 3, sm: 4 } }}>
+                <div className="font-semibold mb-2" style={{ color: muiTheme.palette.text.primary, fontSize: '14px' }}>Quick Actions</div>
+                <div className="grid grid-cols-2" style={{ gap: '8px' }}>
+                  <Button
+                    variant="outlined"
+                    startIcon={<ChatBubbleOutlineRoundedIcon />}
+                    onClick={() => onNavigate?.(`/conversation/new?contacts=${encodeURIComponent(contactName)}`)}
+                    sx={{ textTransform: 'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.75, sm: 1 } }}
+                  >
+                    Chat
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    startIcon={<CallRoundedIcon />}
+                    onClick={() => onNavigate?.(`/call?type=voice&contact=${encodeURIComponent(contactName)}&state=dialing`)}
+                    sx={{ textTransform: 'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.75, sm: 1 } }}
+                  >
+                    Call
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    startIcon={<VideocamRoundedIcon />}
+                    onClick={() => onNavigate?.(`/call?type=video&contact=${encodeURIComponent(contactName)}&state=dialing`)}
+                    sx={{ textTransform: 'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.75, sm: 1 } }}
+                  >
+                    Video
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    startIcon={<GroupsRoundedIcon />}
+                    onClick={() => onNavigate?.(`/group-call?contact=${encodeURIComponent(contactName)}&type=conference`)}
+                    sx={{ textTransform: 'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.75, sm: 1 } }}
+                  >
+                    Conference
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    startIcon={<EventAvailableRoundedIcon />}
+                    onClick={() => onNavigate?.('/meetings/book')}
+                    sx={{ textTransform: 'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.75, sm: 1 }, gridColumn: 'span 2' }}
+                  >
+                    Schedule Meeting
+                  </Button>
+                </div>
               </Box>
             )}
           </Box>

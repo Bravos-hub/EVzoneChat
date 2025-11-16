@@ -246,6 +246,10 @@ function ShellFrame({ children }){
           <ListItemIcon><EventAvailableRoundedIcon fontSize="small" sx={{ opacity: 0.7 }}/></ListItemIcon>
           <ListItemText primary="My meetings" />
         </MenuItem>
+        <MenuItem onClick={()=>go('/media')}>
+          <ListItemIcon><ImageRoundedIcon fontSize="small"/></ListItemIcon>
+          <ListItemText primary="Media & Docs" />
+        </MenuItem>
         <Divider sx={{ my: 0.5 }} />
         {/* Personalization */}
         <MenuItem onClick={()=>go('/theme')}>
