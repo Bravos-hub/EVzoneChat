@@ -26,8 +26,67 @@ import CallRoundedIcon from "@mui/icons-material/CallRounded";
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
 /**
- * U11-31 — Context Panels Pack 1
+ * Promo Avatar Component - Shows green ring for active promos
+ * Single promo = solid green ring
+ * Multiple promos = broken/dashed green rings (one ring per promo)
+ */
+function PromoAvatar({ src, promoCount = 0, size = 40 }) {
+  const EV = { green: "#03cd8c" };
+  
+  if (promoCount === 0) {
+    return <Avatar src={src} sx={{ width: size, height: size }} />;
+  }
+
+  // For single promo: solid green ring
+  if (promoCount === 1) {
+    return (
+      <Box
+        sx={{
+          position: 'relative',
+          display: 'inline-flex',
+          borderRadius: '50%',
+          border: `3px solid ${EV.green}`,
+          p: '3px',
+        }}
+      >
+        <Avatar 
+          src={src} 
+          sx={{ 
+            width: size, 
+            height: size,
+          }} 
+        />
+      </Box>
+    );
+  }
+
+  // For multiple promos: broken/dashed ring (like WhatsApp status)
+  // Dashed border creates the "broken ring" effect for multiple promos
+  return (
+    <Box
+      sx={{
+        position: 'relative',
+        display: 'inline-flex',
+        borderRadius: '50%',
+        border: `2.5px dashed ${EV.green}`,
+        p: '2px',
+      }}
+    >
+      <Avatar 
+        src={src} 
+        sx={{ 
+          width: size, 
+          height: size,
+        }} 
+      />
+    </Box>
+  );
+}
+
+/**
+ * U11-31 — Context Panels Pack 1 (Dealz)
  * Tabs: Marketplace | Rides | School
+ * Shows Promo Ads and Live Sessions with green rings around avatars
  */
 export default function ContextPanelsPack1({ onBack }) {
   const muiTheme = useMuiTheme();
@@ -38,6 +97,34 @@ export default function ContextPanelsPack1({ onBack }) {
     { key:'school', label:'School', icon: <SchoolRoundedIcon/> },
   ];
   const [tab, setTab] = useState('marketplace');
+
+  // Demo data with promo information
+  // promoAds: number of active promo ads
+  // liveSessions: number of active live sessions
+  // totalPromos = promoAds + liveSessions
+  const sellers = [
+    { 
+      id: 's1', 
+      name: 'EVzone Store', 
+      avatar: 'https://i.pravatar.cc/100?img=8',
+      promoAds: 1,
+      liveSessions: 0,
+    },
+    { 
+      id: 's2', 
+      name: 'John Driver', 
+      avatar: 'https://i.pravatar.cc/100?img=10',
+      promoAds: 2,
+      liveSessions: 1,
+    },
+    { 
+      id: 's3', 
+      name: 'Leslie Alexander', 
+      avatar: 'https://i.pravatar.cc/100?img=5',
+      promoAds: 0,
+      liveSessions: 1,
+    },
+  ];
 
   const Panel = useMemo(()=> ({
     marketplace: (
@@ -52,7 +139,11 @@ export default function ContextPanelsPack1({ onBack }) {
           <Grid item xs={7} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>EV Fast Charger 22kW</Grid>
           <Grid item xs={5} style={{ color: muiTheme.palette.text.secondary }}>Seller</Grid>
           <Grid item xs={7} className="flex items-center" style={{ gap: '4px' }}>
-            <Avatar src="https://i.pravatar.cc/100?img=8" sx={{ width: { xs: 16, sm: 18 }, height: { xs: 16, sm: 18 } }} /> 
+            <PromoAvatar 
+              src={sellers[0].avatar} 
+              promoCount={sellers[0].promoAds + sellers[0].liveSessions}
+              size={18}
+            /> 
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>EVzone Store</span>
           </Grid>
           <Grid item xs={5} style={{ color: muiTheme.palette.text.secondary }}>Total</Grid>
@@ -85,7 +176,11 @@ export default function ContextPanelsPack1({ onBack }) {
         <Grid container spacing={1} sx={{ mt: 1 }} style={{ color: muiTheme.palette.text.primary, fontSize: '13px' }}>
           <Grid item xs={5} style={{ color: muiTheme.palette.text.secondary }}>Driver</Grid>
           <Grid item xs={7} className="flex items-center" style={{ gap: '4px' }}>
-            <Avatar src="https://i.pravatar.cc/100?img=10" sx={{ width: { xs: 16, sm: 18 }, height: { xs: 16, sm: 18 } }} /> 
+            <PromoAvatar 
+              src={sellers[1].avatar} 
+              promoCount={sellers[1].promoAds + sellers[1].liveSessions}
+              size={18}
+            /> 
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>John Driver • UAB 123X</span>
           </Grid>
           <Grid item xs={5} style={{ color: muiTheme.palette.text.secondary }}>ETA</Grid>
@@ -110,7 +205,11 @@ export default function ContextPanelsPack1({ onBack }) {
         <Grid container spacing={1} style={{ color: muiTheme.palette.text.primary, fontSize: '13px' }}>
           <Grid item xs={5} style={{ color: muiTheme.palette.text.secondary }}>Teacher</Grid>
           <Grid item xs={7} className="flex items-center" style={{ gap: '4px' }}>
-            <Avatar src="https://i.pravatar.cc/100?img=5" sx={{ width: { xs: 16, sm: 18 }, height: { xs: 16, sm: 18 } }} /> 
+            <PromoAvatar 
+              src={sellers[2].avatar} 
+              promoCount={sellers[2].promoAds + sellers[2].liveSessions}
+              size={18}
+            /> 
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Leslie Alexander</span>
           </Grid>
           <Grid item xs={5} style={{ color: muiTheme.palette.text.secondary }}>Schedule</Grid>
@@ -140,7 +239,7 @@ export default function ContextPanelsPack1({ onBack }) {
             <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary', padding: { xs: '6px', sm: '8px' } }}>
               <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
             </IconButton>
-            <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 } }}>Context</Typography>
+            <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 } }}>Dealz</Typography>
           </Toolbar>
         </AppBar>
 
