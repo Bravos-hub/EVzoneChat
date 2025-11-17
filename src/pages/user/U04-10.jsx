@@ -7,6 +7,8 @@ import {
   List, ListItem, ListItemAvatar, ListItemText as ListItemTextComp, Divider, Chip, Typography
 } from "@mui/material";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
+import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
+import ExpandLessRoundedIcon from "@mui/icons-material/ExpandLessRounded";
 import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
 import MicNoneRoundedIcon from "@mui/icons-material/MicNoneRounded";
 import MicOffRoundedIcon from "@mui/icons-material/MicOffRounded";
@@ -62,7 +64,7 @@ export default function OneToOneCall({
 
   const callModule = useMemo(() => {
     const params = new URLSearchParams(location?.search || '');
-    return params.get('module') || remote.module || null;
+    return params.get('module') || remote.module || 'E-Commerce';
   }, [location, remote.module]);
 
   const callStateFromUrl = useMemo(() => {
@@ -119,6 +121,7 @@ export default function OneToOneCall({
   const [sharing, setSharing] = useState(flags.share);
   const [captions, setCaptions] = useState(flags.captions);
   const [menuEl, setMenuEl] = useState(null);
+  const [showMoreButtons, setShowMoreButtons] = useState(false);
 
   // Call state management - auto-transition through dialing states
   const [callState, setCallState] = useState(callStateFromUrl);
@@ -275,6 +278,15 @@ export default function OneToOneCall({
 
   // If showing calls list, render list view (after all hooks)
   if (showCallList) {
+    const actionButtons = [
+      { icon: <VideocamRoundedIcon sx={{ fontSize: { xs: 24, sm: 28, md: 32 }, color: '#fff' }} />, label: 'Video call', onClick: () => onNavigate?.('/call?type=video&state=dialing') },
+      { icon: <GroupsRoundedIcon sx={{ fontSize: { xs: 24, sm: 28, md: 32 }, color: '#fff' }} />, label: 'Group call', onClick: () => onNavigate?.('/group-call?type=conference') },
+      { icon: <EventAvailableRoundedIcon sx={{ fontSize: { xs: 24, sm: 28, md: 32 }, color: '#fff' }} />, label: 'My Meetings', onClick: () => onNavigate?.('/meetings') },
+      { icon: <CallRoundedIcon sx={{ fontSize: { xs: 24, sm: 28, md: 32 }, color: '#fff' }} />, label: 'Voice Call', onClick: () => onNavigate?.('/call?type=voice&state=dialing') },
+    ];
+    
+    const visibleButtons = showMoreButtons ? actionButtons : actionButtons.slice(0, 2);
+    
     return (
       <>
         <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none`}</style>
@@ -283,42 +295,197 @@ export default function OneToOneCall({
             <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
               <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 } }}>Calls</Typography>
               <Box sx={{ flexGrow: 1 }} />
-              <Box sx={{ display: 'flex', gap: { xs: 0.25, sm: 0.5 }, flexWrap: 'nowrap' }}>
-                <IconButton 
-                  onClick={()=>onNavigate?.('/call?type=video&state=dialing')} 
-                  aria-label="New video call" 
-                  title="New video call"
-                  sx={{ color: accentColor, padding: { xs: '6px', sm: '8px' } }}
-                >
-                  <VideoCallRoundedIcon sx={{ fontSize: { xs: '20px', sm: '24px' } }} />
-                </IconButton>
-                <IconButton 
-                  onClick={()=>onNavigate?.('/group-call?type=conference')} 
-                  aria-label="New conference" 
-                  title="New conference"
-                  sx={{ color: accentColor, padding: { xs: '6px', sm: '8px' } }}
-                >
-                  <GroupsRoundedIcon sx={{ fontSize: { xs: '20px', sm: '24px' } }} />
-                </IconButton>
-                <IconButton 
-                  onClick={()=>onNavigate?.('/meetings/book')} 
-                  aria-label="Schedule meeting" 
-                  title="Schedule meeting"
-                  sx={{ color: accentColor, padding: { xs: '6px', sm: '8px' } }}
-                >
-                  <EventAvailableRoundedIcon sx={{ fontSize: { xs: '20px', sm: '24px' } }} />
-                </IconButton>
-                <IconButton 
-                  onClick={()=>onNavigate?.('/call?type=voice&state=dialing')} 
-                  aria-label="New voice call" 
-                  title="New voice call"
-                  sx={{ color: accentColor, padding: { xs: '6px', sm: '8px' } }}
-                >
-                  <CallRoundedIcon sx={{ fontSize: { xs: '20px', sm: '24px' } }} />
-                </IconButton>
-              </Box>
             </Toolbar>
           </AppBar>
+
+          {/* Action Buttons - Responsive with show more option */}
+          <Box sx={{ 
+            px: { xs: 1.5, sm: 2, md: 3 }, 
+            pt: { xs: 3, sm: 3.5, md: 4 },
+            pb: { xs: 2, sm: 2.5 },
+            bgcolor: 'background.paper',
+            borderBottom: `1px solid ${muiTheme.palette.divider}`
+          }}>
+            <Box sx={{ 
+              display: 'grid', 
+              gridTemplateColumns: { 
+                xs: showMoreButtons ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+                sm: 'repeat(4, 1fr)' 
+              }, 
+              gap: { xs: 0.75, sm: 1, md: 1.5 },
+              justifyContent: 'center',
+              alignItems: 'flex-start',
+              width: '100%'
+            }}>
+              {visibleButtons.map((button, index) => (
+                <Box 
+                  key={index}
+                  sx={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    alignItems: 'center', 
+                    gap: { xs: 0.5, sm: 0.75 },
+                    cursor: 'pointer',
+                    minWidth: 0,
+                    width: '100%',
+                    maxWidth: '100%',
+                    overflow: 'hidden'
+                  }}
+                  onClick={button.onClick}
+                >
+                  <Box
+                    sx={{
+                      width: { xs: 48, sm: 56, md: 64 },
+                      height: { xs: 48, sm: 56, md: 64 },
+                      borderRadius: '50%',
+                      bgcolor: accentColor,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: `0 2px 8px ${accentColor}33`,
+                      flexShrink: 0,
+                      '&:hover': {
+                        transform: 'scale(1.05)',
+                        boxShadow: `0 4px 12px ${accentColor}66`,
+                      },
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    {button.icon}
+                  </Box>
+                  <Typography 
+                    variant="caption" 
+                    sx={{ 
+                      fontSize: { xs: '9px', sm: '10px', md: '11px' }, 
+                      color: 'text.primary', 
+                      fontWeight: 500, 
+                      textAlign: 'center',
+                      lineHeight: 1.3,
+                      wordBreak: 'break-word',
+                      overflowWrap: 'break-word',
+                      hyphens: 'auto',
+                      maxWidth: '100%',
+                      width: '100%',
+                      px: 0.25,
+                      display: 'block',
+                      whiteSpace: 'normal'
+                    }}
+                  >
+                    {button.label}
+                  </Typography>
+                </Box>
+              ))}
+              
+              {/* Show More/Less button for small screens */}
+              {!showMoreButtons && (
+                <Box 
+                  sx={{ 
+                    display: { xs: 'flex', sm: 'none' },
+                    flexDirection: 'column', 
+                    alignItems: 'center', 
+                    gap: { xs: 0.5, sm: 0.75 },
+                    cursor: 'pointer',
+                    minWidth: 0
+                  }}
+                  onClick={() => setShowMoreButtons(true)}
+                >
+                  <Box
+                    sx={{
+                      width: { xs: 48, sm: 56, md: 64 },
+                      height: { xs: 48, sm: 56, md: 64 },
+                      borderRadius: '50%',
+                      bgcolor: 'action.hover',
+                      border: `2px solid ${muiTheme.palette.divider}`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                      '&:hover': {
+                        bgcolor: 'action.selected',
+                        transform: 'scale(1.05)',
+                      },
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <ExpandMoreRoundedIcon sx={{ fontSize: { xs: 24, sm: 28, md: 32 }, color: 'text.secondary' }} />
+                  </Box>
+                  <Typography 
+                    variant="caption" 
+                    sx={{ 
+                      fontSize: { xs: '9px', sm: '10px', md: '11px' }, 
+                      color: 'text.primary', 
+                      fontWeight: 500, 
+                      textAlign: 'center',
+                      lineHeight: 1.3,
+                      wordBreak: 'break-word',
+                      overflowWrap: 'break-word',
+                      maxWidth: '100%',
+                      width: '100%',
+                      px: 0.25,
+                      display: 'block',
+                      whiteSpace: 'normal'
+                    }}
+                  >
+                    More
+                  </Typography>
+                </Box>
+              )}
+              
+              {showMoreButtons && (
+                <Box 
+                  sx={{ 
+                    display: { xs: 'flex', sm: 'none' },
+                    flexDirection: 'column', 
+                    alignItems: 'center', 
+                    gap: { xs: 0.5, sm: 0.75 },
+                    cursor: 'pointer',
+                    minWidth: 0
+                  }}
+                  onClick={() => setShowMoreButtons(false)}
+                >
+                  <Box
+                    sx={{
+                      width: { xs: 48, sm: 56, md: 64 },
+                      height: { xs: 48, sm: 56, md: 64 },
+                      borderRadius: '50%',
+                      bgcolor: 'action.hover',
+                      border: `2px solid ${muiTheme.palette.divider}`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                      '&:hover': {
+                        bgcolor: 'action.selected',
+                        transform: 'scale(1.05)',
+                      },
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <ExpandLessRoundedIcon sx={{ fontSize: { xs: 24, sm: 28, md: 32 }, color: 'text.secondary' }} />
+                  </Box>
+                  <Typography 
+                    variant="caption" 
+                    sx={{ 
+                      fontSize: { xs: '9px', sm: '10px', md: '11px' }, 
+                      color: 'text.primary', 
+                      fontWeight: 500, 
+                      textAlign: 'center',
+                      lineHeight: 1.3,
+                      wordBreak: 'break-word',
+                      overflowWrap: 'break-word',
+                      maxWidth: '100%',
+                      width: '100%',
+                      px: 0.25,
+                      display: 'block',
+                      whiteSpace: 'normal'
+                    }}
+                  >
+                    Less
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+          </Box>
 
           <Box className="flex-1" sx={{ overflowY:'auto', '&::-webkit-scrollbar':{ display:'none' }, scrollbarWidth:'none', msOverflowStyle:'none' }}>
             <List>
@@ -407,8 +574,9 @@ export default function OneToOneCall({
           <Toolbar 
             sx={{ 
               minHeight: { xs: '56px !important', sm: '64px !important' },
-              px: { xs: 1, sm: 2 },
-              py: { xs: 0.5, sm: 1 }
+              px: { xs: 0.75, sm: 1, md: 2 },
+              py: { xs: 0.5, sm: 1 },
+              gap: { xs: 0.5, sm: 1 }
             }}
           >
             <IconButton 
@@ -418,47 +586,78 @@ export default function OneToOneCall({
               aria-label="Back" 
               sx={{ 
                 color: "#fff",
-                padding: { xs: '8px', sm: '12px' },
-                mr: { xs: 0.5, sm: 1 }
+                padding: { xs: '6px', sm: '8px', md: '12px' },
+                flexShrink: 0
               }}
             >
-              <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+              <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} />
             </IconButton>
-            <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, mr: { xs: 0.5, sm: 1 } }}>
+            <Box sx={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              flex: 1, 
+              minWidth: 0, 
+              overflow: 'hidden',
+              maxWidth: { xs: 'calc(100vw - 140px)', sm: 'calc(100vw - 180px)', md: 'none' }
+            }}>
               <Typography 
                 variant="subtitle1" 
                 sx={{ 
                   color: "#fff", 
                   fontWeight: 600, 
-                  fontSize: { xs: '0.875rem', sm: '1rem' }, 
+                  fontSize: { xs: '0.8125rem', sm: '0.9375rem', md: '1rem' }, 
                   whiteSpace: 'nowrap', 
                   overflow: 'hidden', 
                   textOverflow: 'ellipsis',
-                  lineHeight: 1.2
+                  lineHeight: 1.2,
+                  width: '100%'
                 }}
               >
                 {actualRemote.name}
               </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.25, sm: 0.5 }, mt: { xs: 0.125, sm: 0.25 }, flexWrap: 'wrap' }}>
-                {callModule && (
-                  <Chip 
-                    label={callModule} 
-                    size="small" 
-                    sx={{ 
-                      height: { xs: 16, sm: 18 }, 
-                      fontSize: { xs: '9px', sm: '10px' }, 
-                      bgcolor: 'rgba(255,255,255,0.15)', 
-                      color: '#fff',
-                      '& .MuiChip-label': { px: { xs: 0.5, sm: 0.75 }, py: 0 }
-                    }} 
-                  />
-                )}
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: { xs: 0.375, sm: 0.5 }, 
+                mt: { xs: 0.125, sm: 0.25 }, 
+                flexWrap: { xs: 'wrap', sm: 'nowrap' },
+                width: '100%',
+                minWidth: 0
+              }}>
+                <Chip 
+                  label={callModule} 
+                  size="small" 
+                  sx={{ 
+                    height: { xs: 15, sm: 17, md: 18 }, 
+                    fontSize: { xs: '7px', sm: '8px', md: '9px' }, 
+                    bgcolor: 'rgba(255,255,255,0.15)', 
+                    color: '#fff',
+                    maxWidth: { xs: '100%', sm: 'none' },
+                    minWidth: 0,
+                    flexShrink: { xs: 1, sm: 0 },
+                    '& .MuiChip-label': { 
+                      px: { xs: 0.5, sm: 0.625, md: 0.75 }, 
+                      py: 0,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      lineHeight: 1.2,
+                      maxWidth: { xs: '100px', sm: '120px', md: 'none' }
+                    }
+                  }} 
+                />
                 <Typography 
                   variant="caption" 
                   sx={{ 
                     color: "rgba(255,255,255,0.8)", 
-                    fontSize: { xs: '0.625rem', sm: '0.6875rem' },
-                    lineHeight: 1.2
+                    fontSize: { xs: '0.5625rem', sm: '0.625rem', md: '0.6875rem' },
+                    lineHeight: 1.2,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    minWidth: 0,
+                    flex: { xs: '1 1 100%', sm: '0 0 auto' },
+                    maxWidth: { xs: '100%', sm: 'none' }
                   }}
                 >
                 {status}
@@ -470,10 +669,11 @@ export default function OneToOneCall({
               onClick={(e)=>setMenuEl(e.currentTarget)} 
               sx={{ 
                 color: "#fff",
-                padding: { xs: '8px', sm: '12px' }
+                padding: { xs: '6px', sm: '8px', md: '12px' },
+                flexShrink: 0
               }}
             >
-              <MoreVertRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+              <MoreVertRoundedIcon sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} />
             </IconButton>
           </Toolbar>
         </AppBar>
@@ -659,23 +859,55 @@ export default function OneToOneCall({
                       gap: 0.5,
                       mt: 1
                     }}>
-                      <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 600, fontSize: '1rem' }}>
+                      <Typography 
+                        variant="subtitle2" 
+                        sx={{ 
+                          color: '#fff', 
+                          fontWeight: 600, 
+                          fontSize: { xs: '0.875rem', sm: '1rem' },
+                          textAlign: 'center',
+                          wordBreak: 'break-word',
+                          overflowWrap: 'break-word',
+                          maxWidth: '90vw',
+                          px: 1
+                        }}
+                      >
                         {actualRemote.name}
                       </Typography>
-                      {callModule && (
                         <Chip 
                           label={callModule} 
                           size="small" 
                           sx={{ 
                             height: 20, 
-                            fontSize: '11px', 
+                            fontSize: { xs: '10px', sm: '11px' }, 
                             bgcolor: 'rgba(255,255,255,0.15)', 
                             color: '#fff',
-                            '& .MuiChip-label': { px: 1 }
+                            maxWidth: '90vw',
+                            '& .MuiChip-label': { 
+                              px: 1,
+                              wordBreak: 'break-word',
+                              overflowWrap: 'break-word',
+                              whiteSpace: 'normal',
+                              textAlign: 'center'
+                            }
                           }} 
                         />
-                      )}
-                      <Box className="px-4 py-2 rounded-full backdrop-blur" sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: '0.875rem', fontWeight: 500 }}>
+                      <Box 
+                        className="px-4 py-2 rounded-full backdrop-blur" 
+                        sx={{ 
+                          bgcolor: 'rgba(255,255,255,0.1)', 
+                          color: '#fff', 
+                          fontSize: { xs: '0.75rem', sm: '0.875rem' }, 
+                          fontWeight: 500,
+                          textAlign: 'center',
+                          wordBreak: 'break-word',
+                          overflowWrap: 'break-word',
+                          maxWidth: '90vw',
+                          whiteSpace: 'normal',
+                          px: { xs: 2, sm: 4 },
+                          py: { xs: 1, sm: 2 }
+                        }}
+                      >
                         {status}
                       </Box>
                     </Box>
@@ -709,29 +941,72 @@ export default function OneToOneCall({
                       gap: 0.5,
                       mt: 1
                     }}>
-                      <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 600, fontSize: '1rem' }}>
+                      <Typography 
+                        variant="subtitle2" 
+                        sx={{ 
+                          color: '#fff', 
+                          fontWeight: 600, 
+                          fontSize: { xs: '0.875rem', sm: '1rem' },
+                          textAlign: 'center',
+                          wordBreak: 'break-word',
+                          overflowWrap: 'break-word',
+                          maxWidth: '90vw',
+                          px: 1
+                        }}
+                      >
                         {actualRemote.name}
                       </Typography>
-                      {callModule && (
                         <Chip 
                           label={callModule} 
                           size="small" 
                           sx={{ 
                             height: 20, 
-                            fontSize: '11px', 
+                            fontSize: { xs: '10px', sm: '11px' }, 
                             bgcolor: 'rgba(255,255,255,0.15)', 
                             color: '#fff',
-                            '& .MuiChip-label': { px: 1 }
+                            maxWidth: '90vw',
+                            '& .MuiChip-label': { 
+                              px: 1,
+                              wordBreak: 'break-word',
+                              overflowWrap: 'break-word',
+                              whiteSpace: 'normal',
+                              textAlign: 'center'
+                            }
                           }} 
                         />
-                      )}
-                      <Box className="px-4 py-2 rounded-full backdrop-blur" sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: '0.875rem', fontWeight: 500 }}>
+                      <Box 
+                        className="px-4 py-2 rounded-full backdrop-blur" 
+                        sx={{ 
+                          bgcolor: 'rgba(255,255,255,0.1)', 
+                          color: '#fff', 
+                          fontSize: { xs: '0.75rem', sm: '0.875rem' }, 
+                          fontWeight: 500,
+                          textAlign: 'center',
+                          wordBreak: 'break-word',
+                          overflowWrap: 'break-word',
+                          maxWidth: '90vw',
+                          whiteSpace: 'normal',
+                          px: { xs: 2, sm: 4 },
+                          py: { xs: 1, sm: 2 }
+                        }}
+                      >
                         {status}
                       </Box>
                       {callState === "ringing" && (
-                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.75rem' }}>
-                          Waiting for answer...
-                        </Typography>
+                      <Typography 
+                        variant="caption" 
+                        sx={{ 
+                          color: 'rgba(255,255,255,0.7)', 
+                          fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                          textAlign: 'center',
+                          wordBreak: 'break-word',
+                          overflowWrap: 'break-word',
+                          maxWidth: '90vw',
+                          px: 1
+                        }}
+                      >
+                        Waiting for answer...
+                      </Typography>
                       )}
                     </Box>
                   </Box>
@@ -765,23 +1040,55 @@ export default function OneToOneCall({
                       gap: 0.5,
                       mt: 1
                     }}>
-                      <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 600, fontSize: '1rem' }}>
+                      <Typography 
+                        variant="subtitle2" 
+                        sx={{ 
+                          color: '#fff', 
+                          fontWeight: 600, 
+                          fontSize: { xs: '0.875rem', sm: '1rem' },
+                          textAlign: 'center',
+                          wordBreak: 'break-word',
+                          overflowWrap: 'break-word',
+                          maxWidth: '90vw',
+                          px: 1
+                        }}
+                      >
                         {actualRemote.name}
                       </Typography>
-                      {callModule && (
                         <Chip 
                           label={callModule} 
                           size="small" 
                           sx={{ 
                             height: 20, 
-                            fontSize: '11px', 
+                            fontSize: { xs: '10px', sm: '11px' }, 
                             bgcolor: 'rgba(255,255,255,0.15)', 
                             color: '#fff',
-                            '& .MuiChip-label': { px: 1 }
+                            maxWidth: '90vw',
+                            '& .MuiChip-label': { 
+                              px: 1,
+                              wordBreak: 'break-word',
+                              overflowWrap: 'break-word',
+                              whiteSpace: 'normal',
+                              textAlign: 'center'
+                            }
                           }} 
                         />
-                      )}
-                      <Box className="px-4 py-2 rounded-full backdrop-blur" sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: '0.875rem', fontWeight: 500 }}>
+                      <Box 
+                        className="px-4 py-2 rounded-full backdrop-blur" 
+                        sx={{ 
+                          bgcolor: 'rgba(255,255,255,0.1)', 
+                          color: '#fff', 
+                          fontSize: { xs: '0.75rem', sm: '0.875rem' }, 
+                          fontWeight: 500,
+                          textAlign: 'center',
+                          wordBreak: 'break-word',
+                          overflowWrap: 'break-word',
+                          maxWidth: '90vw',
+                          whiteSpace: 'normal',
+                          px: { xs: 2, sm: 4 },
+                          py: { xs: 1, sm: 2 }
+                        }}
+                      >
                         {status}
                       </Box>
                     </Box>
@@ -810,29 +1117,72 @@ export default function OneToOneCall({
                       gap: 0.5,
                       mt: 1
                     }}>
-                      <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 600, fontSize: '1rem' }}>
+                      <Typography 
+                        variant="subtitle2" 
+                        sx={{ 
+                          color: '#fff', 
+                          fontWeight: 600, 
+                          fontSize: { xs: '0.875rem', sm: '1rem' },
+                          textAlign: 'center',
+                          wordBreak: 'break-word',
+                          overflowWrap: 'break-word',
+                          maxWidth: '90vw',
+                          px: 1
+                        }}
+                      >
                         {actualRemote.name}
                       </Typography>
-                      {callModule && (
                         <Chip 
                           label={callModule} 
                           size="small" 
                           sx={{ 
                             height: 20, 
-                            fontSize: '11px', 
+                            fontSize: { xs: '10px', sm: '11px' }, 
                             bgcolor: 'rgba(255,255,255,0.15)', 
                             color: '#fff',
-                            '& .MuiChip-label': { px: 1 }
+                            maxWidth: '90vw',
+                            '& .MuiChip-label': { 
+                              px: 1,
+                              wordBreak: 'break-word',
+                              overflowWrap: 'break-word',
+                              whiteSpace: 'normal',
+                              textAlign: 'center'
+                            }
                           }} 
                         />
-                      )}
-                      <Box className="px-4 py-2 rounded-full backdrop-blur" sx={{ bgcolor: 'rgba(255,255,255,0.1)', color: '#fff', fontSize: '0.875rem', fontWeight: 500 }}>
+                      <Box 
+                        className="px-4 py-2 rounded-full backdrop-blur" 
+                        sx={{ 
+                          bgcolor: 'rgba(255,255,255,0.1)', 
+                          color: '#fff', 
+                          fontSize: { xs: '0.75rem', sm: '0.875rem' }, 
+                          fontWeight: 500,
+                          textAlign: 'center',
+                          wordBreak: 'break-word',
+                          overflowWrap: 'break-word',
+                          maxWidth: '90vw',
+                          whiteSpace: 'normal',
+                          px: { xs: 2, sm: 4 },
+                          py: { xs: 1, sm: 2 }
+                        }}
+                      >
                         {status}
                       </Box>
                       {callState === "ringing" && (
-                        <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.75rem' }}>
-                          Waiting for answer...
-                        </Typography>
+                      <Typography 
+                        variant="caption" 
+                        sx={{ 
+                          color: 'rgba(255,255,255,0.7)', 
+                          fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                          textAlign: 'center',
+                          wordBreak: 'break-word',
+                          overflowWrap: 'break-word',
+                          maxWidth: '90vw',
+                          px: 1
+                        }}
+                      >
+                        Waiting for answer...
+                      </Typography>
                       )}
                     </Box>
                   </>
@@ -849,7 +1199,6 @@ export default function OneToOneCall({
                       <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 600, fontSize: '1rem' }}>
                         {actualRemote.name}
                       </Typography>
-                      {callModule && (
                         <Chip 
                           label={callModule} 
                           size="small" 
@@ -861,8 +1210,18 @@ export default function OneToOneCall({
                             '& .MuiChip-label': { px: 1 }
                           }} 
                         />
-                      )}
-                      <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.875rem' }}>
+                      <Typography 
+                        variant="caption" 
+                        sx={{ 
+                          color: 'rgba(255,255,255,0.8)', 
+                          fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                          textAlign: 'center',
+                          wordBreak: 'break-word',
+                          overflowWrap: 'break-word',
+                          maxWidth: '90vw',
+                          px: 1
+                        }}
+                      >
                         Connected • {hhmmss}
                       </Typography>
                     </Box>
@@ -923,17 +1282,20 @@ export default function OneToOneCall({
             justifyContent: 'center', 
             bgcolor: 'rgba(0,0,0,0.85)', 
             borderRadius: { xs: 2.5, sm: 3 }, 
-            px: { xs: 1, sm: 1.5, md: 2 }, 
+            px: { xs: 0.75, sm: 1, md: 1.5 }, 
             py: { xs: 0.75, sm: 1, md: 1.5 }, 
             backdropFilter: 'blur(20px)',
-            gap: { xs: 0.5, sm: 0.75, md: 1 },
+            gap: { xs: 0.375, sm: 0.5, md: 0.75 },
             flexWrap: 'nowrap',
             overflowX: 'auto',
+            overflowY: 'hidden',
             '&::-webkit-scrollbar': { display: 'none' },
             scrollbarWidth: 'none',
             boxShadow: '0 4px 20px rgba(0,0,0,0.7)',
             border: '1px solid rgba(255,255,255,0.1)',
-            WebkitOverflowScrolling: 'touch' // Smooth scrolling on iOS
+            WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
+            minWidth: 0,
+            width: '100%'
             }}>
               {/* mic - Always visible */}
               <IconButton 

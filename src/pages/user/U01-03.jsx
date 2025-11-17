@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useState, useEffect } from "react";
 import { useTheme } from "../../context/ThemeContext";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTheme as useMuiTheme } from "@mui/material/styles";
 import {
   AppBar,
   Toolbar,
@@ -28,19 +29,29 @@ import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import NotificationsRoundedIcon from "@mui/icons-material/NotificationsRounded";
+import NotificationsOffRoundedIcon from "@mui/icons-material/NotificationsOffRounded";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import PromoRingAvatar from "../../components/PromoRingAvatar";
+import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
+import PlayCircleFilledWhiteRoundedIcon from "@mui/icons-material/PlayCircleFilledWhiteRounded";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
-// demo data - matching design
+// demo data - matching design with promo data
 const DEMO = [
-  { id: 'c1', name: 'Etty Duke', avatar: 'https://i.pravatar.cc/100?img=1', module: 'Rides', last: 'I am near the pickup now', time: '09:30 PM', unread: 0, typing: true },
-  { id: 'c2', name: 'Zev Sharp', avatar: 'https://i.pravatar.cc/100?img=2', module: 'Rides', last: 'Thanks for the ride', time: '10:30 AM', unread: 2, typing: false },
-  { id: 'c3', name: 'EVrides', avatar: 'https://i.pravatar.cc/100?img=3', module: 'Rides', last: 'Your ride has been confirmed', time: 'Yesterday', unread: 1, typing: false },
-  { id: 'c4', name: 'Zalmen Knox', avatar: 'https://i.pravatar.cc/100?img=4', module: 'Rides', last: 'On my way', time: 'Monday', unread: 0, typing: false },
-  { id: 'c5', name: 'Benjamin Peck', avatar: 'https://i.pravatar.cc/100?img=6', module: 'Rides', last: 'See you soon', time: 'June 20', unread: 0, typing: false },
-  { id: 'c6', name: 'Bessie Cooper', avatar: 'https://i.pravatar.cc/100?img=7', module: 'Other', last: 'Meeting scheduled', time: 'June 14', unread: 0, typing: false },
-  { id: 'c7', name: 'Guy Hawkins', avatar: 'https://i.pravatar.cc/100?img=9', module: 'Other', last: 'Payment received', time: 'May 07', unread: 0, typing: false },
-  { id: 'c8', name: 'Leslie Alexander', avatar: 'https://i.pravatar.cc/100?img=5', module: 'Other', last: "Newton's laws PDF attached", time: 'Yesterday', unread: 0, typing: false },
+  { id: 'c1', name: 'Etty Duke', avatar: 'https://i.pravatar.cc/100?img=1', module: 'Rides', last: 'I am near the pickup now', time: '09:30 PM', unread: 0, typing: true, promos: [] },
+  { id: 'c2', name: 'Zev Sharp', avatar: 'https://i.pravatar.cc/100?img=2', module: 'Rides', last: 'Thanks for the ride', time: '10:30 AM', unread: 2, typing: false, promos: [
+    { id: 'p1', type: 'promo-ad', title: 'Flash Sale', module: 'Rides', seen: false }
+  ]},
+  { id: 'c3', name: 'EVrides', avatar: 'https://i.pravatar.cc/100?img=3', module: 'Rides', last: 'Your ride has been confirmed', time: 'Yesterday', unread: 1, typing: false, promos: [] },
+  { id: 'c4', name: 'Zalmen Knox', avatar: 'https://i.pravatar.cc/100?img=4', module: 'Rides', last: 'On my way', time: 'Monday', unread: 0, typing: false, promos: [] },
+  { id: 'c5', name: 'Benjamin Peck', avatar: 'https://i.pravatar.cc/100?img=6', module: 'Rides', last: 'See you soon', time: 'June 20', unread: 0, typing: false, promos: [] },
+  { id: 'c6', name: 'Bessie Cooper', avatar: 'https://i.pravatar.cc/100?img=7', module: 'Other', last: 'Meeting scheduled', time: 'June 14', unread: 0, typing: false, promos: [] },
+  { id: 'c7', name: 'Guy Hawkins', avatar: 'https://i.pravatar.cc/100?img=9', module: 'Other', last: 'Payment received', time: 'May 07', unread: 0, typing: false, promos: [] },
+  { id: 'c8', name: 'Leslie Alexander', avatar: 'https://i.pravatar.cc/100?img=5', module: 'Other', last: "Newton's laws PDF attached", time: 'Yesterday', unread: 0, typing: false, promos: [
+    { id: 'p2', type: 'live', title: 'Math Live Session', module: 'School', seen: false },
+    { id: 'p3', type: 'promo-ad', title: 'Study Materials', module: 'School', seen: false }
+  ]},
 ];
 
 const LIVE_DEMO = [
@@ -48,6 +59,80 @@ const LIVE_DEMO = [
   { id: 'lesson_45', module: 'School', title: 'Mathematics', subtitle: "Newton's Laws of Motion", host: 'Leslie Alexander', startedAt: '12m', cta: 'Join' },
   { id: 'tour_88', module: 'Travel', title: 'Evening Old Town Tour', subtitle: 'Live Q&A ongoing', host: 'Ada Guide', startedAt: '3m', cta: 'Join' },
 ];
+
+// Notification Icon Button with Mute Menu
+function NotificationIconButton() {
+  const navigate = useNavigate();
+  const [menuEl, setMenuEl] = useState(null);
+  const [muted, setMuted] = useState(false);
+  
+  const handleClick = (e) => {
+    setMenuEl(e.currentTarget);
+  };
+  
+  const handleClose = () => {
+    setMenuEl(null);
+  };
+  
+  const handleMute = () => {
+    setMuted(!muted);
+    alert(muted ? 'Notifications enabled' : 'Notifications muted');
+    handleClose();
+  };
+  
+  return (
+    <>
+      <IconButton 
+        aria-label="Notifications" 
+        onClick={handleClick}
+        sx={{ color: '#fff', padding: { xs: '6px', sm: '8px' } }}
+      >
+        <Badge 
+          variant="dot" 
+          sx={{
+            '& .MuiBadge-dot': {
+              backgroundColor: '#ff4444',
+              width: 8,
+              height: 8,
+              right: 4,
+              top: 4
+            }
+          }}
+        >
+          <NotificationsRoundedIcon />
+        </Badge>
+      </IconButton>
+      <Menu
+        anchorEl={menuEl}
+        open={Boolean(menuEl)}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        PaperProps={{ 
+          sx:{ 
+            width: '90vw', 
+            maxWidth: 'calc(100vw - 1rem)', 
+            borderRadius: 2, 
+            py: 0.5,
+            bgcolor: 'background.paper',
+            '& .MuiMenuItem-root': {
+              color: 'text.primary',
+            }
+          } 
+        }}
+      >
+        <MenuItem onClick={handleMute}>
+          <ListItemIcon><NotificationsOffRoundedIcon fontSize="small"/></ListItemIcon>
+          <ListItemText primary={muted ? "Unmute notifications" : "Mute notifications"} />
+        </MenuItem>
+        <MenuItem onClick={() => { handleClose(); navigate('/dnd'); }}>
+          <ListItemIcon><NotificationsRoundedIcon fontSize="small"/></ListItemIcon>
+          <ListItemText primary="Notification settings" />
+        </MenuItem>
+      </Menu>
+    </>
+  );
+}
 
 /**
  * U01-03 Unified Inbox - Messages List
@@ -58,6 +143,7 @@ const LIVE_DEMO = [
  */
 export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, onRefresh, onNew, onLiveOpen, onModuleChange, onBack }) {
   const { accent, isDark } = useTheme();
+  const muiTheme = useMuiTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const [q, setQ] = useState("");
@@ -67,6 +153,8 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
   const [showSearch, setShowSearch] = useState(false);
   const searchInputRef = useRef(null);
   const [draftRefresh, setDraftRefresh] = useState(0); // Force re-render to check drafts
+  const [ringMenuEl, setRingMenuEl] = useState(null);
+  const [ringMenuEntity, setRingMenuEntity] = useState(null);
   
   // Refresh drafts when location changes (when navigating back from chat)
   useEffect(() => {
@@ -79,6 +167,38 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
   
   // Get theme accent color
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
+
+  // Ring menu handlers
+  const handleRingClick = (e, entity) => {
+    e.stopPropagation();
+    if (!entity.promos || entity.promos.length === 0) return;
+    setRingMenuEntity(entity);
+    setRingMenuEl(e.currentTarget);
+  };
+
+  const handleRingMenuClose = () => {
+    setRingMenuEl(null);
+    setRingMenuEntity(null);
+  };
+
+  const handleViewPromos = () => {
+    if (ringMenuEntity) {
+      navigate('/dealz');
+    }
+    handleRingMenuClose();
+  };
+
+  const handleJoinPromo = () => {
+    if (ringMenuEntity) {
+      const activePromo = ringMenuEntity.promos.find((p) => !p.seen && p.type === "live");
+      if (activePromo) {
+        navigate('/dealz');
+      } else {
+        navigate('/dealz');
+      }
+    }
+    handleRingMenuClose();
+  };
 
   // Calculate total unread count
   const totalUnread = useMemo(() => {
@@ -161,36 +281,21 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
             >
               Inbox
             </Typography>
-            <IconButton 
-              aria-label="Notifications" 
-              onClick={() => navigate('/dnd')}
-              sx={{ color: '#fff', padding: { xs: '6px', sm: '8px' } }}
-            >
-              <Badge 
-                variant="dot" 
-                sx={{
-                  '& .MuiBadge-dot': {
-                    backgroundColor: '#ff4444',
-                    width: 8,
-                    height: 8,
-                    right: 4,
-                    top: 4
-                  }
-                }}
-            >
-                <NotificationsRoundedIcon />
-              </Badge>
-            </IconButton>
+            <NotificationIconButton />
           </Toolbar>
         </AppBar>
 
         {/* 2. Live Ongoing Section (Dark Grey Background) - Swipeable Carousel */}
         <Box 
           sx={{ 
-            bgcolor: isDark ? '#2a2a2a' : '#4a4a4a',
+            bgcolor: isDark ? '#3a3a3a' : '#5a5a5a',
             color: '#fff',
             px: { xs: 1.5, sm: 2 },
-            py: { xs: 1.25, sm: 1.5 }
+            py: { xs: 1.25, sm: 1.5 },
+            pb: { xs: 2.5, sm: 3 },
+            mb: 3,
+            position: 'relative',
+            zIndex: 0
           }}
         >
           <Typography 
@@ -360,7 +465,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
           )}
         </Box>
 
-        {/* 3. Message Drawer (White Rounded Panel) - Overlaps Live Ongoing */}
+        {/* 3. Message Drawer (White Rounded Panel) - Separate from Live Ongoing */}
         <Paper
           elevation={0}
           sx={{
@@ -368,12 +473,12 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
             bgcolor: 'background.paper',
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
-            mt: -2, // Overlap more with Live Ongoing section to create layered effect
+            mt: 2,
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
             position: 'relative',
-            zIndex: 1,
+            zIndex: 0,
             boxShadow: isDark ? '0 -2px 8px rgba(0,0,0,0.2)' : '0 -2px 8px rgba(0,0,0,0.1)'
           }}
         >
@@ -585,7 +690,12 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                         }
                       }}
                     >
-                      <Avatar src={c.avatar || `https://i.pravatar.cc/100?u=${c.id}`} sx={{ bgcolor: 'background.default', color: 'text.primary' }} />
+                      <PromoRingAvatar
+                        entity={c}
+                        accentColor={accentColor}
+                        onClick={(e) => handleRingClick(e, c)}
+                        size={40}
+                      />
                     </Badge>
                   </ListItemAvatar>
                   <ListItemText
@@ -683,6 +793,50 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
         </Box>
         </Paper>
       </Box>
+
+      {/* Ring Menu - Pull-up menu for promo rings */}
+      <Menu
+        anchorEl={ringMenuEl}
+        open={Boolean(ringMenuEl)}
+        onClose={handleRingMenuClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        PaperProps={{
+          sx: {
+            width: '90vw',
+            maxWidth: 300,
+            borderRadius: 3,
+            py: 0.5,
+            bgcolor: 'background.paper',
+            '& .MuiMenuItem-root': {
+              color: 'text.primary',
+            }
+          }
+        }}
+      >
+        {ringMenuEntity && (
+          <>
+            <Box sx={{ px: 2, py: 1.5, borderBottom: `1px solid ${muiTheme.palette.divider}` }}>
+              <Typography variant="subtitle2" className="font-semibold" sx={{ color: 'text.primary' }}>
+                {ringMenuEntity.name}
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                {ringMenuEntity.promos.filter((p) => !p.seen).length} active promo{ringMenuEntity.promos.filter((p) => !p.seen).length !== 1 ? 's' : ''}
+              </Typography>
+            </Box>
+            {ringMenuEntity.promos.some((p) => !p.seen && p.type === "live") && (
+              <MenuItem onClick={handleJoinPromo}>
+                <ListItemIcon><PlayCircleFilledWhiteRoundedIcon fontSize="small" sx={{ color: accentColor }} /></ListItemIcon>
+                <ListItemText primary="Join live session" />
+              </MenuItem>
+            )}
+            <MenuItem onClick={handleViewPromos}>
+              <ListItemIcon><VisibilityRoundedIcon fontSize="small" /></ListItemIcon>
+              <ListItemText primary="View all promos" />
+            </MenuItem>
+          </>
+        )}
+      </Menu>
     </>
   );
 }
