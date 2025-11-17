@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTheme as useMuiTheme } from "@mui/material/styles";
 import { useTheme } from "../context/ThemeContext";
 import {
   AppBar,
@@ -14,7 +15,6 @@ import {
   Snackbar
 } from "@mui/material";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
-import EventAvailableRoundedIcon from "@mui/icons-material/EventAvailableRounded";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 import VideocamRoundedIcon from "@mui/icons-material/VideocamRounded";
 import PhoneRoundedIcon from "@mui/icons-material/PhoneRounded";
@@ -45,6 +45,7 @@ const DEMO_CONFIRM = {
 };
 
 export default function MeetingConfirmationJoin({ onBack, onNavigate }) {
+  const muiTheme = useMuiTheme();
   const { accent, isDark } = useTheme();
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
   const [snack, setSnack] = useState("");
@@ -102,39 +103,25 @@ export default function MeetingConfirmationJoin({ onBack, onNavigate }) {
     }
   };
 
-  const roleLabel = b.role === "host" ? "You are the host" : "You are attending";
-
   return (
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none`}</style>
 
       <Box sx={{ width: '100%', height: '100%', bgcolor: 'background.default', overflowX: 'hidden', margin: 0, padding: 0 }}>
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
-          {/* Header */}
-          <AppBar elevation={0} position="fixed" sx={{ bgcolor: accentColor, color: "#fff", width: '100%', zIndex: 1100 }}>
-            <Toolbar
-              sx={{ 
-                minHeight: { xs: '56px', md: '64px' },
-                width: "100%",
-                px: { xs: 1.5, sm: 2, md: 3, lg: 4 }
-              }}
-            >
+          {/* Header - matching Dealz Status style */}
+          <AppBar elevation={0} position="static" sx={{ bgcolor: 'background.paper', color: 'text.primary', borderBottom: `1px solid ${muiTheme.palette.divider}` }}>
+            <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
               <IconButton
                 onClick={onBack}
                 aria-label="Back"
-                sx={{ color: "#fff", mr: 1 }}
+                sx={{ color: 'text.primary', padding: { xs: '6px', sm: '8px' } }}
               >
-                <ArrowBackRoundedIcon />
+                <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
               </IconButton>
-              <EventAvailableRoundedIcon sx={{ mr: 1 }} />
-              <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                <Typography variant="subtitle1" className="font-semibold" noWrap>
+              <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 }, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   Meeting confirmed
                 </Typography>
-                <Typography variant="caption" sx={{ opacity: 0.9 }}>
-                  {roleLabel}
-                </Typography>
-              </Box>
             </Toolbar>
           </AppBar>
 
@@ -144,7 +131,6 @@ export default function MeetingConfirmationJoin({ onBack, onNavigate }) {
             sx={{ 
               flex: 1, 
               overflowY: "auto", 
-              pt: { xs: "56px", md: "64px" }, 
               pb: { xs: 8, md: 10 }, 
               px: { xs: 1.5, sm: 2, md: 3, lg: 4 },
               width: '100%'

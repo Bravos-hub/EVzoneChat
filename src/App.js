@@ -15,7 +15,7 @@ export default function App(){
       <CallContextProvider>
         <EncryptionProvider userId={userId}>
           <SessionTimeoutProvider timeoutMs={30 * 60 * 1000} warningMs={5 * 60 * 1000}>
-            <EVZUserMobileShell registry={registry} />
+        <EVZUserMobileShell registry={registry} />
           </SessionTimeoutProvider>
         </EncryptionProvider>
       </CallContextProvider>

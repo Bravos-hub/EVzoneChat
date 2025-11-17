@@ -348,36 +348,26 @@ export default function MyMeetingsList({ onBack, onNavigate }) {
 
       <Box sx={{ width: '100%', height: '100%', bgcolor: 'background.default', overflowX: 'hidden', margin: 0, padding: 0 }}>
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
-          {/* Header */}
-          <AppBar elevation={0} position="fixed" sx={{ bgcolor: accentColor, color: "#fff", width: '100%', zIndex: 1100 }}>
-            <Toolbar
-              sx={{ 
-                minHeight: { xs: '56px', md: '64px' },
-                width: "100%",
-                px: { xs: 1.5, sm: 2, md: 3 }
-              }}
-            >
+          {/* Header - matching Dealz Status style */}
+          <AppBar elevation={0} position="static" sx={{ bgcolor: 'background.paper', color: 'text.primary', borderBottom: `1px solid ${muiTheme.palette.divider}` }}>
+            <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
               <IconButton
                 onClick={onBack}
                 aria-label="Back"
-                sx={{ color: "#fff", mr: 1, padding: { xs: '6px', sm: '8px' } }}
+                sx={{ color: 'text.primary', padding: { xs: '6px', sm: '8px' } }}
               >
                 <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
               </IconButton>
-              <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                <Typography variant="subtitle1" className="font-semibold" noWrap sx={{ fontSize: { xs: '15px', sm: '16px' } }}>
+              <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 }, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   My meetings
                 </Typography>
-                <Typography variant="caption" sx={{ opacity: 0.9, fontSize: { xs: '11px', sm: '12px' } }}>
-                  Upcoming, past and booking requests
-                </Typography>
-              </Box>
+              <Box sx={{ flexGrow: 1 }} />
               <Button
                 onClick={() => onNavigate?.('/meetings/book')}
                 variant="contained"
                 startIcon={<EventAvailableRoundedIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />}
                 sx={{ 
-                  bgcolor: 'rgba(255, 255, 255, 0.2)',
+                  bgcolor: accentColor,
                   color: '#fff',
                   textTransform: 'none',
                   fontSize: { xs: '12px', sm: '13px' },
@@ -385,7 +375,7 @@ export default function MyMeetingsList({ onBack, onNavigate }) {
                   py: { xs: 0.5, sm: 0.75 },
                   fontWeight: 600,
                   '&:hover': {
-                    bgcolor: 'rgba(255, 255, 255, 0.3)',
+                    bgcolor: accent === 'green' ? '#02b87a' : accent === 'orange' ? '#e06f00' : '#8a8a8a',
                     boxShadow: 2
                   },
                   transition: 'all 0.2s ease',
@@ -396,20 +386,6 @@ export default function MyMeetingsList({ onBack, onNavigate }) {
               </Button>
             </Toolbar>
           </AppBar>
-
-          {/* Title above tabs */}
-          <Box sx={{ pt: { xs: "60px", md: "68px" }, bgcolor: 'background.paper', width: '100%', px: { xs: 1.5, sm: 2, md: 3 }, pb: { xs: 0.5, sm: 1 } }}>
-            <Typography 
-              variant="h5" 
-              sx={{ 
-                fontWeight: 600, 
-                color: 'text.primary',
-                fontSize: { xs: '18px', sm: '20px', md: '22px' }
-              }}
-            >
-              My Meetings
-            </Typography>
-          </Box>
 
           {/* Tabs */}
           <Box sx={{ bgcolor: 'background.paper', width: '100%', borderBottom: `1px solid ${muiTheme.palette.divider}` }}>
