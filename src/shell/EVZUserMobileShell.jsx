@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 import { useCall } from "../context/CallContext";
@@ -608,33 +608,36 @@ function RouteWrapper({ Component, registry, ...props }) {
       // Handle search result clicks - navigate based on result type
       if (!result) return;
       
-      const { type, id } = result;
+      const { type, id, name } = result;
+      
+      // Include name in URL params if available
+      const nameParam = name ? `&name=${encodeURIComponent(name)}` : '';
       
       switch (type) {
         case 'person':
           // Navigate to conversation with person
-          navigate(`/conversation/${id}`);
+          navigate(`/conversation/${id}${nameParam ? '?' + nameParam.substring(1) : ''}`);
           break;
         case 'channel':
           // Navigate to channel conversation
-          navigate(`/conversation/${id}?type=channel`);
+          navigate(`/conversation/${id}?type=channel${nameParam}`);
           break;
         case 'group':
           // Navigate to group conversation
-          navigate(`/conversation/${id}?type=group`);
+          navigate(`/conversation/${id}?type=group${nameParam}`);
           break;
         case 'message':
           // Navigate to conversation and scroll to message
-          navigate(`/conversation/${id}?message=${id}`);
+          navigate(`/conversation/${id}?message=${id}${nameParam}`);
           break;
         case 'thread':
           // Navigate to conversation and show thread
-          navigate(`/conversation/${id}?thread=${id}`);
+          navigate(`/conversation/${id}?thread=${id}${nameParam}`);
           break;
         default:
           // Fallback: try to navigate to conversation
           if (id) {
-            navigate(`/conversation/${id}`);
+            navigate(`/conversation/${id}${nameParam ? '?' + nameParam.substring(1) : ''}`);
           }
       }
     },

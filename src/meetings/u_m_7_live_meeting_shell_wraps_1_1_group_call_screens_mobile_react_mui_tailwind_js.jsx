@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { useTheme as useMuiTheme } from "@mui/material/styles";
 import { useTheme } from "../context/ThemeContext";
 import {
   AppBar,
@@ -50,8 +49,7 @@ const DEMO_MEETING = {
 };
 
 export default function LiveMeetingShell({ onBack, onNavigate, location, registry }) {
-  const muiTheme = useMuiTheme();
-  const { accent, isDark } = useTheme();
+  const { accent } = useTheme();
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
   const routeLocation = useLocation();
   
