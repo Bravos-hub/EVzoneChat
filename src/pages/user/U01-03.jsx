@@ -95,11 +95,12 @@ function NotificationIconButton() {
               width: 8,
               height: 8,
               right: 4,
-              top: 4
+              top: 4,
+              display: muted ? 'none' : 'block' // Hide badge when muted
             }
           }}
         >
-          <NotificationsRoundedIcon />
+          {muted ? <NotificationsOffRoundedIcon /> : <NotificationsRoundedIcon />}
         </Badge>
       </IconButton>
       <Menu

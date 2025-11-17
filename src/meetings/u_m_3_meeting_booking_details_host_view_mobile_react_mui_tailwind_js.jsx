@@ -90,7 +90,11 @@ export default function MeetingBookingDetails({ onBack, onNavigate, location: ro
     }
   };
 
-  const modeIcon = mode === "video" ? <VideocamRoundedIcon sx={{ fontSize: 18 }} /> : <PhoneRoundedIcon sx={{ fontSize: 18 }} />;
+  const modeIcon = mode === "video" ? (
+    <VideocamRoundedIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+  ) : (
+    <PhoneRoundedIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+  );
 
   return (
     <>
@@ -175,17 +179,17 @@ export default function MeetingBookingDetails({ onBack, onNavigate, location: ro
                   <Typography
                     variant="subtitle1"
                     className="font-semibold"
-                    sx={{ mb: 0.4, whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}
+                    sx={{ mb: 0.4, whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden", color: 'text.primary' }}
                   >
                     {title}
                   </Typography>
                   <Stack direction="row" spacing={0.75} alignItems="center">
                     {type === "group" ? (
-                      <GroupRoundedIcon sx={{ fontSize: 18, opacity: 0.8 }} />
+                      <GroupRoundedIcon sx={{ fontSize: 18, opacity: 0.8, color: 'text.secondary' }} />
                     ) : (
-                      <PersonRoundedIcon sx={{ fontSize: 18, opacity: 0.8 }} />
+                      <PersonRoundedIcon sx={{ fontSize: 18, opacity: 0.8, color: 'text.secondary' }} />
                     )}
-                    <Typography variant="caption" sx={{ opacity: 0.9 }}>
+                    <Typography variant="caption" sx={{ opacity: 0.9, color: 'text.secondary' }}>
                       {type === "group" ? "Group" : "1:1"} • With {who}
                     </Typography>
                   </Stack>
@@ -194,30 +198,30 @@ export default function MeetingBookingDetails({ onBack, onNavigate, location: ro
 
               {/* Mode + location */}
               <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-                {modeIcon}
-                <Typography variant="caption" sx={{ opacity: 0.9 }}>
+                <Box sx={{ color: 'text.secondary' }}>{modeIcon}</Box>
+                <Typography variant="caption" sx={{ opacity: 0.9, color: 'text.secondary' }}>
                   {mode === "video" ? "Video" : "Audio"} • {location}
                 </Typography>
               </Stack>
 
               {/* Availability window */}
               <Box sx={{ mt: 1.5, mb: 1.5 }}>
-                <Typography variant="subtitle2" className="font-semibold" sx={{ mb: 0.5 }}>
+                <Typography variant="subtitle2" className="font-semibold" sx={{ mb: 0.5, color: 'text.primary' }}>
                   Availability window
                 </Typography>
                 <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
-                  <AccessTimeRoundedIcon sx={{ fontSize: 18, opacity: 0.8 }} />
-                  <Typography variant="caption">
+                  <AccessTimeRoundedIcon sx={{ fontSize: 18, opacity: 0.8, color: 'text.secondary' }} />
+                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                     Dates: {availability.startDate} → {availability.endDate}
                   </Typography>
                 </Stack>
                 <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
-                  <AccessTimeRoundedIcon sx={{ fontSize: 18, opacity: 0.8 }} />
-                  <Typography variant="caption">
+                  <AccessTimeRoundedIcon sx={{ fontSize: 18, opacity: 0.8, color: 'text.secondary' }} />
+                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                     Daily window: {availability.windowStart} – {availability.windowEnd}
                   </Typography>
                 </Stack>
-                <Typography variant="caption" sx={{ display: "block", opacity: 0.9 }}>
+                <Typography variant="caption" sx={{ display: "block", opacity: 0.9, color: 'text.secondary' }}>
                   Slot length: {availability.duration} minutes
                 </Typography>
               </Box>
@@ -225,17 +229,25 @@ export default function MeetingBookingDetails({ onBack, onNavigate, location: ro
               {/* Co-hosts & notes */}
               {type === "group" && (
                 <Box sx={{ mb: 1.5 }}>
-                  <Typography variant="subtitle2" className="font-semibold" sx={{ mb: 0.5 }}>
+                  <Typography variant="subtitle2" className="font-semibold" sx={{ mb: 0.5, color: 'text.primary' }}>
                     Co‑hosts
                   </Typography>
                   {coHosts.length === 0 ? (
-                    <Typography variant="caption" sx={{ color: EV.grey }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                       None
                     </Typography>
                   ) : (
                     <Stack direction="row" flexWrap="wrap" gap={0.5}>
                       {coHosts.map((name) => (
-                        <Chip key={name} size="small" label={name} />
+                        <Chip 
+                          key={name} 
+                          size="small" 
+                          label={name}
+                          sx={{ 
+                            bgcolor: isDark ? 'rgba(255,255,255,0.1)' : EV.light,
+                            color: 'text.primary'
+                          }}
+                        />
                       ))}
                     </Stack>
                   )}
@@ -243,17 +255,17 @@ export default function MeetingBookingDetails({ onBack, onNavigate, location: ro
               )}
 
               <Box sx={{ mb: 1.5 }}>
-                <Typography variant="subtitle2" className="font-semibold" sx={{ mb: 0.5 }}>
+                <Typography variant="subtitle2" className="font-semibold" sx={{ mb: 0.5, color: 'text.primary' }}>
                   Notes / agenda
                 </Typography>
-                <Typography variant="body2" sx={{ fontSize: 13, color: "#444" }}>
+                <Typography variant="body2" sx={{ fontSize: 13, color: 'text.primary' }}>
                   {notes}
                 </Typography>
               </Box>
 
               {/* Booking link */}
               <Box sx={{ mb: 1.5 }}>
-                <Typography variant="subtitle2" className="font-semibold" sx={{ mb: 0.5 }}>
+                <Typography variant="subtitle2" className="font-semibold" sx={{ mb: 0.5, color: 'text.primary' }}>
                   Booking link
                 </Typography>
                 <Typography
@@ -262,7 +274,8 @@ export default function MeetingBookingDetails({ onBack, onNavigate, location: ro
                     display: "block",
                     p: 1,
                     borderRadius: 1,
-                    bgcolor: EV.light,
+                    bgcolor: isDark ? 'rgba(255,255,255,0.1)' : EV.light,
+                    color: 'text.primary',
                     wordBreak: "break-all",
                     mb: 0.5,
                   }}

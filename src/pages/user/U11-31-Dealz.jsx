@@ -454,7 +454,7 @@ export default function DealzPromoStatusFeed({ onBack }) {
           minHeight: '100vh',
           width: '100%'
         }}
-      >
+              >
 
           {/* Content */}
           <Box
@@ -822,8 +822,8 @@ export default function DealzPromoStatusFeed({ onBack }) {
               >
                 Follow channels or people to keep their future Dealz at the top.
               </Typography>
-            </Box>
           </Box>
+        </Box>
       </Box>
 
       {/* Drawer: promos for selected entity */}

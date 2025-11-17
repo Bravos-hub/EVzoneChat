@@ -76,18 +76,35 @@ function MeetingCard({ meeting, kind, onNavigate }) {
   const muiTheme = useMuiTheme();
   const { accent, isDark } = useTheme();
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
-  const modeIcon = meeting.mode === "video" ? <VideocamRoundedIcon sx={{ fontSize: 18 }} /> : <PhoneRoundedIcon sx={{ fontSize: 18 }} />;
+  
+  const handleCardClick = () => {
+    // Allow clicking the card itself to view details
+    onNavigate?.(`/meetings/${meeting.id}`);
+  };
+  const modeIcon = meeting.mode === "video" ? (
+    <VideocamRoundedIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+  ) : (
+    <PhoneRoundedIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+  );
 
   return (
     <Paper
       variant="outlined"
+      onClick={handleCardClick}
       sx={{
         mb: { xs: 1, sm: 1.5 },
         p: { xs: 1.25, sm: 1.5 },
         borderRadius: 2,
         borderColor: muiTheme.palette.divider,
         bgcolor: 'background.paper',
-        boxShadow: 1
+        boxShadow: 1,
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+        '&:hover': {
+          boxShadow: 2,
+          borderColor: accentColor,
+          transform: 'translateY(-2px)'
+        }
       }}
     >
       <Stack direction="row" spacing={1} alignItems="flex-start" sx={{ mb: 0.5 }}>
@@ -102,12 +119,12 @@ function MeetingCard({ meeting, kind, onNavigate }) {
           <Typography
             variant="subtitle2"
             className="font-semibold"
-            sx={{ mb: 0.2, whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}
+            sx={{ mb: 0.2, whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden", color: 'text.primary' }}
           >
             {meeting.title}
           </Typography>
           <Stack direction="row" spacing={0.5} alignItems="center" sx={{ mb: 0.3 }}>
-            <Typography variant="caption" sx={{ opacity: 0.85 }}>
+            <Typography variant="caption" sx={{ opacity: 0.85, color: 'text.secondary' }}>
               With {meeting.who}
             </Typography>
             <Chip
@@ -123,41 +140,83 @@ function MeetingCard({ meeting, kind, onNavigate }) {
           </Stack>
           <Stack direction="row" spacing={0.75} alignItems="center">
             {modeIcon}
-            <AccessTimeRoundedIcon sx={{ fontSize: 18, opacity: 0.7 }} />
-            <Typography variant="caption" sx={{ opacity: 0.8 }}>
+            <AccessTimeRoundedIcon sx={{ fontSize: 18, opacity: 0.7, color: 'text.secondary' }} />
+            <Typography variant="caption" sx={{ opacity: 0.8, color: 'text.secondary' }}>
               {meeting.when}
             </Typography>
           </Stack>
-          <Typography variant="caption" sx={{ mt: 0.5, color: EV.grey }}>
+          <Typography variant="caption" sx={{ mt: 0.5, color: 'text.secondary' }}>
             {meeting.status}
           </Typography>
         </Box>
       </Stack>
       <Divider sx={{ my: 1 }} />
-      <Stack direction="row" spacing={1} justifyContent="flex-end">
+      <Stack 
+        direction="row" 
+        spacing={1} 
+        justifyContent="flex-end"
+        onClick={(e) => e.stopPropagation()} // Prevent card click when clicking buttons
+      >
         {kind === "upcoming" && (
           <>
             <Button 
               size="small" 
               variant="outlined" 
-              sx={{ textTransform: "none", fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 } }}
+              sx={{ 
+                textTransform: "none", 
+                fontSize: { xs: '12px', sm: '13px' }, 
+                py: { xs: 0.5, sm: 0.75 },
+                px: { xs: 1, sm: 1.5 },
+                borderColor: 'text.secondary',
+                color: 'text.primary',
+                '&:hover': {
+                  borderColor: accentColor,
+                  bgcolor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
+                }
+              }}
               onClick={() => onNavigate?.(`/meetings/${meeting.id}`)}
+              title={`View details for "${meeting.title}"`}
             >
               View
             </Button>
             <Button 
               size="small" 
               variant="outlined" 
-              sx={{ textTransform: "none", fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 } }}
+              sx={{ 
+                textTransform: "none", 
+                fontSize: { xs: '12px', sm: '13px' }, 
+                py: { xs: 0.5, sm: 0.75 },
+                px: { xs: 1, sm: 1.5 },
+                borderColor: 'text.secondary',
+                color: 'text.primary',
+                '&:hover': {
+                  borderColor: accentColor,
+                  bgcolor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
+                }
+              }}
               onClick={() => onNavigate?.(`/meetings/book?reschedule=${meeting.id}`)}
+              title={`Update or reschedule "${meeting.title}"`}
             >
               Reschedule
             </Button>
             <Button 
               size="small" 
               variant="contained" 
-              sx={{ textTransform: "none", bgcolor: accentColor, fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 }, "&:hover": { bgcolor: accent === 'green' ? '#02b87a' : accent === 'orange' ? '#e06f00' : '#8a8a8a' } }}
+              sx={{ 
+                textTransform: "none", 
+                bgcolor: accentColor, 
+                color: '#fff',
+                fontSize: { xs: '12px', sm: '13px' }, 
+                py: { xs: 0.5, sm: 0.75 },
+                px: { xs: 1.5, sm: 2 },
+                fontWeight: 600,
+                "&:hover": { 
+                  bgcolor: accent === 'green' ? '#02b87a' : accent === 'orange' ? '#e06f00' : '#8a8a8a',
+                  boxShadow: 2
+                } 
+              }}
               onClick={() => onNavigate?.(`/meetings/live/${meeting.id}`)}
+              title={`Join "${meeting.title}" meeting`}
             >
               Join
             </Button>
@@ -165,20 +224,95 @@ function MeetingCard({ meeting, kind, onNavigate }) {
         )}
         {kind === "past" && (
           <>
-            <Button size="small" variant="outlined" sx={{ textTransform: "none" }}>
+            <Button 
+              size="small" 
+              variant="outlined" 
+              sx={{ 
+                textTransform: "none", 
+                fontSize: { xs: '12px', sm: '13px' }, 
+                py: { xs: 0.5, sm: 0.75 },
+                px: { xs: 1, sm: 1.5 },
+                borderColor: 'text.secondary',
+                color: 'text.primary',
+                '&:hover': {
+                  borderColor: accentColor,
+                  bgcolor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
+                }
+              }}
+              onClick={() => onNavigate?.(`/meetings/${meeting.id}`)}
+              title={`View details for "${meeting.title}"`}
+            >
               View
             </Button>
-            <Button size="small" variant="contained" sx={{ textTransform: "none", bgcolor: EV.orange }}>
+            <Button 
+              size="small" 
+              variant="contained" 
+              sx={{ 
+                textTransform: "none", 
+                bgcolor: accentColor,
+                color: '#fff',
+                fontSize: { xs: '12px', sm: '13px' }, 
+                py: { xs: 0.5, sm: 0.75 },
+                px: { xs: 1.5, sm: 2 },
+                fontWeight: 600,
+                "&:hover": { 
+                  bgcolor: accent === 'green' ? '#02b87a' : accent === 'orange' ? '#e06f00' : '#8a8a8a',
+                  boxShadow: 2
+                } 
+              }}
+              onClick={() => onNavigate?.('/meetings/book')}
+              title="Create a new meeting with the same details"
+            >
               Book again
             </Button>
           </>
         )}
         {kind === "requests" && (
           <>
-            <Button size="small" variant="outlined" sx={{ textTransform: "none" }}>
+            <Button 
+              size="small" 
+              variant="outlined" 
+              sx={{ 
+                textTransform: "none", 
+                fontSize: { xs: '12px', sm: '13px' }, 
+                py: { xs: 0.5, sm: 0.75 },
+                px: { xs: 1, sm: 1.5 },
+                borderColor: 'text.secondary',
+                color: 'text.primary',
+                '&:hover': {
+                  borderColor: accentColor,
+                  bgcolor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)',
+                }
+              }}
+              onClick={() => onNavigate?.(`/meetings/${meeting.id}`)}
+              title={`View details for "${meeting.title}"`}
+            >
               View
             </Button>
-            <Button size="small" variant="outlined" color="error" sx={{ textTransform: "none" }}>
+            <Button 
+              size="small" 
+              variant="outlined" 
+              color="error" 
+              sx={{ 
+                textTransform: "none",
+                fontSize: { xs: '12px', sm: '13px' }, 
+                py: { xs: 0.5, sm: 0.75 },
+                px: { xs: 1, sm: 1.5 },
+                '&:hover': {
+                  bgcolor: isDark ? 'rgba(211, 47, 47, 0.1)' : 'rgba(211, 47, 47, 0.08)',
+                  borderColor: 'error.main',
+                }
+              }}
+              onClick={() => {
+                if (window.confirm(`Are you sure you want to cancel "${meeting.title}"?`)) {
+                  // In production, this would call an API to cancel the meeting
+                  alert(`Meeting "${meeting.title}" has been cancelled (demo).`);
+                  // Optionally navigate back or refresh the list
+                  // onNavigate?.('/meetings');
+                }
+              }}
+              title={`Cancel "${meeting.title}" meeting request`}
+            >
               Cancel
             </Button>
           </>
@@ -189,6 +323,7 @@ function MeetingCard({ meeting, kind, onNavigate }) {
 }
 
 export default function MyMeetingsList({ onBack, onNavigate }) {
+  const muiTheme = useMuiTheme();
   const { accent } = useTheme();
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
   const [tab, setTab] = useState("upcoming");
@@ -240,7 +375,7 @@ export default function MyMeetingsList({ onBack, onNavigate }) {
               <Button
                 onClick={() => onNavigate?.('/meetings/book')}
                 variant="contained"
-                startIcon={<EventAvailableRoundedIcon />}
+                startIcon={<EventAvailableRoundedIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />}
                 sx={{ 
                   bgcolor: 'rgba(255, 255, 255, 0.2)',
                   color: '#fff',
@@ -248,10 +383,14 @@ export default function MyMeetingsList({ onBack, onNavigate }) {
                   fontSize: { xs: '12px', sm: '13px' },
                   px: { xs: 1.5, sm: 2 },
                   py: { xs: 0.5, sm: 0.75 },
+                  fontWeight: 600,
                   '&:hover': {
                     bgcolor: 'rgba(255, 255, 255, 0.3)',
-                  }
+                    boxShadow: 2
+                  },
+                  transition: 'all 0.2s ease',
                 }}
+                title="Create a new meeting booking"
               >
                 Book Meeting
               </Button>
@@ -273,7 +412,7 @@ export default function MyMeetingsList({ onBack, onNavigate }) {
           </Box>
 
           {/* Tabs */}
-          <Box sx={{ bgcolor: 'background.paper', width: '100%' }}>
+          <Box sx={{ bgcolor: 'background.paper', width: '100%', borderBottom: `1px solid ${muiTheme.palette.divider}` }}>
             <Tabs
               value={tab}
               onChange={(_, v) => {
@@ -290,14 +429,24 @@ export default function MyMeetingsList({ onBack, onNavigate }) {
                 '& .MuiTab-root': {
                   fontSize: { xs: '13px', sm: '14px' },
                   minHeight: { xs: 44, sm: 48 },
-                  textTransform: 'none'
+                  textTransform: 'none',
+                  fontWeight: 500,
+                  color: 'text.secondary',
+                  '&.Mui-selected': {
+                    color: accentColor,
+                    fontWeight: 600
+                  }
+                },
+                '& .MuiTabs-indicator': {
+                  backgroundColor: accentColor,
+                  height: 3
                 }
               }}
             >
-              <Tab value="new" label="New" />
-              <Tab value="upcoming" label="Upcoming" />
-              <Tab value="past" label="Past" />
-              <Tab value="requests" label="Requests" />
+              <Tab value="new" label="New" title="Book a new meeting" />
+              <Tab value="upcoming" label="Upcoming" title="View upcoming meetings" />
+              <Tab value="past" label="Past" title="View past meetings" />
+              <Tab value="requests" label="Requests" title="View meeting requests" />
             </Tabs>
           </Box>
 
@@ -312,10 +461,44 @@ export default function MyMeetingsList({ onBack, onNavigate }) {
           }}>
             
             {data.length === 0 ? (
-              <Box className="h-full flex items-center justify-center">
-                <Typography variant="body2" sx={{ color: EV.grey }}>
-                  No meetings here yet.
+              <Box sx={{ 
+                display: 'flex', 
+                flexDirection: 'column',
+                alignItems: 'center', 
+                justifyContent: 'center',
+                minHeight: { xs: '200px', sm: '300px' },
+                py: { xs: 4, sm: 6 }
+              }}>
+                <EventAvailableRoundedIcon sx={{ fontSize: { xs: 48, sm: 64 }, color: 'text.secondary', opacity: 0.5, mb: 2 }} />
+                <Typography variant="body2" sx={{ color: 'text.secondary', textAlign: 'center', mb: 1 }}>
+                  {tab === "new" ? "Click 'New' tab to book a meeting" : 
+                   tab === "upcoming" ? "No upcoming meetings" :
+                   tab === "past" ? "No past meetings" :
+                   "No meeting requests"}
                 </Typography>
+                {tab !== "new" && (
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => onNavigate?.('/meetings/book')}
+                    sx={{
+                      mt: 2,
+                      textTransform: 'none',
+                      borderColor: accentColor,
+                      color: accentColor,
+                      fontSize: { xs: '12px', sm: '13px' },
+                      px: { xs: 2, sm: 2.5 },
+                      py: { xs: 0.75, sm: 1 },
+                      '&:hover': {
+                        borderColor: accentColor,
+                        bgcolor: accent === 'green' ? 'rgba(3, 205, 140, 0.1)' : accent === 'orange' ? 'rgba(247, 127, 0, 0.1)' : 'rgba(166, 166, 166, 0.1)'
+                      }
+                    }}
+                    title="Create a new meeting booking"
+                  >
+                    Book a Meeting
+                  </Button>
+                )}
               </Box>
             ) : (
               data.map((m) => <MeetingCard key={m.id} meeting={m} kind={tab} onNavigate={onNavigate} />)

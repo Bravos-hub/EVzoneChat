@@ -38,6 +38,42 @@ const COHOST_SUGGESTIONS = [
   "KB",
 ];
 
+// Demo meetings data - in production this would come from API/context
+const DEMO_MEETINGS = {
+  m1: {
+    id: "m1",
+    title: "Charging Onboarding Call",
+    module: "Charging",
+    type: "1:1",
+    selectedPerson: "Leslie Alexander",
+    selectedGroup: "",
+    mode: "video",
+    startDate: "2025-04-11",
+    endDate: "2025-04-11",
+    windowStart: "10:30",
+    windowEnd: "11:00",
+    duration: "30",
+    coHosts: [],
+    notes: "We will walk through the new Charging dashboard and mobile flows."
+  },
+  m2: {
+    id: "m2",
+    title: "Seller Training — Group",
+    module: "E-Commerce",
+    type: "group",
+    selectedPerson: "",
+    selectedGroup: "Core Team",
+    mode: "video",
+    startDate: "2025-04-12",
+    endDate: "2025-04-12",
+    windowStart: "15:00",
+    windowEnd: "16:00",
+    duration: "60",
+    coHosts: ["Alex Cooper", "Kayle"],
+    notes: "Training session for new sellers on the platform."
+  }
+};
+
 /**
  * MeetingBooking — Online 1:1 & Group meeting bookings (Calendly‑style)
  *
@@ -53,19 +89,39 @@ const COHOST_SUGGESTIONS = [
  * - Step 6: Notes/agenda.
  * - Bottom CTA & note are pinned and constrained to the mobile frame.
  */
-export default function MeetingBooking({ onBack, onNavigate }) {
+export default function MeetingBooking({ onBack, onNavigate, location: routeLocation }) {
   const muiTheme = useMuiTheme();
   const { accent, isDark } = useTheme();
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
+
+  // Check if this is a reschedule action and get meeting ID
+  const rescheduleMeetingId = useMemo(() => {
+    if (routeLocation?.search) {
+      const params = new URLSearchParams(routeLocation.search);
+      return params.get('reschedule');
+    }
+    return null;
+  }, [routeLocation]);
+  
+  const isReschedule = rescheduleMeetingId !== null;
+  
+  // Get existing meeting data if rescheduling
+  const existingMeeting = useMemo(() => {
+    if (isReschedule && rescheduleMeetingId && DEMO_MEETINGS[rescheduleMeetingId]) {
+      return DEMO_MEETINGS[rescheduleMeetingId];
+    }
+    return null;
+  }, [isReschedule, rescheduleMeetingId]);
   
   // Set document title
   useEffect(() => {
-    document.title = "Meeting Booking - EVzone Chat";
+    document.title = isReschedule ? "Reschedule Meeting - EVzone Chat" : "Meeting Booking - EVzone Chat";
     return () => {
       document.title = "EVzone Chat";
     };
-  }, []);
+  }, [isReschedule]);
   
+  // Initialize form state
   const [meetingType, setMeetingType] = useState("1:1"); // '1:1' | 'group'
   const [module, setModule] = useState("E-Commerce");
   const [title, setTitle] = useState("");
@@ -88,6 +144,50 @@ export default function MeetingBooking({ onBack, onNavigate }) {
 
   // extra
   const [notes, setNotes] = useState("");
+
+  // Get today's date in YYYY-MM-DD format for min date validation
+  const today = useMemo(() => {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    return date.toISOString().split('T')[0];
+  }, []);
+
+  // Load existing meeting data when rescheduling
+  useEffect(() => {
+    if (existingMeeting) {
+      setMeetingType(existingMeeting.type);
+      setModule(existingMeeting.module);
+      setTitle(existingMeeting.title);
+      // Validate existing dates - if in past, set to today
+      const existingStart = existingMeeting.startDate || "";
+      const existingEnd = existingMeeting.endDate || "";
+      setStartDate(existingStart && existingStart >= today ? existingStart : today);
+      setEndDate(existingEnd && existingEnd >= today ? existingEnd : (existingStart && existingStart >= today ? existingStart : today));
+      setWindowStart(existingMeeting.windowStart || "09:00");
+      setWindowEnd(existingMeeting.windowEnd || "17:00");
+      setDuration(existingMeeting.duration || "30");
+      setSelectedPerson(existingMeeting.selectedPerson || "Leslie Alexander");
+      setSelectedGroup(existingMeeting.selectedGroup || "Core Team");
+      setCoHosts(existingMeeting.coHosts || []);
+      setMode(existingMeeting.mode || "video");
+      setNotes(existingMeeting.notes || "");
+    } else if (!isReschedule) {
+      // Reset form when not rescheduling (clean state for new booking)
+      setMeetingType("1:1");
+      setModule("E-Commerce");
+      setTitle("");
+      setStartDate("");
+      setEndDate("");
+      setWindowStart("09:00");
+      setWindowEnd("17:00");
+      setDuration("30");
+      setSelectedPerson("Leslie Alexander");
+      setSelectedGroup("Core Team");
+      setCoHosts([]);
+      setMode("video");
+      setNotes("");
+    }
+  }, [existingMeeting, isReschedule, today]);
 
   const location = "Online"; // all online
   const modeLabel = mode === "video" ? "Online video meeting" : "Online audio meeting";
@@ -132,16 +232,52 @@ export default function MeetingBooking({ onBack, onNavigate }) {
   ]);
 
   const handleSchedule = () => {
-    console.log("Meeting booking created", {
-      title,
-      meetingType,
-      summary,
-    });
-    // Navigate to My Meetings after creating booking
-    if (onNavigate) {
-      onNavigate('/meetings');
+    // Validate dates - must be in the future
+    if (startDate && startDate < today) {
+      alert("Start date cannot be in the past. Please select a future date.");
+      return;
+    }
+    if (endDate && endDate < today) {
+      alert("End date cannot be in the past. Please select a future date.");
+      return;
+    }
+    if (startDate && endDate && endDate < startDate) {
+      alert("End date must be on or after the start date.");
+      return;
+    }
+    if (!startDate || !endDate) {
+      alert("Please select both start and end dates for the availability window.");
+      return;
+    }
+    if (!title.trim()) {
+      alert("Please enter a meeting title.");
+      return;
+    }
+
+    if (isReschedule && rescheduleMeetingId) {
+      console.log("Meeting updated/rescheduled", {
+        meetingId: rescheduleMeetingId,
+        title,
+        meetingType,
+        summary,
+      });
+      if (onNavigate) {
+        onNavigate('/meetings');
+      } else {
+        alert(`Meeting "${title}" has been updated successfully (demo).`);
+      }
     } else {
-    alert("Meeting booking created (demo). Guests will pick a time inside your availability.");
+      console.log("Meeting booking created", {
+        title,
+        meetingType,
+        summary,
+      });
+      // Navigate to My Meetings after creating booking
+      if (onNavigate) {
+        onNavigate('/meetings');
+      } else {
+        alert("Meeting booking created (demo). Guests will pick a time inside your availability.");
+      }
     }
   };
 
@@ -188,10 +324,10 @@ export default function MeetingBooking({ onBack, onNavigate }) {
               </IconButton>
               <Box sx={{ minWidth: 0, flexGrow: 1 }}>
                 <Typography variant="subtitle1" className="font-semibold" noWrap sx={{ fontSize: { xs: '15px', sm: '16px' } }}>
-                  Meeting booking
+                  {isReschedule ? "Update Meeting" : "Meeting booking"}
                 </Typography>
               <Typography variant="caption" sx={{ opacity: 0.9, fontSize: { xs: '11px', sm: '12px' } }}>
-                  Guests pick a time inside your availability
+                  {isReschedule ? `Modify meeting details and availability${existingMeeting ? ` - ${existingMeeting.title}` : ''}` : "Guests pick a time inside your availability"}
                 </Typography>
               </Box>
               <IconButton 
@@ -220,18 +356,33 @@ export default function MeetingBooking({ onBack, onNavigate }) {
           }}
         >
             {/* Page Title */}
-            <Typography 
-              variant="h5" 
-              sx={{ 
-                fontWeight: 600, 
-                mt: { xs: 0, sm: 0.25 }, 
-                mb: { xs: 1, sm: 1.5 }, 
-                color: 'text.primary',
-                fontSize: { xs: '18px', sm: '20px', md: '22px' }
-              }}
-            >
-              Meeting Booking
-            </Typography>
+            <Box sx={{ mb: { xs: 1, sm: 1.5 } }}>
+              <Typography 
+                variant="h5" 
+                sx={{ 
+                  fontWeight: 600, 
+                  mt: { xs: 0, sm: 0.25 }, 
+                  mb: { xs: 0.5, sm: 0.75 }, 
+                  color: 'text.primary',
+                  fontSize: { xs: '18px', sm: '20px', md: '22px' }
+                }}
+              >
+                {isReschedule ? "Update Meeting" : "Meeting Booking"}
+              </Typography>
+              {isReschedule && existingMeeting && (
+                <Chip
+                  label={`Updating: ${existingMeeting.title}`}
+                  size="small"
+                  sx={{
+                    bgcolor: accentColor,
+                    color: '#fff',
+                    fontSize: { xs: '10px', sm: '11px' },
+                    height: { xs: 20, sm: 22 },
+                    fontWeight: 500
+                  }}
+                />
+              )}
+            </Box>
             
             {/* 1. Module */}
             <Typography variant="caption" sx={{ color: 'text.secondary', mt: { xs: 1.5, sm: 2 }, mb: { xs: 1, sm: 1.5 }, display: 'block', fontSize: { xs: '13px', sm: '14px' } }}>
@@ -328,7 +479,28 @@ export default function MeetingBooking({ onBack, onNavigate }) {
               placeholder={meetingType === "1:1" ? "Catch‑up with Leslie" : "Weekly team sync"}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              sx={{ mb: { xs: 2, sm: 2.5 } }}
+              sx={{ 
+                mb: { xs: 2, sm: 2.5 },
+                '& .MuiInputLabel-root': {
+                  color: 'text.secondary',
+                  fontSize: { xs: '0.875rem', sm: '1rem' }
+                },
+                '& .MuiInputBase-input': {
+                  color: 'text.primary',
+                  fontSize: { xs: '0.875rem', sm: '1rem' }
+                },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: 'divider'
+                  },
+                  '&:hover fieldset': {
+                    borderColor: accentColor
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: accentColor
+                  }
+                }
+              }}
               size="small"
             />
 
@@ -411,10 +583,14 @@ export default function MeetingBooking({ onBack, onNavigate }) {
                   />
                   <Button
                     variant="outlined"
+                    size="small"
                     sx={{ 
                       minWidth: { xs: '100%', sm: 48 }, 
+                      height: { xs: 36, sm: 40 },
                       borderColor: accentColor, 
                       color: accentColor, 
+                      fontSize: { xs: '1.25rem', sm: '1.5rem' },
+                      fontWeight: 600,
                       "&:hover": { 
                         borderColor: accentColor, 
                         bgcolor: accent === 'green' ? 'rgba(3, 205, 140, 0.1)' : accent === 'orange' ? 'rgba(247, 127, 0, 0.1)' : 'rgba(166, 166, 166, 0.1)' 
@@ -426,6 +602,7 @@ export default function MeetingBooking({ onBack, onNavigate }) {
                       setCoHosts((prev) => (prev.includes(name) ? prev : [...prev, name]));
                       setNewCoHost("");
                     }}
+                    title="Add co-host"
                   >
                     +
                   </Button>
@@ -437,22 +614,88 @@ export default function MeetingBooking({ onBack, onNavigate }) {
             <Typography variant="caption" sx={{ color: 'text.secondary', mt: { xs: 1.5, sm: 2 }, mb: { xs: 1, sm: 1.5 }, display: 'block', fontSize: { xs: '13px', sm: '14px' } }}>
               4. When are you available? (Guests will choose a slot)
             </Typography>
+            <Typography variant="caption" sx={{ color: 'text.secondary', mb: { xs: 1, sm: 1.5 }, display: 'block', fontSize: { xs: '11px', sm: '12px' }, fontStyle: 'italic' }}>
+              Note: Only future dates can be selected. Past dates are not allowed.
+            </Typography>
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: { xs: 1.5, sm: 2 }, mb: { xs: 1.5, sm: 2 } }}>
               <TextField
                 label="Earliest date"
                 type="date"
                 size="small"
                 InputLabelProps={{ shrink: true }}
+                inputProps={{ min: today }}
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
+                onChange={(e) => {
+                  const selectedDate = e.target.value;
+                  if (selectedDate >= today) {
+                    setStartDate(selectedDate);
+                    // If end date is before new start date, update it
+                    if (endDate && endDate < selectedDate) {
+                      setEndDate(selectedDate);
+                    }
+                  } else {
+                    alert("Please select a date from today onwards. Past dates are not allowed.");
+                  }
+                }}
+                sx={{
+                  '& .MuiInputLabel-root': {
+                    color: 'text.secondary',
+                    fontSize: { xs: '0.875rem', sm: '1rem' }
+                  },
+                  '& .MuiInputBase-input': {
+                    color: 'text.primary',
+                    fontSize: { xs: '0.875rem', sm: '1rem' }
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: 'divider'
+                    },
+                    '&:hover fieldset': {
+                      borderColor: accentColor
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: accentColor
+                    }
+                  }
+                }}
               />
               <TextField
                 label="Latest date"
                 type="date"
                 size="small"
                 InputLabelProps={{ shrink: true }}
+                inputProps={{ min: startDate || today }}
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
+                onChange={(e) => {
+                  const selectedDate = e.target.value;
+                  const minDate = startDate || today;
+                  if (selectedDate >= minDate) {
+                    setEndDate(selectedDate);
+                  } else {
+                    alert(`Latest date must be on or after ${startDate ? 'the earliest date' : 'today'}.`);
+                  }
+                }}
+                sx={{
+                  '& .MuiInputLabel-root': {
+                    color: 'text.secondary',
+                    fontSize: { xs: '0.875rem', sm: '1rem' }
+                  },
+                  '& .MuiInputBase-input': {
+                    color: 'text.primary',
+                    fontSize: { xs: '0.875rem', sm: '1rem' }
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: 'divider'
+                    },
+                    '&:hover fieldset': {
+                      borderColor: accentColor
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: accentColor
+                    }
+                  }
+                }}
               />
             </Box>
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: { xs: 1.5, sm: 2 }, mb: { xs: 1.5, sm: 2 } }}>
@@ -463,6 +706,27 @@ export default function MeetingBooking({ onBack, onNavigate }) {
                 InputLabelProps={{ shrink: true }}
                 value={windowStart}
                 onChange={(e) => setWindowStart(e.target.value)}
+                sx={{
+                  '& .MuiInputLabel-root': {
+                    color: 'text.secondary',
+                    fontSize: { xs: '0.875rem', sm: '1rem' }
+                  },
+                  '& .MuiInputBase-input': {
+                    color: 'text.primary',
+                    fontSize: { xs: '0.875rem', sm: '1rem' }
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: 'divider'
+                    },
+                    '&:hover fieldset': {
+                      borderColor: accentColor
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: accentColor
+                    }
+                  }
+                }}
               />
               <TextField
                 label="Latest time"
@@ -471,6 +735,27 @@ export default function MeetingBooking({ onBack, onNavigate }) {
                 InputLabelProps={{ shrink: true }}
                 value={windowEnd}
                 onChange={(e) => setWindowEnd(e.target.value)}
+                sx={{
+                  '& .MuiInputLabel-root': {
+                    color: 'text.secondary',
+                    fontSize: { xs: '0.875rem', sm: '1rem' }
+                  },
+                  '& .MuiInputBase-input': {
+                    color: 'text.primary',
+                    fontSize: { xs: '0.875rem', sm: '1rem' }
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: 'divider'
+                    },
+                    '&:hover fieldset': {
+                      borderColor: accentColor
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: accentColor
+                    }
+                  }
+                }}
               />
             </Box>
             <FormControl size="small" fullWidth sx={{ mb: { xs: 2, sm: 2.5 } }}>
@@ -559,7 +844,28 @@ export default function MeetingBooking({ onBack, onNavigate }) {
               multiline
               minRows={3}
               maxRows={4}
-              sx={{ mb: { xs: 2, sm: 2.5 } }}
+              sx={{ 
+                mb: { xs: 2, sm: 2.5 },
+                '& .MuiInputLabel-root': {
+                  color: 'text.secondary',
+                  fontSize: { xs: '0.875rem', sm: '1rem' }
+                },
+                '& .MuiInputBase-input': {
+                  color: 'text.primary',
+                  fontSize: { xs: '0.875rem', sm: '1rem' }
+                },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: 'divider'
+                  },
+                  '&:hover fieldset': {
+                    borderColor: accentColor
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: accentColor
+                  }
+                }
+              }}
               size="small"
             />
 
@@ -634,15 +940,21 @@ export default function MeetingBooking({ onBack, onNavigate }) {
                   textTransform: "none",
                   borderRadius: 2,
                   boxShadow: 2,
-                  "&:hover": { bgcolor: accent === 'green' ? '#02b87a' : accent === 'orange' ? '#e06f00' : '#8a8a8a' },
+                  fontWeight: 600,
+                  "&:hover": { 
+                    bgcolor: accent === 'green' ? '#02b87a' : accent === 'orange' ? '#e06f00' : '#8a8a8a',
+                    boxShadow: 4
+                  },
                   mb: 1,
                   fontSize: { xs: '0.875rem', sm: '1rem', md: '1.0625rem' },
                   py: { xs: 1.25, sm: 1.5, md: 1.75 },
                   minHeight: { xs: 44, sm: 48, md: 52 },
+                  transition: 'all 0.2s ease',
                 }}
                 onClick={handleSchedule}
+                title={isReschedule ? "Save changes to update this meeting" : "Create a new meeting booking"}
               >
-                Create meeting booking
+                {isReschedule ? "Update Meeting" : "Create meeting booking"}
               </Button>
           <Typography 
             variant="caption" 
