@@ -667,10 +667,10 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
         }
         // Fallback: try to decode from URL format (e.g., "leslie-alexander" -> "Leslie Alexander")
         if (conversationId.includes('-')) {
-          return conversationId
-            .split('-')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
+        return conversationId
+          .split('-')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
         }
       }
     }
@@ -1751,10 +1751,10 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
           </MenuItem>
           {/* Role-based: Only admins and moderators can clear chat */}
           {(isAdmin || isModerator) && (
-            <MenuItem onClick={()=>{ closeHeaderMenu(); if(window.confirm('Clear all messages in this chat?')) { setMessages([]); } }}>
-              <ListItemIcon><DeleteSweepRoundedIcon fontSize="small"/></ListItemIcon>
-              <ListItemText primary="Clear chat" />
-            </MenuItem>
+          <MenuItem onClick={()=>{ closeHeaderMenu(); if(window.confirm('Clear all messages in this chat?')) { setMessages([]); } }}>
+            <ListItemIcon><DeleteSweepRoundedIcon fontSize="small"/></ListItemIcon>
+            <ListItemText primary="Clear chat" />
+          </MenuItem>
           )}
           {chatKind === '1:1' && (
             <MenuItem onClick={()=>{ closeHeaderMenu(); if(window.confirm('Block this contact?')) { alert('Contact blocked'); } }}>
