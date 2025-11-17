@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 import { useCall } from "../context/CallContext";
@@ -19,7 +19,6 @@ import {
   ListItemText,
   Divider
 } from "@mui/material";
-import MicOffRoundedIcon from "@mui/icons-material/MicOffRounded";
 import ChatBubbleOutlineRoundedIcon from "@mui/icons-material/ChatBubbleOutlineRounded";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import PhoneRoundedIcon from "@mui/icons-material/PhoneRounded";
@@ -139,13 +138,6 @@ function ShellFrame({ children }){
       html.style.colorScheme = '';
     };
   }, [actualMode, accentColor]);
-
-  // Format time
-  const hhmmss = useMemo(() => {
-    const minutes = Math.floor(callDuration / 60);
-    const seconds = callDuration % 60;
-    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-  }, [callDuration]);
 
   return (
     <Box sx={{ 
@@ -610,6 +602,40 @@ function RouteWrapper({ Component, registry, ...props }) {
         } else {
           navigate(`/conversation/new?contacts=${selected.join(',')}${forwardParam}`);
         }
+      }
+    },
+    onOpenResult: (result) => {
+      // Handle search result clicks - navigate based on result type
+      if (!result) return;
+      
+      const { type, id } = result;
+      
+      switch (type) {
+        case 'person':
+          // Navigate to conversation with person
+          navigate(`/conversation/${id}`);
+          break;
+        case 'channel':
+          // Navigate to channel conversation
+          navigate(`/conversation/${id}?type=channel`);
+          break;
+        case 'group':
+          // Navigate to group conversation
+          navigate(`/conversation/${id}?type=group`);
+          break;
+        case 'message':
+          // Navigate to conversation and scroll to message
+          navigate(`/conversation/${id}?message=${id}`);
+          break;
+        case 'thread':
+          // Navigate to conversation and show thread
+          navigate(`/conversation/${id}?thread=${id}`);
+          break;
+        default:
+          // Fallback: try to navigate to conversation
+          if (id) {
+            navigate(`/conversation/${id}`);
+          }
       }
     },
   };

@@ -267,16 +267,16 @@ export default function MeetingBooking({ onBack, onNavigate, location: routeLoca
         alert(`Meeting "${title}" has been updated successfully (demo).`);
       }
     } else {
-      console.log("Meeting booking created", {
-        title,
-        meetingType,
-        summary,
-      });
-      // Navigate to My Meetings after creating booking
-      if (onNavigate) {
-        onNavigate('/meetings');
-      } else {
-        alert("Meeting booking created (demo). Guests will pick a time inside your availability.");
+    console.log("Meeting booking created", {
+      title,
+      meetingType,
+      summary,
+    });
+    // Navigate to My Meetings after creating booking
+    if (onNavigate) {
+      onNavigate('/meetings');
+    } else {
+    alert("Meeting booking created (demo). Guests will pick a time inside your availability.");
       }
     }
   };
@@ -357,18 +357,18 @@ export default function MeetingBooking({ onBack, onNavigate, location: routeLoca
         >
             {/* Page Title */}
             <Box sx={{ mb: { xs: 1, sm: 1.5 } }}>
-              <Typography 
-                variant="h5" 
-                sx={{ 
-                  fontWeight: 600, 
-                  mt: { xs: 0, sm: 0.25 }, 
+            <Typography 
+              variant="h5" 
+              sx={{ 
+                fontWeight: 600, 
+                mt: { xs: 0, sm: 0.25 }, 
                   mb: { xs: 0.5, sm: 0.75 }, 
-                  color: 'text.primary',
-                  fontSize: { xs: '18px', sm: '20px', md: '22px' }
-                }}
-              >
+                color: 'text.primary',
+                fontSize: { xs: '18px', sm: '20px', md: '22px' }
+              }}
+            >
                 {isReschedule ? "Update Meeting" : "Meeting Booking"}
-              </Typography>
+            </Typography>
               {isReschedule && existingMeeting && (
                 <Chip
                   label={`Updating: ${existingMeeting.title}`}

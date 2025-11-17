@@ -59,17 +59,42 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
   const { accentColor } = useTheme();
   const [tab, setTab] = useState(0); // 0 global, 1 in-thread
   const [q, setQ] = useState("");
+  const [activeFilters, setActiveFilters] = useState(new Set(['people', 'channels', 'groups', 'messages']));
+
+  const toggleFilter = (filterType) => {
+    setActiveFilters(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(filterType)) {
+        newSet.delete(filterType);
+      } else {
+        newSet.add(filterType);
+      }
+      return newSet;
+    });
+  };
+
+  const applyFilters = () => {
+    // Filters are already applied in real-time via activeFilters state
+    // This button can be used to reset or confirm, but for now it just applies immediately
+  };
 
   const globalResults = useMemo(()=>{
     const s = q.trim().toLowerCase();
-    if(!s) return { people: PEOPLE, channels: CHANNELS, groups: GROUPS, messages: MESSAGES };
-    return {
-      people: PEOPLE.filter(p => p.name.toLowerCase().includes(s)),
-      channels: CHANNELS.filter(c => c.name.toLowerCase().includes(s)),
-      groups: GROUPS.filter(g => g.name.toLowerCase().includes(s)),
-      messages: MESSAGES.filter(m => m.snippet.toLowerCase().includes(s)),
+    const baseResults = {
+      people: !s ? PEOPLE : PEOPLE.filter(p => p.name.toLowerCase().includes(s)),
+      channels: !s ? CHANNELS : CHANNELS.filter(c => c.name.toLowerCase().includes(s)),
+      groups: !s ? GROUPS : GROUPS.filter(g => g.name.toLowerCase().includes(s)),
+      messages: !s ? MESSAGES : MESSAGES.filter(m => m.snippet.toLowerCase().includes(s)),
     };
-  }, [q]);
+    
+    // Apply filters
+    return {
+      people: activeFilters.has('people') ? baseResults.people : [],
+      channels: activeFilters.has('channels') ? baseResults.channels : [],
+      groups: activeFilters.has('groups') ? baseResults.groups : [],
+      messages: activeFilters.has('messages') ? baseResults.messages : [],
+    };
+  }, [q, activeFilters]);
 
   const threadResults = useMemo(()=>{
     const s = q.trim().toLowerCase();
@@ -122,11 +147,13 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
           {tab === 0 && (
             <>
               {/* People */}
-              <Box sx={{ px: { xs: 2, sm: 3 }, py: { xs: 1.5, sm: 2 } }}>
-                <Typography variant="caption" sx={{ fontSize: { xs: '10px', sm: '12px' }, color: 'text.secondary', textTransform: 'uppercase', fontWeight: 600 }}>People</Typography>
-              </Box>
-              <List>
-                {globalResults.people.map((p, idx)=> (
+              {activeFilters.has('people') && globalResults.people.length > 0 && (
+                <>
+                  <Box sx={{ px: { xs: 2, sm: 3 }, py: { xs: 1.5, sm: 2 } }}>
+                    <Typography variant="caption" sx={{ fontSize: { xs: '10px', sm: '12px' }, color: 'text.secondary', textTransform: 'uppercase', fontWeight: 600 }}>People</Typography>
+                  </Box>
+                  <List>
+                    {globalResults.people.map((p, idx)=> (
                   <React.Fragment key={p.id}>
                     <ListItem 
                       button 
@@ -143,17 +170,21 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
                       <ListItemAvatar><Avatar src={p.avatar} sx={{ width: { xs: 36, sm: 40 }, height: { xs: 36, sm: 40 } }} /></ListItemAvatar>
                       <ListItemText primary={<span className="font-semibold" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{highlight(p.name, q, muiTheme)}</span>} />
                     </ListItem>
-                    {idx < globalResults.people.length - 1 && <Divider component="li" />}
-                  </React.Fragment>
-                ))}
-              </List>
+                      {idx < globalResults.people.length - 1 && <Divider component="li" />}
+                    </React.Fragment>
+                  ))}
+                  </List>
+                </>
+              )}
 
               {/* Channels */}
-              <Box sx={{ px: { xs: 2, sm: 3 }, py: { xs: 1.5, sm: 2 } }}>
-                <Typography variant="caption" sx={{ fontSize: { xs: '10px', sm: '12px' }, color: 'text.secondary', textTransform: 'uppercase', fontWeight: 600 }}>Channels</Typography>
-              </Box>
-              <List>
-                {globalResults.channels.map((c, idx)=> (
+              {activeFilters.has('channels') && globalResults.channels.length > 0 && (
+                <>
+                  <Box sx={{ px: { xs: 2, sm: 3 }, py: { xs: 1.5, sm: 2 } }}>
+                    <Typography variant="caption" sx={{ fontSize: { xs: '10px', sm: '12px' }, color: 'text.secondary', textTransform: 'uppercase', fontWeight: 600 }}>Channels</Typography>
+                  </Box>
+                  <List>
+                    {globalResults.channels.map((c, idx)=> (
                   <React.Fragment key={c.id}>
                     <ListItem 
                       button 
@@ -170,17 +201,21 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
                       <ListItemAvatar><Avatar sx={{ bgcolor: 'background.default', color: 'text.primary', width: { xs: 36, sm: 40 }, height: { xs: 36, sm: 40 } }}>#</Avatar></ListItemAvatar>
                       <ListItemText primary={<span className="font-semibold" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{highlight(c.name, q, muiTheme)}</span>} />
                     </ListItem>
-                    {idx < globalResults.channels.length - 1 && <Divider component="li" />}
-                  </React.Fragment>
-                ))}
-              </List>
+                      {idx < globalResults.channels.length - 1 && <Divider component="li" />}
+                    </React.Fragment>
+                  ))}
+                  </List>
+                </>
+              )}
 
               {/* Groups */}
-              <Box sx={{ px: { xs: 2, sm: 3 }, py: { xs: 1.5, sm: 2 } }}>
-                <Typography variant="caption" sx={{ fontSize: { xs: '10px', sm: '12px' }, color: 'text.secondary', textTransform: 'uppercase', fontWeight: 600 }}>Groups</Typography>
-              </Box>
-              <List>
-                {globalResults.groups.map((g, idx)=> (
+              {activeFilters.has('groups') && globalResults.groups.length > 0 && (
+                <>
+                  <Box sx={{ px: { xs: 2, sm: 3 }, py: { xs: 1.5, sm: 2 } }}>
+                    <Typography variant="caption" sx={{ fontSize: { xs: '10px', sm: '12px' }, color: 'text.secondary', textTransform: 'uppercase', fontWeight: 600 }}>Groups</Typography>
+                  </Box>
+                  <List>
+                    {globalResults.groups.map((g, idx)=> (
                   <React.Fragment key={g.id}>
                     <ListItem 
                       button 
@@ -204,17 +239,21 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
                         secondary={<span>{g.members} members</span>}
                       />
                     </ListItem>
-                    {idx < globalResults.groups.length - 1 && <Divider component="li" />}
-                  </React.Fragment>
-                ))}
-              </List>
+                      {idx < globalResults.groups.length - 1 && <Divider component="li" />}
+                    </React.Fragment>
+                  ))}
+                  </List>
+                </>
+              )}
 
               {/* Messages */}
-              <Box sx={{ px: { xs: 2, sm: 3 }, py: { xs: 1.5, sm: 2 } }}>
-                <Typography variant="caption" sx={{ fontSize: { xs: '10px', sm: '12px' }, color: 'text.secondary', textTransform: 'uppercase', fontWeight: 600 }}>Messages</Typography>
-              </Box>
-              <List>
-                {globalResults.messages.map((m, idx)=> (
+              {activeFilters.has('messages') && globalResults.messages.length > 0 && (
+                <>
+                  <Box sx={{ px: { xs: 2, sm: 3 }, py: { xs: 1.5, sm: 2 } }}>
+                    <Typography variant="caption" sx={{ fontSize: { xs: '10px', sm: '12px' }, color: 'text.secondary', textTransform: 'uppercase', fontWeight: 600 }}>Messages</Typography>
+                  </Box>
+                  <List>
+                    {globalResults.messages.map((m, idx)=> (
                   <React.Fragment key={m.id}>
                     <ListItem 
                       button 
@@ -239,10 +278,12 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
                       />
                       <Typography variant="caption" sx={{ fontSize: { xs: '10px', sm: '11px' }, color: 'text.secondary', ml: { xs: 1, sm: 2 }, flexShrink: 0 }}>{m.time}</Typography>
                     </ListItem>
-                    {idx < globalResults.messages.length - 1 && <Divider component="li" />}
-                  </React.Fragment>
-                ))}
-              </List>
+                      {idx < globalResults.messages.length - 1 && <Divider component="li" />}
+                    </React.Fragment>
+                  ))}
+                  </List>
+                </>
+              )}
             </>
           )}
 
@@ -250,7 +291,9 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
             <List>
               {threadResults.map((t, idx)=> (
                 <React.Fragment key={t.id}>
-                  <ListItem
+                  <ListItem 
+                    button
+                    onClick={()=>onOpenResult?.({ type:'thread', id:t.id })}
                     sx={{
                       px: { xs: 2, sm: 3 },
                       py: { xs: 1, sm: 1.25 },
@@ -283,9 +326,38 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
           <Box sx={{ px: { xs: 2, sm: 3 }, pb: { xs: 2, sm: 3 }, pt: { xs: 1.5, sm: 2 } }}>
             <div className="flex gap-2 flex-wrap" style={{ gap: '8px' }}>
               {['people','channels','groups','messages'].map(k => (
-                <Chip key={k} label={`Filter: ${k}`} sx={{ border:`1px solid ${accentColor}`, color: accentColor, fontSize: { xs: '11px', sm: '12px' }, height: { xs: 24, sm: 28 } }} variant="outlined" />
+                <Chip 
+                  key={k} 
+                  label={`Filter: ${k}`} 
+                  onClick={() => toggleFilter(k)}
+                  sx={{ 
+                    border:`1px solid ${accentColor}`, 
+                    color: activeFilters.has(k) ? '#fff' : accentColor,
+                    bgcolor: activeFilters.has(k) ? accentColor : 'transparent',
+                    fontSize: { xs: '11px', sm: '12px' }, 
+                    height: { xs: 24, sm: 28 },
+                    cursor: 'pointer',
+                    '&:hover': {
+                      bgcolor: activeFilters.has(k) ? accentColor : `${accentColor}20`,
+                      opacity: 0.9
+                    }
+                  }} 
+                  variant={activeFilters.has(k) ? "filled" : "outlined"} 
+                />
               ))}
-              <Button variant="contained" sx={{ bgcolor: accentColor, textTransform:'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 }, '&:hover':{ bgcolor: accentColor, opacity: 0.9 } }}>Apply</Button>
+              <Button 
+                variant="contained" 
+                onClick={applyFilters}
+                sx={{ 
+                  bgcolor: accentColor, 
+                  textTransform:'none', 
+                  fontSize: { xs: '12px', sm: '13px' }, 
+                  py: { xs: 0.5, sm: 0.75 }, 
+                  '&:hover':{ bgcolor: accentColor, opacity: 0.9 } 
+                }}
+              >
+                Apply
+              </Button>
             </div>
           </Box>
         )}
