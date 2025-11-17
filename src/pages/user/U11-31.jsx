@@ -239,7 +239,7 @@ export default function ContextPanelsPack1({ onBack }) {
             <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary', padding: { xs: '6px', sm: '8px' } }}>
               <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
             </IconButton>
-            <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 } }}>Dealz</Typography>
+            <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 } }}>Dealz status</Typography>
           </Toolbar>
         </AppBar>
 

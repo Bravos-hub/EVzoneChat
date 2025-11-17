@@ -23,11 +23,9 @@ import {
   Menu,
   ListItemIcon
 } from "@mui/material";
-import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import CampaignRoundedIcon from "@mui/icons-material/CampaignRounded";
 import PlayCircleFilledWhiteRoundedIcon from "@mui/icons-material/PlayCircleFilledWhiteRounded";
 import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
-import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
@@ -450,47 +448,13 @@ export default function DealzPromoStatusFeed({ onBack }) {
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none`}</style>
 
       <Box 
-        className="w-full h-full flex justify-center"
+        className="w-full h-full flex flex-col"
         sx={{ 
           bgcolor: actualMode === 'dark' ? '#121212' : EV.light,
-          minHeight: '100vh'
+          minHeight: '100vh',
+          width: '100%'
         }}
       >
-        <Box className="w-full max-w-[390px] flex flex-col">
-          {/* Header */}
-          <AppBar elevation={0} position="fixed" sx={{ bgcolor: accentColor, color: "#fff" }}>
-            <Toolbar
-              className="!min-h-[56px]"
-              sx={{ width: "100%", maxWidth: 390, mx: "auto", px: 1 }}
-            >
-              <IconButton
-                onClick={onBack}
-                aria-label="Back"
-                sx={{ color: "#fff", mr: 1 }}
-              >
-                <ArrowBackRoundedIcon />
-              </IconButton>
-              <CampaignRoundedIcon sx={{ mr: 1 }} />
-              <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                <Typography variant="subtitle1" className="font-semibold" noWrap>
-                  Dealz status
-                </Typography>
-                <Typography variant="caption" sx={{ opacity: 0.9 }}>
-                  Promo Ads & Live Sessions
-                </Typography>
-              </Box>
-              <IconButton
-                size="small"
-                sx={{ color: "#fff" }}
-                onClick={() => {
-                  setSettingsTargetId(null);
-                  setSettingsOpen(true);
-                }}
-              >
-                <MoreVertRoundedIcon />
-              </IconButton>
-            </Toolbar>
-          </AppBar>
 
           {/* Content */}
           <Box
@@ -498,12 +462,47 @@ export default function DealzPromoStatusFeed({ onBack }) {
             sx={{ 
               flex: 1, 
               overflowY: "auto", 
-              pt: "56px", 
-              pb: 10, 
-              px: 2,
-              bgcolor: actualMode === 'dark' ? '#121212' : EV.light
+              pt: { xs: "56px", sm: "64px" }, 
+              pb: { xs: 10, sm: 12 }, 
+              px: { xs: 1.5, sm: 2, md: 3 },
+              bgcolor: actualMode === 'dark' ? '#121212' : EV.light,
+              width: '100%'
             }}
           >
+            {/* Large Prominent Title - Dealz Status */}
+            <Box
+              sx={{
+                pt: { xs: 2, sm: 3 },
+                pb: { xs: 1.5, sm: 2 },
+                mb: { xs: 1, sm: 1.5 },
+                width: '100%'
+              }}
+            >
+              <Typography 
+                variant="h4" 
+                sx={{ 
+                  fontSize: { xs: '24px', sm: '28px', md: '32px' },
+                  fontWeight: 800,
+                  lineHeight: 1.2,
+                  color: actualMode === 'dark' ? '#fff' : '#000',
+                  mb: 0.5,
+                  letterSpacing: '-0.02em'
+                }}
+              >
+                Dealz Status
+              </Typography>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  fontSize: { xs: '13px', sm: '14px' },
+                  color: actualMode === 'dark' ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)',
+                  fontWeight: 500
+                }}
+              >
+                Promo Ads & Live Sessions
+              </Typography>
+            </Box>
+
             {/* Filter row */}
             <Box className="flex items-center justify-between mt-2 mb-2">
               <Stack direction="row" spacing={1}>
@@ -800,15 +799,16 @@ export default function DealzPromoStatusFeed({ onBack }) {
               pb: "env(safe-area-inset-bottom)",
               display: "flex",
               justifyContent: "center",
+              width: '100%'
             }}
           >
             <Box
               sx={{
                 width: "100%",
-                maxWidth: 390,
+                maxWidth: { xs: '100%', sm: '600px', md: '800px' },
                 mx: "auto",
-                px: 3,
-                pb: 2.5,
+                px: { xs: 2, sm: 3 },
+                pb: { xs: 2, sm: 2.5 },
                 bgcolor: actualMode === 'dark' 
                   ? 'rgba(30,30,30,0.95)' 
                   : 'rgba(255,255,255,0.96)',
@@ -824,7 +824,6 @@ export default function DealzPromoStatusFeed({ onBack }) {
               </Typography>
             </Box>
           </Box>
-        </Box>
       </Box>
 
       {/* Drawer: promos for selected entity */}
@@ -836,8 +835,11 @@ export default function DealzPromoStatusFeed({ onBack }) {
           sx: {
             borderTopLeftRadius: 16,
             borderTopRightRadius: 16,
-            maxWidth: 390,
+            maxWidth: { xs: '100%', sm: '600px', md: '800px' },
+            width: '100%',
             mx: "auto",
+            left: { xs: 0, sm: 'auto' },
+            right: { xs: 0, sm: 'auto' }
           },
         }}
       >
@@ -1032,7 +1034,8 @@ export default function DealzPromoStatusFeed({ onBack }) {
           sx: {
             borderTopLeftRadius: 16,
             borderTopRightRadius: 16,
-            maxWidth: 390,
+            maxWidth: { xs: '100%', sm: '600px', md: '800px' },
+            width: '100%',
             mx: "auto",
             bgcolor: actualMode === 'dark' ? '#1e1e1e' : muiTheme.palette.background.paper,
             color: muiTheme.palette.text.primary,
@@ -1297,8 +1300,8 @@ export default function DealzPromoStatusFeed({ onBack }) {
         }}
         PaperProps={{
           sx: {
-            maxWidth: 390,
-            width: "90vw",
+            maxWidth: { xs: '90vw', sm: '400px', md: '450px' },
+            width: { xs: "90vw", sm: "400px", md: "450px" },
             borderRadius: 3,
             bgcolor: muiTheme.palette.background.paper,
           },
