@@ -669,17 +669,17 @@ export default function OneToOneCall({
               </Box>
             </Box>
             <Box sx={{ flexShrink: 0, ml: 'auto' }}>
-              <IconButton 
-                aria-label="More" 
-                onClick={(e)=>setMenuEl(e.currentTarget)} 
-                sx={{ 
-                  color: "#fff",
-                  padding: { xs: '6px', sm: '8px', md: '12px' },
-                  flexShrink: 0
-                }}
-              >
-                <MoreVertRoundedIcon sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} />
-              </IconButton>
+            <IconButton 
+              aria-label="More" 
+              onClick={(e)=>setMenuEl(e.currentTarget)} 
+              sx={{ 
+                color: "#fff",
+                padding: { xs: '6px', sm: '8px', md: '12px' },
+                flexShrink: 0
+              }}
+            >
+              <MoreVertRoundedIcon sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} />
+            </IconButton>
             </Box>
           </Toolbar>
         </AppBar>

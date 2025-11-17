@@ -99,7 +99,11 @@ export default function PublicBookingPage({ onBack, onNavigate }) {
     return out;
   }, [availability.windowStart, availability.windowEnd, duration]);
 
-  const modeIcon = mode === "video" ? <VideocamRoundedIcon sx={{ fontSize: 18 }} /> : <PhoneRoundedIcon sx={{ fontSize: 18 }} />;
+  const modeIcon = mode === "video" ? (
+    <VideocamRoundedIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+  ) : (
+    <PhoneRoundedIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+  );
 
   const handleConfirm = () => {
     if (!selectedSlot || !selectedDate || !name || !email) {
@@ -180,28 +184,28 @@ export default function PublicBookingPage({ onBack, onNavigate }) {
                 p: 2,
                 mt: 1.5,
                 borderRadius: 2,
-                border: "1px solid rgba(0,0,0,0.06)",
-                bgcolor: "#fff",
+                border: `1px solid ${muiTheme.palette.divider}`,
+                bgcolor: 'background.paper',
               }}
             >
-              <Typography variant="subtitle1" className="font-semibold" sx={{ mb: 0.5 }}>
+              <Typography variant="subtitle1" className="font-semibold" sx={{ mb: 0.5, color: 'text.primary' }}>
                 {title}
               </Typography>
               <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
                 <Chip size="small" label={module} sx={{ bgcolor: isDark ? 'rgba(255,255,255,0.1)' : EV.light, color: 'text.primary' }} />
                 <Stack direction="row" spacing={0.5} alignItems="center">
-                  <PersonRoundedIcon sx={{ fontSize: 18, opacity: 0.8 }} />
-                  <Typography variant="caption" sx={{ opacity: 0.9 }}>Hosted by {host}</Typography>
+                  <PersonRoundedIcon sx={{ fontSize: 18, opacity: 0.8, color: 'text.secondary' }} />
+                  <Typography variant="caption" sx={{ opacity: 0.9, color: 'text.secondary' }}>Hosted by {host}</Typography>
                 </Stack>
               </Stack>
               <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
-                {modeIcon}
-                <AccessTimeRoundedIcon sx={{ fontSize: 18, opacity: 0.8 }} />
-                <Typography variant="caption" sx={{ opacity: 0.9 }}>{duration} min</Typography>
+                <Box sx={{ color: 'text.secondary' }}>{modeIcon}</Box>
+                <AccessTimeRoundedIcon sx={{ fontSize: 18, opacity: 0.8, color: 'text.secondary' }} />
+                <Typography variant="caption" sx={{ opacity: 0.9, color: 'text.secondary' }}>{duration} min</Typography>
               </Stack>
               <Stack direction="row" spacing={1} alignItems="center">
-                <LocationOnRoundedIcon sx={{ fontSize: 18, opacity: 0.8 }} />
-                <Typography variant="caption" sx={{ opacity: 0.9 }}>{location}</Typography>
+                <LocationOnRoundedIcon sx={{ fontSize: 18, opacity: 0.8, color: 'text.secondary' }} />
+                <Typography variant="caption" sx={{ opacity: 0.9, color: 'text.secondary' }}>{location}</Typography>
               </Stack>
             </Paper>
 
@@ -223,17 +227,25 @@ export default function PublicBookingPage({ onBack, onNavigate }) {
                       textTransform: "none",
                       borderRadius: 999,
                       minWidth: "auto",
-                      px: { xs: 1, sm: 1.5 },
+                      px: { xs: 1.5, sm: 2 },
+                      py: { xs: 0.5, sm: 0.75 },
                       whiteSpace: "nowrap",
                       bgcolor: selected ? accentColor : 'background.paper',
                       color: selected ? "#fff" : 'text.primary',
                       borderColor: selected ? accentColor : muiTheme.palette.divider,
                       fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                      fontWeight: selected ? 600 : 400,
+                      '&:hover': {
+                        bgcolor: selected ? accentColor : (isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)'),
+                        borderColor: accentColor,
+                      },
+                      transition: 'all 0.2s ease',
                     }}
                     onClick={() => {
                       setSelectedDate(iso);
                       setSelectedSlot(null);
                     }}
+                    title={`Select date ${label}`}
                   >
                     {label}
                   </Button>
@@ -263,11 +275,20 @@ export default function PublicBookingPage({ onBack, onNavigate }) {
                         textTransform: "none",
                         borderRadius: 999,
                         fontSize: { xs: 11, sm: 12 },
+                        py: { xs: 0.75, sm: 1 },
+                        px: { xs: 1.5, sm: 2 },
                         bgcolor: selected ? accentColor : 'background.paper',
                         color: selected ? "#fff" : 'text.primary',
                         borderColor: selected ? accentColor : muiTheme.palette.divider,
+                        fontWeight: selected ? 600 : 400,
+                        '&:hover': {
+                          bgcolor: selected ? accentColor : (isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)'),
+                          borderColor: accentColor,
+                        },
+                        transition: 'all 0.2s ease',
                       }}
                       onClick={() => setSelectedSlot(label)}
+                      title={`Select time slot ${label}`}
                     >
                       {label}
                     </Button>
@@ -286,7 +307,28 @@ export default function PublicBookingPage({ onBack, onNavigate }) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               size="small"
-              sx={{ mb: 1.5 }}
+              sx={{ 
+                mb: 1.5,
+                '& .MuiInputLabel-root': {
+                  color: 'text.secondary',
+                  fontSize: { xs: '0.875rem', sm: '1rem' }
+                },
+                '& .MuiInputBase-input': {
+                  color: 'text.primary',
+                  fontSize: { xs: '0.875rem', sm: '1rem' }
+                },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: 'divider'
+                  },
+                  '&:hover fieldset': {
+                    borderColor: accentColor
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: accentColor
+                  }
+                }
+              }}
             />
             <TextField
               fullWidth
@@ -295,7 +337,28 @@ export default function PublicBookingPage({ onBack, onNavigate }) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               size="small"
-              sx={{ mb: 1.5 }}
+              sx={{ 
+                mb: 1.5,
+                '& .MuiInputLabel-root': {
+                  color: 'text.secondary',
+                  fontSize: { xs: '0.875rem', sm: '1rem' }
+                },
+                '& .MuiInputBase-input': {
+                  color: 'text.primary',
+                  fontSize: { xs: '0.875rem', sm: '1rem' }
+                },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: 'divider'
+                  },
+                  '&:hover fieldset': {
+                    borderColor: accentColor
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: accentColor
+                  }
+                }
+              }}
             />
             <TextField
               fullWidth
@@ -303,7 +366,28 @@ export default function PublicBookingPage({ onBack, onNavigate }) {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               size="small"
-              sx={{ mb: 1.5 }}
+              sx={{ 
+                mb: 1.5,
+                '& .MuiInputLabel-root': {
+                  color: 'text.secondary',
+                  fontSize: { xs: '0.875rem', sm: '1rem' }
+                },
+                '& .MuiInputBase-input': {
+                  color: 'text.primary',
+                  fontSize: { xs: '0.875rem', sm: '1rem' }
+                },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: 'divider'
+                  },
+                  '&:hover fieldset': {
+                    borderColor: accentColor
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: accentColor
+                  }
+                }
+              }}
             />
             <TextField
               fullWidth
@@ -313,7 +397,28 @@ export default function PublicBookingPage({ onBack, onNavigate }) {
               size="small"
               multiline
               minRows={3}
-              sx={{ mb: 2 }}
+              sx={{ 
+                mb: 2,
+                '& .MuiInputLabel-root': {
+                  color: 'text.secondary',
+                  fontSize: { xs: '0.875rem', sm: '1rem' }
+                },
+                '& .MuiInputBase-input': {
+                  color: 'text.primary',
+                  fontSize: { xs: '0.875rem', sm: '1rem' }
+                },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: 'divider'
+                  },
+                  '&:hover fieldset': {
+                    borderColor: accentColor
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: accentColor
+                  }
+                }
+              }}
             />
 
             {/* Confirmation card once booked */}
@@ -324,20 +429,34 @@ export default function PublicBookingPage({ onBack, onNavigate }) {
                   p: 2,
                   mb: 3,
                   borderRadius: 2,
-                  border: "1px solid rgba(0,0,0,0.06)",
-                  bgcolor: "#f0fff4",
+                  border: `1px solid ${accentColor}`,
+                  bgcolor: isDark ? 'rgba(3, 205, 140, 0.15)' : 'rgba(3, 205, 140, 0.08)',
                 }}
               >
-                <Typography variant="subtitle2" className="font-semibold" sx={{ mb: 0.5 }}>
+                <Typography variant="subtitle2" className="font-semibold" sx={{ mb: 0.5, color: 'text.primary' }}>
                   Booking confirmed
                 </Typography>
-                <Typography variant="caption" sx={{ display: "block", mb: 0.5 }}>
+                <Typography variant="caption" sx={{ display: "block", mb: 0.5, color: 'text.secondary' }}>
                   {selectedDate} • {selectedSlot}
                 </Typography>
-                <Typography variant="caption" sx={{ display: "block", mb: 1 }}>
+                <Typography variant="caption" sx={{ display: "block", mb: 1, color: 'text.secondary' }}>
                   A confirmation email will contain your join link and calendar invite.
                 </Typography>
-                <Button size="small" variant="outlined" sx={{ textTransform: "none" }}>
+                <Button 
+                  size="small" 
+                  variant="outlined" 
+                  sx={{ 
+                    textTransform: "none",
+                    borderColor: accentColor,
+                    color: accentColor,
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                    '&:hover': {
+                      borderColor: accentColor,
+                      bgcolor: accent === 'green' ? 'rgba(3, 205, 140, 0.1)' : accent === 'orange' ? 'rgba(247, 127, 0, 0.1)' : 'rgba(166, 166, 166, 0.1)'
+                    }
+                  }}
+                  title="Download calendar file"
+                >
                   Add to calendar (ICS)
                 </Button>
               </Paper>
@@ -376,10 +495,24 @@ export default function PublicBookingPage({ onBack, onNavigate }) {
                   textTransform: "none",
                   borderRadius: 999,
                   boxShadow: "0 10px 30px rgba(0,0,0,0.18)",
-                  "&:hover": { bgcolor: accent === 'green' ? '#02b87a' : accent === 'orange' ? '#e06f00' : '#8a8a8a' },
+                  fontWeight: 600,
+                  fontSize: { xs: '0.875rem', sm: '1rem', md: '1.0625rem' },
+                  py: { xs: 1.25, sm: 1.5, md: 1.75 },
+                  minHeight: { xs: 44, sm: 48, md: 52 },
+                  "&:hover": { 
+                    bgcolor: accent === 'green' ? '#02b87a' : accent === 'orange' ? '#e06f00' : '#8a8a8a',
+                    boxShadow: "0 12px 35px rgba(0,0,0,0.25)"
+                  },
+                  "&:disabled": {
+                    bgcolor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)',
+                    color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.26)'
+                  },
+                  transition: 'all 0.2s ease',
                   mb: 1,
                 }}
                 onClick={handleConfirm}
+                title="Confirm your meeting booking"
+                disabled={!selectedSlot || !selectedDate || !name || !email}
               >
                 Confirm booking
               </Button>
