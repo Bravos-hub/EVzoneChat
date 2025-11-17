@@ -149,7 +149,7 @@ function MeetingCard({ meeting, kind, onNavigate }) {
               size="small" 
               variant="outlined" 
               sx={{ textTransform: "none", fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.5, sm: 0.75 } }}
-              onClick={() => onNavigate?.(`/meetings/${meeting.id}/reschedule`)}
+              onClick={() => onNavigate?.(`/meetings/book?reschedule=${meeting.id}`)}
             >
               Reschedule
             </Button>
@@ -189,8 +189,7 @@ function MeetingCard({ meeting, kind, onNavigate }) {
 }
 
 export default function MyMeetingsList({ onBack, onNavigate }) {
-  const muiTheme = useMuiTheme();
-  const { accent, isDark } = useTheme();
+  const { accent } = useTheme();
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
   const [tab, setTab] = useState("upcoming");
   
@@ -277,7 +276,13 @@ export default function MyMeetingsList({ onBack, onNavigate }) {
           <Box sx={{ bgcolor: 'background.paper', width: '100%' }}>
             <Tabs
               value={tab}
-              onChange={(_, v) => setTab(v)}
+              onChange={(_, v) => {
+                if (v === "new") {
+                  onNavigate?.('/meetings/book');
+                } else {
+                  setTab(v);
+                }
+              }}
               variant="fullWidth"
               textColor="primary"
               indicatorColor="primary"
@@ -289,6 +294,7 @@ export default function MyMeetingsList({ onBack, onNavigate }) {
                 }
               }}
             >
+              <Tab value="new" label="New" />
               <Tab value="upcoming" label="Upcoming" />
               <Tab value="past" label="Past" />
               <Tab value="requests" label="Requests" />

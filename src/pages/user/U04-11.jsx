@@ -149,7 +149,7 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
             </IconButton>
             <Box sx={{ flex: 1, minWidth: 0, ml: 1 }}>
               <Typography variant="h6" className="font-bold" sx={{ fontSize: { xs: '16px', sm: '18px' }, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {isVideoCall ? 'Group Video Call' : 'Group Voice Call'}
+                {isVideoCall ? 'Group Call' : 'Group Call'}
               </Typography>
               <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: { xs: '11px', sm: '12px' } }}>
                 {isVideoCall ? 'Video' : 'Voice'} • {timeString}

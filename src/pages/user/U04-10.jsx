@@ -262,7 +262,7 @@ export default function OneToOneCall({
   // Derived label
   const status = useMemo(() => {
     const callTypeLabel = isGroupCall 
-      ? (actualType === "video" ? "Group Video Call" : "Group Voice Call")
+      ? (actualType === "video" ? "Group Call" : "Group Call")
       : (actualType === "video" ? "Video Call" : "Voice Call");
     
     switch (callState) {
@@ -576,7 +576,10 @@ export default function OneToOneCall({
               minHeight: { xs: '56px !important', sm: '64px !important' },
               px: { xs: 0.75, sm: 1, md: 2 },
               py: { xs: 0.5, sm: 1 },
-              gap: { xs: 0.5, sm: 1 }
+              gap: { xs: 0.5, sm: 1 },
+              display: 'flex',
+              alignItems: 'center',
+              width: '100%'
             }}
           >
             <IconButton 
@@ -587,7 +590,8 @@ export default function OneToOneCall({
               sx={{ 
                 color: "#fff",
                 padding: { xs: '6px', sm: '8px', md: '12px' },
-                flexShrink: 0
+                flexShrink: 0,
+                mr: { xs: 0.5, sm: 1 }
               }}
             >
               <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} />
@@ -664,17 +668,19 @@ export default function OneToOneCall({
               </Typography>
               </Box>
             </Box>
-            <IconButton 
-              aria-label="More" 
-              onClick={(e)=>setMenuEl(e.currentTarget)} 
-              sx={{ 
-                color: "#fff",
-                padding: { xs: '6px', sm: '8px', md: '12px' },
-                flexShrink: 0
-              }}
-            >
-              <MoreVertRoundedIcon sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} />
-            </IconButton>
+            <Box sx={{ flexShrink: 0, ml: 'auto' }}>
+              <IconButton 
+                aria-label="More" 
+                onClick={(e)=>setMenuEl(e.currentTarget)} 
+                sx={{ 
+                  color: "#fff",
+                  padding: { xs: '6px', sm: '8px', md: '12px' },
+                  flexShrink: 0
+                }}
+              >
+                <MoreVertRoundedIcon sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} />
+              </IconButton>
+            </Box>
           </Toolbar>
         </AppBar>
 
@@ -687,12 +693,13 @@ export default function OneToOneCall({
           transformOrigin={{ vertical: "top", horizontal: "right" }}
           PaperProps={{ 
             sx:{ 
-              width: '90vw', 
-              maxWidth: "calc(100vw - 1rem)", 
+              width: { xs: '90vw', sm: '280px', md: '320px' }, 
+              maxWidth: { xs: "calc(100vw - 1rem)", sm: "320px" }, 
               borderRadius: 2, 
               py: 0.5, 
-              mx: "auto",
+              mt: 0.5,
               bgcolor: 'background.paper',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
               '& .MuiMenuItem-root': {
                 color: 'text.primary',
               }
