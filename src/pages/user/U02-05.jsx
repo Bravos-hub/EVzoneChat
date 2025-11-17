@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
 import { useTheme } from "../../context/ThemeContext";
+import { useEncryption } from "../../context/EncryptionContext";
+import { useRoleBasedAccess } from "../../hooks/useRoleBasedAccess";
 import AudioPlayer from "../../components/AudioPlayer";
 import {
   AppBar,
@@ -69,9 +71,9 @@ const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2
 const lighten = (hex, a=0.12) => `rgba(${parseInt(hex.slice(1,3),16)},${parseInt(hex.slice(3,5),16)},${parseInt(hex.slice(5,7),16)},${a})`;
 
 const DEMO = [
-  { id: 'm1', author: { id:'u2', name:'Leslie Alexander', avatar:'https://i.pravatar.cc/100?img=5' }, text: 'Hi! Do we still meet at 3 pm?', time: '07:32 PM', mine: false, read: true },
-  { id: 'm2', author: { id:'me', name:'You', avatar:'https://i.pravatar.cc/100?img=2' }, text: 'Yes. I will send the Zoom link here.', time: '07:33 PM', mine: true, read: true },
-  { id: 'm3', author: { id:'u2', name:'Leslie Alexander', avatar:'https://i.pravatar.cc/100?img=5' }, text: 'Perfect. Also, can you check the PDF I shared?', time: '07:34 PM', mine: false, read: false }
+  { id: 'm1', author: { id:'u2', name:'Leslie Alexander', avatar:'https://i.pravatar.cc/100?img=5' }, text: 'Hi! Do we still meet at 3 pm?', time: '07:32 PM', mine: false, read: true, encryptedData: null },
+  { id: 'm2', author: { id:'me', name:'You', avatar:'https://i.pravatar.cc/100?img=2' }, text: 'Yes. I will send the Zoom link here.', time: '07:33 PM', mine: true, read: true, encryptedData: null },
+  { id: 'm3', author: { id:'u2', name:'Leslie Alexander', avatar:'https://i.pravatar.cc/100?img=5' }, text: 'Perfect. Also, can you check the PDF I shared?', time: '07:34 PM', mine: false, read: false, encryptedData: null }
 ];
 
 function Bubble({ msg, onQuote, onAction, scrollTo, onSelect, isSelected, isSelectionMode }){
@@ -423,11 +425,48 @@ function Bubble({ msg, onQuote, onAction, scrollTo, onSelect, isSelected, isSele
 export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='E-Commerce', onNavigate, location }){
   const muiTheme = useMuiTheme();
   const { isDark, accent } = useTheme();
+  const { encryptMessage, decryptMessage, rekeySession, isInitialized: encryptionReady } = useEncryption();
+  const { isAdmin, isModerator } = useRoleBasedAccess('me');
   
   // Get theme accent color
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
   const [messages, setMessages] = useState(DEMO);
   const [replyTo, setReplyTo] = useState(null);
+  const messageCountRef = useRef(0); // Track messages for rekeying
+  const REKEY_INTERVAL = 50; // Rekey after 50 messages
+  
+  // Decrypt incoming messages on mount and when messages change
+  useEffect(() => {
+    if (!encryptionReady) return;
+    
+    const decryptMessages = async () => {
+      const decryptedMessages = await Promise.all(
+        messages.map(async (msg) => {
+          // Only decrypt incoming encrypted messages
+          if (!msg.mine && msg.encryptedData && msg.encryptedData.encrypted) {
+            try {
+              const senderId = msg.author?.id || 'u2';
+              const decrypted = await decryptMessage(msg.encryptedData, senderId);
+              return { ...msg, text: decrypted, decrypted: true };
+            } catch (error) {
+              console.error('Failed to decrypt message:', error);
+              return { ...msg, text: '[Encrypted - decryption failed]', decrypted: false };
+            }
+          }
+          return msg;
+        })
+      );
+      
+      // Only update if decryption changed something
+      const hasEncrypted = messages.some(m => !m.mine && m.encryptedData?.encrypted);
+      if (hasEncrypted) {
+        setMessages(decryptedMessages);
+      }
+    };
+    
+    decryptMessages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [encryptionReady, decryptMessage]); // Only run when encryption is ready, messages handled internally
   
   // Get conversation ID for draft storage
   const conversationId = useMemo(() => {
@@ -597,15 +636,42 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
 
   // Get contact name from URL path or params
   const contactNameFromUrl = useMemo(() => {
+    // Lookup maps for IDs to names (in production, this would come from backend/context)
+    const PEOPLE_LOOKUP = {
+      'u1': 'Etty Duke',
+      'u2': 'Leslie Alexander',
+      'me': 'You'
+    };
+    
+    const GROUPS_LOOKUP = {
+      'g1': 'Team Alpha',
+      'g2': 'Project Beta'
+    };
+
     if (location?.pathname) {
       const pathParts = location.pathname.split('/');
       const conversationId = pathParts[pathParts.length - 1];
       if (conversationId && conversationId !== 'new') {
-        // Decode the contact name from URL (e.g., "leslie-alexander" -> "Leslie Alexander")
-        return conversationId
-          .split('-')
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(' ');
+        // Check if it's an ID (u1, g1, etc.) and look it up
+        if (PEOPLE_LOOKUP[conversationId]) {
+          return PEOPLE_LOOKUP[conversationId];
+        }
+        if (GROUPS_LOOKUP[conversationId]) {
+          return GROUPS_LOOKUP[conversationId];
+        }
+        // Check URL params for name
+        const params = new URLSearchParams(location?.search || '');
+        const nameParam = params.get('name');
+        if (nameParam) {
+          return decodeURIComponent(nameParam);
+        }
+        // Fallback: try to decode from URL format (e.g., "leslie-alexander" -> "Leslie Alexander")
+        if (conversationId.includes('-')) {
+          return conversationId
+            .split('-')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+        }
       }
     }
     return null;
@@ -623,7 +689,10 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
   }, [moduleFromUrl, moduleLabel]);
 
   const title = useMemo(()=> {
-    if (chatKind === 'group') return 'Group Chat';
+    if (chatKind === 'group') {
+      // For groups, use the name from URL or lookup, or default
+      return contactNameFromUrl || 'Group Chat';
+    }
     if (chatKind === 'channel') return '#announcements';
     return contactNameFromUrl || 'Leslie Alexander';
   }, [chatKind, contactNameFromUrl]);
@@ -786,12 +855,53 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
     }
   };
 
-  const send = ()=>{
+  const send = async ()=>{
     if(!draft.trim() && !isRecording) return;
+    
     const ts = new Date();
-    const newMsg = { id:'m'+Date.now(), author:{ id:'me', name:'You', avatar:'https://i.pravatar.cc/100?img=2' }, text:draft, time: ts.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }), mine:true, read:false, replyTo: replyTo? { id: replyTo.id, text: replyTo.text } : undefined };
+    const plaintext = draft;
+    
+    // Get recipient ID (in production, get from conversation data)
+    // For demo, use the first non-me author from messages
+    const recipientId = messages.find(m => !m.mine)?.author?.id || 'u2';
+    
+    // Encrypt message if encryption is ready
+    let encryptedData = { text: plaintext, encrypted: false };
+    if (encryptionReady) {
+      try {
+        encryptedData = await encryptMessage(plaintext, recipientId);
+      } catch (error) {
+        console.error('Encryption failed, sending unencrypted:', error);
+        encryptedData = { text: plaintext, encrypted: false };
+      }
+    }
+    
+    const newMsg = { 
+      id:'m'+Date.now(), 
+      author:{ id:'me', name:'You', avatar:'https://i.pravatar.cc/100?img=2' }, 
+      text: plaintext, // Keep plaintext for display
+      encryptedData: encryptedData.encrypted ? encryptedData : null, // Store encrypted data
+      time: ts.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }), 
+      mine:true, 
+      read:false,
+      replyTo: replyTo? { id: replyTo.id, text: replyTo.text } : undefined 
+    };
+    
     setMessages(prev=> [...prev, newMsg]);
-    setDraft(''); setReplyTo(null);
+    setDraft(''); 
+    setReplyTo(null);
+    
+    // Increment message count and rekey if needed
+    messageCountRef.current += 1;
+    if (encryptionReady && messageCountRef.current % REKEY_INTERVAL === 0) {
+      try {
+        await rekeySession(recipientId);
+        console.log('Session rekeyed after', messageCountRef.current, 'messages');
+      } catch (error) {
+        console.error('Rekeying failed:', error);
+      }
+    }
+    
     // Clear draft from localStorage when message is sent
     try {
       localStorage.removeItem(`chat-draft-${conversationId}`);
@@ -1639,14 +1749,24 @@ export default function ConversationWAHeader({ onBack, kind='1:1', moduleLabel='
             <ListItemIcon><IosShareRoundedIcon fontSize="small"/></ListItemIcon>
             <ListItemText primary="Export chat" />
           </MenuItem>
-          <MenuItem onClick={()=>{ closeHeaderMenu(); if(window.confirm('Clear all messages in this chat?')) { setMessages([]); } }}>
-            <ListItemIcon><DeleteSweepRoundedIcon fontSize="small"/></ListItemIcon>
-            <ListItemText primary="Clear chat" />
-          </MenuItem>
+          {/* Role-based: Only admins and moderators can clear chat */}
+          {(isAdmin || isModerator) && (
+            <MenuItem onClick={()=>{ closeHeaderMenu(); if(window.confirm('Clear all messages in this chat?')) { setMessages([]); } }}>
+              <ListItemIcon><DeleteSweepRoundedIcon fontSize="small"/></ListItemIcon>
+              <ListItemText primary="Clear chat" />
+            </MenuItem>
+          )}
           {chatKind === '1:1' && (
             <MenuItem onClick={()=>{ closeHeaderMenu(); if(window.confirm('Block this contact?')) { alert('Contact blocked'); } }}>
               <ListItemIcon><BlockRoundedIcon fontSize="small"/></ListItemIcon>
               <ListItemText primary="Block" />
+            </MenuItem>
+          )}
+          {/* Encryption status indicator */}
+          {encryptionReady && (
+            <MenuItem disabled>
+              <ListItemIcon><Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: EV.green }} /></ListItemIcon>
+              <ListItemText primary="End-to-end encrypted" secondary="Messages are secured" />
             </MenuItem>
           )}
           <MenuItem onClick={()=>{ closeHeaderMenu(); onNavigate?.('/safety'); }}>

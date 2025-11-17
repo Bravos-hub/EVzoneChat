@@ -157,7 +157,7 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
                   <React.Fragment key={p.id}>
                     <ListItem 
                       button 
-                      onClick={()=>onOpenResult?.({ type:'person', id:p.id })}
+                      onClick={()=>onOpenResult?.({ type:'person', id:p.id, name:p.name })}
                       sx={{
                         px: { xs: 2, sm: 3 },
                         py: { xs: 1, sm: 1.25 },
@@ -219,7 +219,7 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
                   <React.Fragment key={g.id}>
                     <ListItem 
                       button 
-                      onClick={()=>onOpenResult?.({ type:'group', id:g.id })}
+                      onClick={()=>onOpenResult?.({ type:'group', id:g.id, name:g.name })}
                       sx={{
                         px: { xs: 2, sm: 3 },
                         py: { xs: 1, sm: 1.25 },
