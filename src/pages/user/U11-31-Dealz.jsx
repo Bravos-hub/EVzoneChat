@@ -23,6 +23,7 @@ import {
   Menu,
   ListItemIcon
 } from "@mui/material";
+import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import CampaignRoundedIcon from "@mui/icons-material/CampaignRounded";
 import PlayCircleFilledWhiteRoundedIcon from "@mui/icons-material/PlayCircleFilledWhiteRounded";
 import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
@@ -454,7 +455,16 @@ export default function DealzPromoStatusFeed({ onBack }) {
           minHeight: '100vh',
           width: '100%'
         }}
-              >
+      >
+        {/* Header - matching Settings style */}
+        <AppBar elevation={0} position="static" sx={{ bgcolor: 'background.paper', color: 'text.primary', borderBottom:`1px solid ${muiTheme.palette.divider}` }}>
+          <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
+            <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary', padding: { xs: '6px', sm: '8px' } }}>
+              <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+            </IconButton>
+            <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 }, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Dealz Status</Typography>
+          </Toolbar>
+        </AppBar>
 
           {/* Content */}
           <Box
@@ -462,46 +472,13 @@ export default function DealzPromoStatusFeed({ onBack }) {
             sx={{ 
               flex: 1, 
               overflowY: "auto", 
-              pt: { xs: "56px", sm: "64px" }, 
               pb: { xs: 10, sm: 12 }, 
               px: { xs: 1.5, sm: 2, md: 3 },
+              pt: { xs: 2, sm: 3 },
               bgcolor: actualMode === 'dark' ? '#121212' : EV.light,
               width: '100%'
             }}
           >
-            {/* Large Prominent Title - Dealz Status */}
-            <Box
-              sx={{
-                pt: { xs: 2, sm: 3 },
-                pb: { xs: 1.5, sm: 2 },
-                mb: { xs: 1, sm: 1.5 },
-                width: '100%'
-              }}
-            >
-              <Typography 
-                variant="h4" 
-                sx={{ 
-                  fontSize: { xs: '24px', sm: '28px', md: '32px' },
-                  fontWeight: 800,
-                  lineHeight: 1.2,
-                  color: actualMode === 'dark' ? '#fff' : '#000',
-                  mb: 0.5,
-                  letterSpacing: '-0.02em'
-                }}
-              >
-                Dealz Status
-              </Typography>
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  fontSize: { xs: '13px', sm: '14px' },
-                  color: actualMode === 'dark' ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)',
-                  fontWeight: 500
-                }}
-              >
-                Promo Ads & Live Sessions
-              </Typography>
-            </Box>
 
             {/* Filter row */}
             <Box className="flex items-center justify-between mt-2 mb-2">
