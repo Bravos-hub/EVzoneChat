@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import type React from "react";
-import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 import { useCall } from "../context/CallContext";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
@@ -683,7 +683,7 @@ export default function MobileUserShell({ registry: externalRegistry = {} }){
   const LiveMeeting = getComponent(registry, 'U-M7', () => <Screen title="Live Meeting"/>);
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <ShellFrame>
         <Routes>
           <Route path="/" element={<Navigate to="/inbox" replace/>} />
@@ -719,7 +719,7 @@ export default function MobileUserShell({ registry: externalRegistry = {} }){
           <Route path="/conversation/new" element={<RouteWrapper Component={Conversation} />} />
         </Routes>
       </ShellFrame>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
