@@ -13,7 +13,7 @@ Opens http://localhost:3000 — default route `/inbox`.
 - Create React App (JavaScript)
 - MUI 5 + Icons
 - TailwindCSS 3
-- React Router v6
+- React Router v6 
 
 ## EV colors
 - EV Green: #03cd8c
