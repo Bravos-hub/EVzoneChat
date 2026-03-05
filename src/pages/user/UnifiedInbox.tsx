@@ -38,22 +38,8 @@ import PlayCircleFilledWhiteRoundedIcon from "@mui/icons-material/PlayCircleFill
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
-// demo data - matching design with promo data
-const DEMO = [
-  { id: 'c1', name: 'Etty Duke', avatar: 'https://i.pravatar.cc/100?img=1', module: 'Rides', last: 'I am near the pickup now', time: '09:30 PM', unread: 0, typing: true, promos: [] },
-  { id: 'c2', name: 'Zev Sharp', avatar: 'https://i.pravatar.cc/100?img=2', module: 'Rides', last: 'Thanks for the ride', time: '10:30 AM', unread: 2, typing: false, promos: [
-    { id: 'p1', type: 'promo-ad', title: 'Flash Sale', module: 'Rides', seen: false }
-  ]},
-  { id: 'c3', name: 'EVrides', avatar: 'https://i.pravatar.cc/100?img=3', module: 'Rides', last: 'Your ride has been confirmed', time: 'Yesterday', unread: 1, typing: false, promos: [] },
-  { id: 'c4', name: 'Zalmen Knox', avatar: 'https://i.pravatar.cc/100?img=4', module: 'Rides', last: 'On my way', time: 'Monday', unread: 0, typing: false, promos: [] },
-  { id: 'c5', name: 'Benjamin Peck', avatar: 'https://i.pravatar.cc/100?img=6', module: 'Rides', last: 'See you soon', time: 'June 20', unread: 0, typing: false, promos: [] },
-  { id: 'c6', name: 'Bessie Cooper', avatar: 'https://i.pravatar.cc/100?img=7', module: 'Other', last: 'Meeting scheduled', time: 'June 14', unread: 0, typing: false, promos: [] },
-  { id: 'c7', name: 'Guy Hawkins', avatar: 'https://i.pravatar.cc/100?img=9', module: 'Other', last: 'Payment received', time: 'May 07', unread: 0, typing: false, promos: [] },
-  { id: 'c8', name: 'Leslie Alexander', avatar: 'https://i.pravatar.cc/100?img=5', module: 'Other', last: "Newton's laws PDF attached", time: 'Yesterday', unread: 0, typing: false, promos: [
-    { id: 'p2', type: 'live', title: 'Math Live Session', module: 'School', seen: false },
-    { id: 'p3', type: 'promo-ad', title: 'Study Materials', module: 'School', seen: false }
-  ]},
-];
+// Empty demo data for testing the new user experience
+const DEMO = [];
 
 const LIVE_DEMO = [
   { id: 'ride_123', module: 'Rides', title: 'Kampala → Entebbe', subtitle: 'ETA 22 min', host: 'John Driver', startedAt: '7m', cta: 'Resume' },
@@ -66,30 +52,30 @@ function NotificationIconButton() {
   const navigate = useNavigate();
   const [menuEl, setMenuEl] = useState(null);
   const [muted, setMuted] = useState(false);
-  
+
   const handleClick = (e) => {
     setMenuEl(e.currentTarget);
   };
-  
+
   const handleClose = () => {
     setMenuEl(null);
   };
-  
+
   const handleMute = () => {
     setMuted(!muted);
     alert(muted ? 'Notifications enabled' : 'Notifications muted');
     handleClose();
   };
-  
+
   return (
     <>
-      <IconButton 
-        aria-label="Notifications" 
+      <IconButton
+        aria-label="Notifications"
         onClick={handleClick}
         sx={{ color: '#fff', padding: { xs: '6px', sm: '8px' } }}
       >
-        <Badge 
-          variant="dot" 
+        <Badge
+          variant="dot"
           sx={{
             '& .MuiBadge-dot': {
               backgroundColor: '#ff4444',
@@ -110,31 +96,33 @@ function NotificationIconButton() {
         onClose={handleClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        PaperProps={{ 
-          sx:{ 
-            width: '90vw', 
-            maxWidth: 'calc(100vw - 1rem)', 
-            borderRadius: 2, 
+        PaperProps={{
+          sx: {
+            width: '90vw',
+            maxWidth: 'calc(100vw - 1rem)',
+            borderRadius: 2,
             py: 0.5,
             bgcolor: 'background.paper',
             '& .MuiMenuItem-root': {
               color: 'text.primary',
             }
-          } 
+          }
         }}
       >
         <MenuItem onClick={handleMute}>
-          <ListItemIcon><NotificationsOffRoundedIcon fontSize="small"/></ListItemIcon>
+          <ListItemIcon><NotificationsOffRoundedIcon fontSize="small" /></ListItemIcon>
           <ListItemText primary={muted ? "Unmute notifications" : "Mute notifications"} />
         </MenuItem>
         <MenuItem onClick={() => { handleClose(); navigate('/dnd'); }}>
-          <ListItemIcon><NotificationsRoundedIcon fontSize="small"/></ListItemIcon>
+          <ListItemIcon><NotificationsRoundedIcon fontSize="small" /></ListItemIcon>
           <ListItemText primary="Notification settings" />
         </MenuItem>
       </Menu>
     </>
   );
 }
+
+import AddRoundedIcon from "@mui/icons-material/AddRounded";
 
 /**
  * U01-03 Unified Inbox - Messages List
@@ -157,7 +145,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
   const [draftRefresh, setDraftRefresh] = useState(0); // Force re-render to check drafts
   const [ringMenuEl, setRingMenuEl] = useState(null);
   const [ringMenuEntity, setRingMenuEntity] = useState(null);
-  
+
   // Refresh drafts when location changes (when navigating back from chat)
   useEffect(() => {
     // Small delay to ensure localStorage is updated after navigation
@@ -166,7 +154,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
     }, 100);
     return () => clearTimeout(timer);
   }, [location.pathname]);
-  
+
   // Get theme accent color
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
 
@@ -209,7 +197,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
 
   // Available modules
   const MODULES = ['E-Commerce', 'EV Charging', 'Rides & Logistics', 'School & E-Learning', 'Medical & Health Care', 'Travel & Tourism', 'Green Investments', 'Faith Hub', 'Social Networking', 'Virtual Workspace', 'Wallet & Payments', 'AI Chatbot'];
-  
+
   // Get drafts for all conversations - reactive to draftRefresh and location changes
   const drafts = useMemo(() => {
     const draftMap = {};
@@ -227,7 +215,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
     return draftMap;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items, draftRefresh, location.pathname]);
-  
+
   // filter logic - filter by tab (E-Commerce = selected module, Other = everything else)
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
@@ -245,36 +233,36 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
       {/* Hide scrollbars globally for this component */}
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
 
-      <Box sx={{ 
-        width: '100%', 
-        mx: 'auto', 
-        bgcolor: 'background.default', 
-        height: '100%', 
-        display: 'flex', 
+      <Box sx={{
+        width: '100%',
+        mx: 'auto',
+        bgcolor: 'background.default',
+        height: '100%',
+        display: 'flex',
         flexDirection: 'column',
         position: 'relative'
       }}>
         {/* 1. Top Header - Parent Section (Theme Color Background) */}
-        <AppBar 
-          elevation={0} 
-          position="static" 
-          sx={{ 
-            bgcolor: accentColor, 
+        <AppBar
+          elevation={0}
+          position="static"
+          sx={{
+            bgcolor: accentColor,
             color: '#fff',
             boxShadow: 'none'
           }}
         >
           <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
-            <IconButton 
-              aria-label="Back" 
+            <IconButton
+              aria-label="Back"
               onClick={onBack}
               sx={{ color: '#fff', mr: { xs: 0.75, sm: 1 }, padding: { xs: '6px', sm: '8px' } }}
             >
               <ArrowBackRoundedIcon sx={{ fontSize: { xs: '20px', sm: '24px' } }} />
             </IconButton>
-            <Typography 
-              variant="h6" 
-              sx={{ 
+            <Typography
+              variant="h6"
+              sx={{
                 fontSize: { xs: '16px', sm: '18px' },
                 fontWeight: 700,
                 color: '#fff',
@@ -288,8 +276,8 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
         </AppBar>
 
         {/* 2. Live Ongoing Section (Dark Grey Background) - Swipeable Carousel */}
-        <Box 
-          sx={{ 
+        <Box
+          sx={{
             bgcolor: isDark ? '#3a3a3a' : '#5a5a5a',
             color: '#fff',
             px: { xs: 1.5, sm: 2 },
@@ -300,9 +288,9 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
             zIndex: 0
           }}
         >
-          <Typography 
-            variant="body2" 
-            sx={{ 
+          <Typography
+            variant="body2"
+            sx={{
               fontSize: '12px',
               fontWeight: 600,
               color: '#fff',
@@ -335,7 +323,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                   key={live.id}
                   onClick={() => onLiveOpen?.(live)}
                   elevation={0}
-                  sx={{ 
+                  sx={{
                     bgcolor: 'rgba(255, 255, 255, 0.1)',
                     borderRadius: 2,
                     p: 2,
@@ -353,16 +341,16 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                   }}
                 >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
-                    <Avatar 
-                      src={live.host === 'Leslie Alexander' ? 'https://i.pravatar.cc/100?img=5' : live.host === 'John Driver' ? 'https://i.pravatar.cc/100?img=1' : 'https://i.pravatar.cc/100?img=3'} 
+                    <Avatar
+                      src={live.host === 'Leslie Alexander' ? 'https://i.pravatar.cc/100?img=5' : live.host === 'John Driver' ? 'https://i.pravatar.cc/100?img=1' : 'https://i.pravatar.cc/100?img=3'}
                       sx={{ width: 40, height: 40 }}
                     />
                     <Box sx={{ flex: 1, minWidth: 0 }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                        <Typography 
-                          variant="body2" 
-                          sx={{ 
-                            fontWeight: 600, 
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontWeight: 600,
                             color: '#fff',
                             fontSize: '14px',
                             overflow: 'hidden',
@@ -373,22 +361,22 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                         >
                           {live.host}
                         </Typography>
-                        <Chip 
-                          size="small" 
-                          label={live.module || 'E-Commerce'} 
-                          sx={{ 
+                        <Chip
+                          size="small"
+                          label={live.module || 'E-Commerce'}
+                          sx={{
                             height: 18,
                             fontSize: '9px',
                             fontWeight: 600,
                             bgcolor: 'rgba(255, 255, 255, 0.2)',
                             color: '#fff',
                             border: '1px solid rgba(255, 255, 255, 0.3)'
-                          }} 
+                          }}
                         />
                       </Box>
-                      <Typography 
-                        variant="caption" 
-                        sx={{ 
+                      <Typography
+                        variant="caption"
+                        sx={{
                           color: 'rgba(255, 255, 255, 0.8)',
                           fontSize: '12px',
                           overflow: 'hidden',
@@ -401,9 +389,9 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                       </Typography>
                     </Box>
                   </Box>
-                  <Typography 
-                    variant="body2" 
-                    sx={{ 
+                  <Typography
+                    variant="body2"
+                    sx={{
                       color: 'rgba(255, 255, 255, 0.9)',
                       fontSize: '13px',
                       fontWeight: 500,
@@ -416,9 +404,9 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                     {live.subtitle}
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 1.5 }}>
-                    <Typography 
-                      variant="caption" 
-                      sx={{ 
+                    <Typography
+                      variant="caption"
+                      sx={{
                         color: 'rgba(255, 255, 255, 0.7)',
                         fontSize: '11px'
                       }}
@@ -453,9 +441,9 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
               ))}
             </Box>
           ) : (
-            <Typography 
-              variant="body2" 
-              sx={{ 
+            <Typography
+              variant="body2"
+              sx={{
                 color: 'rgba(255, 255, 255, 0.6)',
                 fontSize: '13px',
                 textAlign: 'center',
@@ -488,9 +476,9 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
           <Box sx={{ px: 2, pt: 2, pb: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography 
-                  variant="h6" 
-                  sx={{ 
+                <Typography
+                  variant="h6"
+                  sx={{
                     fontSize: '18px',
                     fontWeight: 700,
                     color: 'text.primary'
@@ -499,8 +487,8 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                   Messages
                 </Typography>
                 {totalUnread > 0 && (
-                  <Badge 
-                    badgeContent={totalUnread} 
+                  <Badge
+                    badgeContent={totalUnread}
                     sx={{
                       '& .MuiBadge-badge': {
                         backgroundColor: accentColor,
@@ -515,16 +503,16 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                 )}
               </Box>
               <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-                <IconButton 
-                  aria-label="Refresh" 
+                <IconButton
+                  aria-label="Refresh"
                   onClick={onRefresh}
                   size="small"
                   sx={{ color: 'text.secondary' }}
                 >
                   <RefreshRoundedIcon fontSize="small" />
                 </IconButton>
-                <IconButton 
-                  aria-label="Search" 
+                <IconButton
+                  aria-label="Search"
                   onClick={() => {
                     setShowSearch(!showSearch);
                     if (!showSearch) {
@@ -543,8 +531,8 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
 
             {/* Tabs: E-Commerce and Other - Inside Drawer */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Tabs 
-                value={tab} 
+              <Tabs
+                value={tab}
                 onChange={(e, v) => {
                   if (v === 1) {
                     // When clicking "Other" tab, switch to it AND show module selection menu
@@ -553,12 +541,12 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                   } else {
                     setTab(v);
                   }
-                }} 
-                textColor="inherit"
-                TabIndicatorProps={{ 
-                  style: { background: accentColor } 
                 }}
-                sx={{ 
+                textColor="inherit"
+                TabIndicatorProps={{
+                  style: { background: accentColor }
+                }}
+                sx={{
                   minHeight: 40,
                   flex: 1,
                   '& .MuiTab-root': {
@@ -584,7 +572,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                 <Tab label="Other" />
               </Tabs>
             </Box>
-            
+
             {/* Module Selection Menu */}
             <Menu
               anchorEl={moduleMenuEl}
@@ -636,163 +624,242 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
           {/* Search - shown when search icon is clicked - Inside Drawer */}
           {showSearch && (
             <Box sx={{ px: 2, pb: 1.5 }}>
-            <TextField
+              <TextField
                 inputRef={searchInputRef}
-              fullWidth 
-              size="small" 
-              value={q} 
-              onChange={(e)=>setQ(e.target.value)} 
-              placeholder="Search people, channels, messages"
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  bgcolor: 'background.default',
-                  borderRadius: 2,
-                  '&:hover': {
-                    bgcolor: 'action.hover'
-                  },
-                  '&.Mui-focused': {
-                    bgcolor: 'background.paper',
+                fullWidth
+                size="small"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Search people, channels, messages"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    bgcolor: 'background.default',
+                    borderRadius: 2,
+                    '&:hover': {
+                      bgcolor: 'action.hover'
+                    },
+                    '&.Mui-focused': {
+                      bgcolor: 'background.paper',
                       boxShadow: `0 0 0 2px ${accentColor}33`
-                  },
-                  '& .MuiInputBase-input': {
-                    color: 'text.primary',
-                  },
-                  '& .MuiInputBase-input::placeholder': {
-                    color: 'text.secondary',
-                    opacity: 1,
-                  },
-                }
-              }}
-              InputProps={{ 
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchRoundedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
-                  </InputAdornment>
-                ) 
-              }}
-            />
-          </Box>
-        )}
+                    },
+                    '& .MuiInputBase-input': {
+                      color: 'text.primary',
+                    },
+                    '& .MuiInputBase-input::placeholder': {
+                      color: 'text.secondary',
+                      opacity: 1,
+                    },
+                  }
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchRoundedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                    </InputAdornment>
+                  )
+                }}
+              />
+            </Box>
+          )}
 
           {/* Conversation list - Inside Drawer */}
-        <Box className="flex-1" sx={{ overflowY:'auto', '&::-webkit-scrollbar':{ display:'none' }, scrollbarWidth:'none', msOverflowStyle:'none' }}>
-          <List>
-            {filtered.map((c, idx) => (
-              <React.Fragment key={c.id}>
-                <ListItem button onClick={() => onOpen?.(c)} alignItems="flex-start">
-                  <ListItemAvatar>
-                    <Badge 
-                      invisible={!c.unread} 
-                      badgeContent={c.unread} 
-                      overlap="circular"
-                      sx={{
-                        '& .MuiBadge-badge': {
-                          backgroundColor: accentColor,
-                          color: '#fff'
-                        }
-                      }}
-                    >
-                      <PromoRingAvatar
-                        entity={c}
-                        accentColor={accentColor}
-                        onClick={(e) => handleRingClick(e, c)}
-                        size={40}
-                      />
-                    </Badge>
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={
-                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
-                        <Typography 
-                          variant="body2" 
-                          sx={{ 
-                            fontWeight: 600, 
-                            color: 'text.primary',
-                            fontSize: '15px',
-                            flex: 1,
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap'
-                          }}
-                        >
-                          {c.name}
-                        </Typography>
-                        <Typography 
-                          variant="caption" 
-                          sx={{ 
-                            color: 'text.secondary',
-                            fontSize: '12px',
-                            flexShrink: 0,
-                            ml: 1
-                          }}
-                        >
-                          {c.time}
-                        </Typography>
-                      </Box>
-                    }
-                    secondary={
-                      <Box sx={{ mt: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
-                        {c.typing ? (
-                          <Typography 
-                            variant="caption" 
-                            sx={{ 
-                              color: accentColor,
-                              fontSize: '12px',
-                              fontWeight: 500
+          <Box className="flex-1" sx={{ overflowY: 'auto', '&::-webkit-scrollbar': { display: 'none' }, scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <List>
+              {filtered.map((c, idx) => (
+                <React.Fragment key={c.id}>
+                  <ListItem button onClick={() => onOpen?.(c)} alignItems="flex-start">
+                    <ListItemAvatar>
+                      <Badge
+                        invisible={!c.unread}
+                        badgeContent={c.unread}
+                        overlap="circular"
+                        sx={{
+                          '& .MuiBadge-badge': {
+                            backgroundColor: accentColor,
+                            color: '#fff'
+                          }
+                        }}
+                      >
+                        <PromoRingAvatar
+                          entity={c}
+                          accentColor={accentColor}
+                          onClick={(e) => handleRingClick(e, c)}
+                          size={40}
+                        />
+                      </Badge>
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              fontWeight: 600,
+                              color: 'text.primary',
+                              fontSize: '15px',
+                              flex: 1,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap'
                             }}
                           >
-                            {c.name} typing…
+                            {c.name}
                           </Typography>
-                        ) : (() => {
-                          // Check for draft message from the drafts map
-                          const draftText = drafts[c.id];
-                          
-                          if (draftText && draftText.trim()) {
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: 'text.secondary',
+                              fontSize: '12px',
+                              flexShrink: 0,
+                              ml: 1
+                            }}
+                          >
+                            {c.time}
+                          </Typography>
+                        </Box>
+                      }
+                      secondary={
+                        <Box sx={{ mt: 0.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+                          {c.typing ? (
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                color: accentColor,
+                                fontSize: '12px',
+                                fontWeight: 500
+                              }}
+                            >
+                              {c.name} typing…
+                            </Typography>
+                          ) : (() => {
+                            // Check for draft message from the drafts map
+                            const draftText = drafts[c.id];
+
+                            if (draftText && draftText.trim()) {
+                              return (
+                                <Typography
+                                  variant="caption"
+                                  sx={{
+                                    color: accentColor,
+                                    fontSize: '12px',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                    flex: 1,
+                                    fontStyle: 'italic'
+                                  }}
+                                >
+                                  Draft: {draftText.length > 30 ? draftText.substring(0, 30) + '...' : draftText}
+                                </Typography>
+                              );
+                            }
+
                             return (
-                              <Typography 
-                                variant="caption" 
-                                sx={{ 
-                                  color: accentColor,
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  color: 'text.secondary',
                                   fontSize: '12px',
                                   overflow: 'hidden',
                                   textOverflow: 'ellipsis',
                                   whiteSpace: 'nowrap',
-                                  flex: 1,
-                                  fontStyle: 'italic'
+                                  flex: 1
                                 }}
                               >
-                                Draft: {draftText.length > 30 ? draftText.substring(0, 30) + '...' : draftText}
+                                {c.last}
                               </Typography>
                             );
-                          }
-                          
-                          return (
-                          <Typography 
-                            variant="caption" 
-                            sx={{ 
-                              color: 'text.secondary',
-                              fontSize: '12px',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap',
-                              flex: 1
-                            }}
-                          >
-                            {c.last}
-                          </Typography>
-                          );
-                        })()}
-                      </Box>
-                    }
-                    sx={{ m: 0 }}
-                  />
-                </ListItem>
-                {idx < filtered.length - 1 && <Divider component="li" />}
-              </React.Fragment>
-            ))}
-            {filtered.length === 0 && (<Box className="px-4 py-10 text-center" sx={{ color: 'text.secondary' }}>No conversations match your search.</Box>)}
-          </List>
-        </Box>
+                          })()}
+                        </Box>
+                      }
+                      sx={{ m: 0 }}
+                    />
+                  </ListItem>
+                  {idx < filtered.length - 1 && <Divider component="li" />}
+                </React.Fragment>
+              ))}
+
+              {/* Empty States */}
+              {filtered.length === 0 && q.trim().length > 0 && (
+                <Box className="px-4 py-10 text-center" sx={{ color: 'text.secondary' }}>
+                  No conversations match your search.
+                </Box>
+              )}
+
+              {filtered.length === 0 && q.trim().length === 0 && (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    px: 4,
+                    py: 8,
+                    textAlign: 'center'
+                  }}
+                >
+                  <Box
+                    sx={{
+                      fontSize: '64px',
+                      mb: 2,
+                      filter: isDark ? `drop-shadow(0 0 20px ${accentColor}40)` : `drop-shadow(0 8px 16px ${accentColor}30)`,
+                      animation: 'float 3s ease-in-out infinite'
+                    }}
+                  >
+                    🔥
+                  </Box>
+                  <style>{`
+                  @keyframes float {
+                    0% { transform: translateY(0px); }
+                    50% { transform: translateY(-10px); }
+                    100% { transform: translateY(0px); }
+                  }
+                `}</style>
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      fontWeight: 700,
+                      mb: 1,
+                      color: 'text.primary',
+                      fontSize: '22px'
+                    }}
+                  >
+                    Welcome to Chat!
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'text.secondary',
+                      mb: 4,
+                      maxWidth: '80%',
+                      lineHeight: 1.5
+                    }}
+                  >
+                    Feel free to start a new conversation by tapping the button below.
+                  </Typography>
+                  <Button
+                    onClick={onNew}
+                    startIcon={<AddRoundedIcon />}
+                    sx={{
+                      bgcolor: isDark ? `${accentColor}25` : `${accentColor}15`,
+                      color: accentColor,
+                      fontWeight: 700,
+                      borderRadius: '24px',
+                      textTransform: 'none',
+                      px: 3,
+                      py: 1.25,
+                      fontSize: '15px',
+                      '&:hover': {
+                        bgcolor: isDark ? `${accentColor}35` : `${accentColor}25`,
+                      }
+                    }}
+                  >
+                    Start New Chat
+                  </Button>
+                </Box>
+              )}
+            </List>
+          </Box>
         </Paper>
       </Box>
 
