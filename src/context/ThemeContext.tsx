@@ -75,7 +75,7 @@ export const ThemeContextProvider: React.FC<ThemeContextProviderProps> = ({ chil
     if (typeof window === 'undefined' || !window.matchMedia) return;
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
+
     const handleChange = (e: MediaQueryListEvent) => {
       const newPreference = e.matches ? 'dark' : 'light';
       setSystemPreference(newPreference);
@@ -88,7 +88,7 @@ export const ThemeContextProvider: React.FC<ThemeContextProviderProps> = ({ chil
     if (mediaQuery.addEventListener) {
       mediaQuery.addEventListener('change', handleChange);
       return () => mediaQuery.removeEventListener('change', handleChange);
-    } 
+    }
     // Fallback for older browsers
     else if ((mediaQuery as any).addListener) {
       (mediaQuery as any).addListener(handleChange);
@@ -122,7 +122,7 @@ export const ThemeContextProvider: React.FC<ThemeContextProviderProps> = ({ chil
   // Create MUI theme with proper dark/light mode support
   const muiTheme = useMemo(() => {
     const isDark = actualMode === 'dark';
-    
+
     return createTheme({
       palette: {
         mode: actualMode,
@@ -144,6 +144,9 @@ export const ThemeContextProvider: React.FC<ThemeContextProviderProps> = ({ chil
         },
         divider: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)',
       },
+      typography: {
+        fontFamily: '"Inter", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif',
+      },
       shape: { borderRadius: 12 },
       components: {
         MuiCssBaseline: {
@@ -156,7 +159,9 @@ export const ThemeContextProvider: React.FC<ThemeContextProviderProps> = ({ chil
         MuiAppBar: {
           styleOverrides: {
             root: {
-              backgroundColor: isDark ? '#1e1e1e' : accentColor,
+              backgroundColor: isDark ? 'rgba(30, 30, 30, 0.85)' : `${accentColor}DD`,
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
               color: '#ffffff',
               transition: 'background-color 0.3s ease',
             },
