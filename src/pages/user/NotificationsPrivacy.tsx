@@ -34,7 +34,7 @@ const CHANNEL_OVERRIDES = [
  * U09-27 — Notifications & Privacy (per module/channel)
  * Configure notifications per module, mentions, read receipts, last seen, quiet hours
  */
-export default function NotificationsPrivacy({ onBack }) {
+export default function NotificationsPrivacy({ onBack, layoutMode = 'mobile' }) {
   const muiTheme = useMuiTheme();
   const { accent, isDark } = useTheme();
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
@@ -438,3 +438,4 @@ export default function NotificationsPrivacy({ onBack }) {
     </>
   );
 }
+

@@ -16,7 +16,7 @@ html, body, #root {
 
 :root {
   --desktop-rail-w: 72px;
-  --desktop-list-w: 380px;
+  --desktop-list-w: clamp(340px, 30vw, 400px);
   --desktop-pane-border: rgba(255, 255, 255, 0.08);
 }
 
@@ -129,9 +129,119 @@ html, body, #root {
   justify-content: flex-start;
 }
 
+.desktop-page-workspace {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  display: flex;
+}
+
+.desktop-page-list-pane {
+  width: var(--desktop-list-w);
+  min-width: var(--desktop-list-w);
+  max-width: var(--desktop-list-w);
+  min-height: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--desktop-pane-border);
+}
+
+.desktop-page-right-pane {
+  flex: 1;
+  min-width: 0;
+  min-height: 100%;
+  display: flex;
+  background: rgba(17, 27, 33, 0.2);
+}
+
+.desktop-page-placeholder {
+  flex: 1;
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.desktop-page-placeholder-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+}
+
 .desktop-pane-scroll {
   flex: 1;
   min-height: 0;
+}
+
+.desktop-wa-compact .desktop-main {
+  min-height: 0;
+}
+
+.desktop-wa-compact .desktop-chat-list-pane,
+.desktop-wa-compact .desktop-page-list-pane,
+.desktop-wa-compact .desktop-calls-list-pane {
+  width: var(--desktop-list-w);
+  min-width: var(--desktop-list-w);
+  max-width: var(--desktop-list-w);
+}
+
+.desktop-wa-compact .desktop-chat-right-pane,
+.desktop-wa-compact .desktop-page-right-pane,
+.desktop-wa-compact .desktop-calls-right-pane {
+  min-height: 0;
+}
+
+.desktop-wa-compact .MuiAppBar-root .MuiToolbar-root {
+  min-height: 52px !important;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.desktop-wa-compact .MuiAppBar-root .MuiTypography-h6,
+.desktop-wa-compact .MuiToolbar-root .MuiTypography-h6 {
+  font-size: 1rem !important;
+  line-height: 1.2;
+}
+
+.desktop-wa-compact .MuiOutlinedInput-root {
+  min-height: 44px;
+}
+
+.desktop-wa-compact .MuiInputBase-input {
+  font-size: 0.92rem;
+}
+
+.desktop-wa-compact .MuiTab-root {
+  min-height: 40px !important;
+  font-size: 0.78rem;
+}
+
+.desktop-wa-compact .MuiChip-root {
+  height: 26px;
+  font-size: 0.74rem;
+}
+
+.desktop-wa-compact .MuiListItem-root {
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.desktop-wa-compact .MuiListItemAvatar-root {
+  min-width: 50px;
+}
+
+.desktop-wa-compact .MuiListItemAvatar-root .MuiAvatar-root {
+  width: 44px;
+  height: 44px;
+}
+
+.desktop-wa-compact .MuiButton-root {
+  min-height: 36px;
 }
 
 /* Light mode default */

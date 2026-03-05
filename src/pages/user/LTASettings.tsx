@@ -39,7 +39,7 @@ const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2
  * U10-29 — Language & Translation / Accessibility / Data & Storage
  * One screen with three tabs
  */
-export default function LTASettings({ onBack, onNavigate }) {
+export default function LTASettings({ onBack, onNavigate, layoutMode = 'mobile' }) {
   const muiTheme = useMuiTheme();
   // const { actualMode } = useTheme();
   const [tab, setTab] = useState(0);
@@ -289,3 +289,4 @@ export default function LTASettings({ onBack, onNavigate }) {
     </>
   );
 }
+

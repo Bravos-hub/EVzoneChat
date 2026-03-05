@@ -35,7 +35,7 @@ import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
  * - Report abuse form
  * - Blocked words notice
  */
-export default function SafetyCenter({ onBack }) {
+export default function SafetyCenter({ onBack, layoutMode = 'mobile' }) {
   const muiTheme = useMuiTheme();
   // const { actualMode } = useTheme();
   const [recordConsent, setRecordConsent] = useState(false);
@@ -152,3 +152,4 @@ export default function SafetyCenter({ onBack }) {
     </>
   );
 }
+

@@ -28,7 +28,7 @@ const DEMO = [
  * U03-08 — ConversationGallery
  * Filter by type and open item via onOpen(item)
  */
-export default function ConversationGallery({ onBack, items = DEMO, onOpen }) {
+export default function ConversationGallery({ onBack, items = DEMO, onOpen, layoutMode = 'mobile' }) {
   const muiTheme = useMuiTheme();
   const [filter, setFilter] = useState('All');
   const types = ['All','Images','Videos','Audio','Docs'];
@@ -98,3 +98,4 @@ export default function ConversationGallery({ onBack, items = DEMO, onOpen }) {
     </>
   );
 }
+

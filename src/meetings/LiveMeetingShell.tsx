@@ -18,6 +18,7 @@ import GroupRoundedIcon from "@mui/icons-material/GroupRounded";
 import VideocamRoundedIcon from "@mui/icons-material/VideocamRounded";
 import PhoneRoundedIcon from "@mui/icons-material/PhoneRounded";
 import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
+import { DESKTOP_COMPACT, isDesktopCompact } from "../constants/desktopCompact";
 // import LocationOnRoundedIcon from "@mui/icons-material/LocationOnRounded"; // Unused
 
 /**
@@ -49,6 +50,8 @@ export default function LiveMeetingShell({ onBack, onNavigate, location, registr
   const muiTheme = useMuiTheme();
   const routeLocation = useLocation();
   const isDesktopLayout = layoutMode === 'desktop';
+  const isCompactDesktop = isDesktopCompact(layoutMode);
+  const compact = DESKTOP_COMPACT;
   
   // Set document title
   useEffect(() => {
@@ -77,9 +80,9 @@ export default function LiveMeetingShell({ onBack, onNavigate, location, registr
 
   const modeIcon =
     m.mode === "video" ? (
-      <VideocamRoundedIcon sx={{ fontSize: 18 }} />
+      <VideocamRoundedIcon sx={{ fontSize: isCompactDesktop ? 16 : 18 }} />
     ) : (
-      <PhoneRoundedIcon sx={{ fontSize: 18 }} />
+      <PhoneRoundedIcon sx={{ fontSize: isCompactDesktop ? 16 : 18 }} />
     );
 
   return (
@@ -92,17 +95,23 @@ export default function LiveMeetingShell({ onBack, onNavigate, location, registr
           <AppBar
             elevation={0}
             position="static"
-            sx={{ bgcolor: 'background.paper', color: 'text.primary', borderBottom: `1px solid ${muiTheme.palette.divider}` }}
+            sx={{ bgcolor: 'transparent', color: 'text.primary', borderBottom: `1px solid ${muiTheme.palette.divider}` }}
           >
-            <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
+            <Toolbar
+              className={isCompactDesktop ? '' : '!min-h-[56px]'}
+              sx={{
+                minHeight: isCompactDesktop ? compact.toolbarHeight : undefined,
+                px: isCompactDesktop ? 1.5 : { xs: 1.5, sm: 3 }
+              }}
+            >
               <IconButton
                 onClick={onBack}
                 aria-label="Back"
-                sx={{ color: 'text.primary', padding: { xs: '6px', sm: '8px' } }}
+                sx={{ color: 'text.primary', padding: isCompactDesktop ? '6px' : { xs: '6px', sm: '8px' } }}
               >
-                <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+                <ArrowBackRoundedIcon sx={{ fontSize: isCompactDesktop ? 20 : { xs: 20, sm: 24 } }} />
               </IconButton>
-              <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 }, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: isCompactDesktop ? compact.nameFont : { xs: '16px', sm: '18px' }, ml: isCompactDesktop ? 0.75 : { xs: 0.5, sm: 1 }, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   Live meeting
                 </Typography>
             </Toolbar>
@@ -110,17 +119,17 @@ export default function LiveMeetingShell({ onBack, onNavigate, location, registr
 
           {/* Page Title */}
           <Box sx={{ 
-            px: { xs: 1.5, sm: 2, md: 3, lg: 4 }, 
-            pb: 1,
+            px: isCompactDesktop ? 1.5 : { xs: 1.5, sm: 2, md: 3, lg: 4 }, 
+            pb: isCompactDesktop ? 0.5 : 1,
             width: '100%'
           }}>
             <Typography 
               variant="h5" 
               sx={{ 
                 fontWeight: 600, 
-                mb: 1, 
+                mb: isCompactDesktop ? 0.65 : 1, 
                 color: '#fff',
-                fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' }
+                fontSize: isCompactDesktop ? compact.titleLG : { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' }
               }}
             >
               Live Meeting
@@ -129,14 +138,14 @@ export default function LiveMeetingShell({ onBack, onNavigate, location, registr
           
           {/* Meeting summary pill just under header */}
           <Box sx={{ 
-            px: { xs: 1.5, sm: 2, md: 3, lg: 4 }, 
-            pb: 1,
+            px: isCompactDesktop ? 1.5 : { xs: 1.5, sm: 2, md: 3, lg: 4 }, 
+            pb: isCompactDesktop ? 0.5 : 1,
             width: '100%'
           }}>
             <Paper
               elevation={0}
               sx={{
-                p: 1.5,
+                p: isCompactDesktop ? 1.25 : 1.5,
                 borderRadius: 999,
                 border: "1px solid rgba(255,255,255,0.12)",
                 bgcolor: "rgba(0,0,0,0.7)",
@@ -147,29 +156,29 @@ export default function LiveMeetingShell({ onBack, onNavigate, location, registr
                 <Chip
                   size="small"
                   label={m.module}
-                  sx={{ bgcolor: "rgba(0,0,0,0.5)", color: "#fff", fontSize: 10, height: 20 }}
+                  sx={{ bgcolor: "rgba(0,0,0,0.5)", color: "#fff", fontSize: isCompactDesktop ? compact.subMetaFont : 10, height: 20 }}
                 />
                 <Stack spacing={0} sx={{ minWidth: 0, flexGrow: 1 }}>
                   <Typography
                     variant="caption"
-                    sx={{ whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}
+                    sx={{ whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden", fontSize: isCompactDesktop ? compact.metaFont : undefined }}
                   >
                     Host: {m.host} • With {m.with}
                   </Typography>
                   <Stack direction="row" spacing={0.5} alignItems="center">
-                    <AccessTimeRoundedIcon sx={{ fontSize: 16 }} />
-                    <Typography variant="caption">{m.datetimeLabel}</Typography>
+                    <AccessTimeRoundedIcon sx={{ fontSize: isCompactDesktop ? 14 : 16 }} />
+                    <Typography variant="caption" sx={{ fontSize: isCompactDesktop ? compact.metaFont : undefined }}>{m.datetimeLabel}</Typography>
                   </Stack>
                 </Stack>
                 <Stack spacing={0.25} alignItems="flex-end">
                   {m.type === "group" ? (
-                    <GroupRoundedIcon sx={{ fontSize: 18 }} />
+                    <GroupRoundedIcon sx={{ fontSize: isCompactDesktop ? 16 : 18 }} />
                   ) : (
-                    <PersonRoundedIcon sx={{ fontSize: 18 }} />
+                    <PersonRoundedIcon sx={{ fontSize: isCompactDesktop ? 16 : 18 }} />
                   )}
                   <Stack direction="row" spacing={0.25} alignItems="center">
                     {modeIcon}
-                    <Typography variant="caption">{m.location}</Typography>
+                    <Typography variant="caption" sx={{ fontSize: isCompactDesktop ? compact.metaFont : undefined }}>{m.location}</Typography>
                   </Stack>
                 </Stack>
               </Stack>
@@ -177,7 +186,7 @@ export default function LiveMeetingShell({ onBack, onNavigate, location, registr
           </Box>
 
           {/* Live call area — plug in U04‑10 / U04‑11 here */}
-          <Box className="flex-1" sx={{ px: 0, pb: 0, pt: 1, minHeight: 0 }}>
+          <Box className="flex-1" sx={{ px: 0, pb: 0, pt: isCompactDesktop ? 0.5 : 1, minHeight: 0 }}>
             <Box className="w-full h-full flex flex-col">
               {m.type === '1:1' && OneToOneCall ? (
                 <OneToOneCall 
@@ -218,15 +227,15 @@ export default function LiveMeetingShell({ onBack, onNavigate, location, registr
             position: "sticky", 
             bottom: 0, 
             width: '100%',
-            pb: isDesktopLayout ? { xs: 1.5, sm: 2, md: 2.5 } : { xs: `calc(2rem + env(safe-area-inset-bottom))`, sm: 2, md: 2.5 }, 
+            pb: isDesktopLayout ? (isCompactDesktop ? 1.25 : { xs: 1.5, sm: 2, md: 2.5 }) : { xs: `calc(2rem + env(safe-area-inset-bottom))`, sm: 2, md: 2.5 }, 
             display: "flex", 
             justifyContent: "center",
             zIndex: 100
           }}>
             <Box sx={{ 
               width: "100%", 
-              px: { xs: 1.5, sm: 2, md: 3, lg: 4 }, 
-              pb: { xs: 2, md: 2.5 } 
+              px: isCompactDesktop ? 1.5 : { xs: 1.5, sm: 2, md: 3, lg: 4 }, 
+              pb: isCompactDesktop ? 1.5 : { xs: 2, md: 2.5 } 
             }}>
               <Stack direction="row" spacing={1} justifyContent="space-between">
                 <Button

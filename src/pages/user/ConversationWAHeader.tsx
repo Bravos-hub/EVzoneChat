@@ -66,6 +66,7 @@ import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
 import PromoRingAvatar from "../../components/PromoRingAvatar";
 import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
 import PlayCircleFilledWhiteRoundedIcon from "@mui/icons-material/PlayCircleFilledWhiteRounded";
+import { DESKTOP_COMPACT, isDesktopCompact } from "../../constants/desktopCompact";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 const lighten = (hex, a = 0.12) => `rgba(${parseInt(hex.slice(1, 3), 16)},${parseInt(hex.slice(3, 5), 16)},${parseInt(hex.slice(5, 7), 16)},${a})`;
@@ -482,9 +483,11 @@ export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel
   }, [location]);
   const isConversationNewRoute = location?.pathname === '/conversation/new';
   const isDesktopLayout = layoutMode === 'desktop';
+  const isCompactDesktop = isDesktopCompact(layoutMode);
+  const compact = DESKTOP_COMPACT;
   const fixedHeaderTop = isDesktopLayout ? 0 : (isConversationNewRoute ? 0 : '3.5rem');
-  const messagesTopPadding = isDesktopLayout ? '0.75rem' : (isConversationNewRoute ? '3.5rem' : '7rem');
-  const messagesBottomPadding = isDesktopLayout ? '0.75rem' : (isConversationNewRoute ? '5.75rem' : '11.25rem');
+  const messagesTopPadding = isCompactDesktop ? '0.5rem' : (isConversationNewRoute ? '3.5rem' : '7rem');
+  const messagesBottomPadding = isCompactDesktop ? '0.5rem' : (isConversationNewRoute ? '5.75rem' : '11.25rem');
   const composerBottom = isDesktopLayout ? 0 : (isConversationNewRoute ? 'env(safe-area-inset-bottom)' : '5.5rem');
 
   // Load draft from localStorage on mount
@@ -1459,7 +1462,7 @@ export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel
 
   return (
     <>
-      <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none`}</style>
+      <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
       <Box sx={{
         width: '100%',
         height: '100%',
@@ -1484,7 +1487,7 @@ export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel
               boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.04)'
             }}
           >
-            <Toolbar className="!min-h-[56px] !px-3">
+            <Toolbar className="!px-3" sx={{ minHeight: `${compact.toolbarHeight}px !important` }}>
               <IconButton
                 aria-label="Cancel selection"
                 onClick={clearSelection}
@@ -1529,7 +1532,7 @@ export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel
               boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.04)'
             }}
           >
-            <Toolbar className="!min-h-[56px]" sx={{ position: 'relative', px: { xs: 1.5, sm: 3 } }}>
+            <Toolbar sx={{ minHeight: `${compact.toolbarHeight}px !important`, position: 'relative', px: { xs: 1.25, sm: 2.25 } }}>
               <IconButton
                 aria-label="Back"
                 onClick={onBack}
@@ -1554,7 +1557,7 @@ export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel
                     whiteSpace: 'nowrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
-                    fontSize: { xs: '14px', sm: '15px' },
+                    fontSize: isCompactDesktop ? compact.nameFont : { xs: '14px', sm: '15px' },
                     fontWeight: 600,
                     lineHeight: 1.2,
                     color: 'text.primary',
@@ -1573,8 +1576,8 @@ export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel
                       color: accent === 'green' ? '#0f5132' : accent === 'orange' ? '#5d2c00' : '#424242',
                       bgcolor: lighten(accentColor, 0.12),
                       border: `1px solid ${lighten(accentColor, 0.28)}`,
-                      height: { xs: 18, sm: 20 },
-                      fontSize: { xs: '9px', sm: '10px' },
+                      height: isCompactDesktop ? compact.chipHeight - 6 : { xs: 18, sm: 20 },
+                      fontSize: isCompactDesktop ? compact.subMetaFont : { xs: '9px', sm: '10px' },
                       fontWeight: 600
                     }}
                   />
@@ -1583,7 +1586,7 @@ export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel
                     <Typography
                       variant="caption"
                       sx={{
-                        fontSize: { xs: '11px', sm: '12px' },
+                        fontSize: isCompactDesktop ? compact.metaFont : { xs: '11px', sm: '12px' },
                         color: accentColor,
                         fontWeight: 500
                       }}
@@ -1801,21 +1804,21 @@ export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel
             overflowY: 'auto',
             pt: messagesTopPadding,
             pb: messagesBottomPadding,
-            px: { xs: 2, sm: 3 },
+            px: isCompactDesktop ? { xs: 1.5, sm: 2 } : { xs: 2, sm: 3 },
             minHeight: 0,
             display: 'flex',
             flexDirection: 'column',
             bgcolor: 'transparent'
           }}
         >
-          <div className="space-y-3" style={{ paddingTop: 8, paddingBottom: 8 }}>
+          <div className={isCompactDesktop ? "space-y-2" : "space-y-3"} style={{ paddingTop: isCompactDesktop ? 4 : 8, paddingBottom: isCompactDesktop ? 4 : 8 }}>
             {/* Today divider */}
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', my: 2 }}>
               <Divider sx={{ flex: 1, mx: 2 }} />
               <Typography
                 variant="caption"
                 sx={{
-                  fontSize: '12px',
+                  fontSize: isCompactDesktop ? compact.subMetaFont : '12px',
                   color: 'text.secondary',
                   fontWeight: 500,
                   px: 1
@@ -1845,8 +1848,8 @@ export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel
           sx={{
             borderTop: `1px solid ${muiTheme.palette.divider}`,
             bgcolor: 'transparent',
-            px: { xs: 1.5, sm: 2 },
-            py: { xs: 1, sm: 1.5 },
+            px: isCompactDesktop ? { xs: 1, sm: 1.5 } : { xs: 1.5, sm: 2 },
+            py: isCompactDesktop ? { xs: 0.75, sm: 1 } : { xs: 1, sm: 1.5 },
             position: isDesktopLayout ? 'static' : 'fixed',
             bottom: isDesktopLayout ? 'auto' : composerBottom,
             left: isDesktopLayout ? 'auto' : 0,
@@ -1871,16 +1874,16 @@ export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel
                 bgcolor: attachEl ? accentColor : 'transparent',
                 color: attachEl ? '#fff' : accentColor,
                 border: `1px solid ${accentColor}`,
-                width: { xs: 36, sm: 40 },
-                height: { xs: 36, sm: 40 },
-                minWidth: { xs: 36, sm: 40 },
+                width: isCompactDesktop ? { xs: 34, sm: 36 } : { xs: 36, sm: 40 },
+                height: isCompactDesktop ? { xs: 34, sm: 36 } : { xs: 36, sm: 40 },
+                minWidth: isCompactDesktop ? { xs: 34, sm: 36 } : { xs: 36, sm: 40 },
                 '&:hover': {
                   bgcolor: attachEl ? accentColor : lighten(accentColor, 0.1),
                   color: attachEl ? '#fff' : accentColor
                 }
               }}
             >
-              {attachEl ? <AddRoundedIcon sx={{ transform: 'rotate(45deg)', fontSize: { xs: 18, sm: 20 } }} /> : <AddRoundedIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />}
+              {attachEl ? <AddRoundedIcon sx={{ transform: 'rotate(45deg)', fontSize: isCompactDesktop ? { xs: 16, sm: 18 } : { xs: 18, sm: 20 } }} /> : <AddRoundedIcon sx={{ fontSize: isCompactDesktop ? { xs: 16, sm: 18 } : { xs: 18, sm: 20 } }} />}
             </IconButton>
 
             {/* Hidden file inputs */}

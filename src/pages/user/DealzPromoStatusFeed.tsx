@@ -148,7 +148,7 @@ function getPrimaryModule(entity) {
   return promos[0]?.module || null;
 }
 
-export default function DealzPromoStatusFeed({ onBack }) {
+export default function DealzPromoStatusFeed({ onBack, layoutMode = 'mobile' }) {
   const muiTheme = useMuiTheme();
   const { accentColor, actualMode } = useTheme();
   const [viewFilter, setViewFilter] = useState("contacts"); // 'contacts' | 'all'
@@ -1401,3 +1401,4 @@ export default function DealzPromoStatusFeed({ onBack }) {
     expect(screen.getByText(/Dealz promo status/i)).toBeInTheDocument();
   });
 */
+

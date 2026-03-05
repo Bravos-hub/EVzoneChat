@@ -89,7 +89,7 @@ const DEMO_MEETINGS = {
  * - Step 6: Notes/agenda.
  * - Bottom CTA & note are pinned and constrained to the mobile frame.
  */
-export default function MeetingBooking({ onBack, onNavigate, location: routeLocation }) {
+export default function MeetingBooking({ onBack, onNavigate, location: routeLocation, layoutMode = 'mobile' }) {
   const muiTheme = useMuiTheme();
   const { accent, isDark } = useTheme();
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
@@ -982,3 +982,4 @@ export default function MeetingBooking({ onBack, onNavigate, location: routeLoca
     expect(screen.getByText(/Group meeting/i)).toBeInTheDocument();
   });
 */
+

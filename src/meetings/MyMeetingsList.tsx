@@ -322,7 +322,7 @@ function MeetingCard({ meeting, kind, onNavigate }) {
   );
 }
 
-export default function MyMeetingsList({ onBack, onNavigate }) {
+export default function MyMeetingsList({ onBack, onNavigate, layoutMode = 'mobile' }) {
   const muiTheme = useMuiTheme();
   const { accent } = useTheme();
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
@@ -501,3 +501,4 @@ export default function MyMeetingsList({ onBack, onNavigate }) {
     expect(screen.getByText(/Requests/i)).toBeInTheDocument();
   });
 */
+

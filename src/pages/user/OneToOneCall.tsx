@@ -31,12 +31,11 @@ import DialpadRoundedIcon from "@mui/icons-material/DialpadRounded";
 import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
-import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
-import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import CallMadeRoundedIcon from "@mui/icons-material/CallMadeRounded";
 import CallReceivedRoundedIcon from "@mui/icons-material/CallReceivedRounded";
 import CallMissedRoundedIcon from "@mui/icons-material/CallMissedRounded";
+import { DESKTOP_COMPACT, isDesktopCompact } from "../../constants/desktopCompact";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
@@ -63,6 +62,8 @@ export default function OneToOneCall({
   layoutMode = 'mobile'
 }) {
   const isDesktopLayout = layoutMode === 'desktop';
+  const isCompactDesktop = isDesktopCompact(layoutMode);
+  const compact = DESKTOP_COMPACT;
   // Get call parameters from URL
   const callType = useMemo(() => {
     const params = new URLSearchParams(location?.search || '');
@@ -289,12 +290,12 @@ export default function OneToOneCall({
     }
   }, [callState, actualType, hhmmss, isGroupCall]);
 
-  if (showCallList && isDesktopLayout) {
+  if (showCallList && isCompactDesktop) {
     const desktopActions = [
-      { icon: <CallRoundedIcon sx={{ fontSize: 34 }} />, label: "Call", onClick: () => onNavigate?.("/call?type=video&state=dialing") },
-      { icon: <CalendarMonthRoundedIcon sx={{ fontSize: 34 }} />, label: "Schedule", onClick: () => onNavigate?.("/meetings/book") },
-      { icon: <DialpadRoundedIcon sx={{ fontSize: 34 }} />, label: "Keypad", onClick: () => onNavigate?.("/call?type=voice&state=dialing") },
-      { icon: <FavoriteBorderRoundedIcon sx={{ fontSize: 34 }} />, label: "Favorites", onClick: () => onNavigate?.("/group-call?type=conference") },
+      { icon: <CallRoundedIcon sx={{ fontSize: 30 }} />, label: "Call", onClick: () => onNavigate?.("/call?type=video&state=dialing") },
+      { icon: <CalendarMonthRoundedIcon sx={{ fontSize: 30 }} />, label: "Schedule", onClick: () => onNavigate?.("/meetings/book") },
+      { icon: <DialpadRoundedIcon sx={{ fontSize: 30 }} />, label: "Keypad", onClick: () => onNavigate?.("/call?type=voice&state=dialing") },
+      { icon: <FavoriteBorderRoundedIcon sx={{ fontSize: 30 }} />, label: "Favorites", onClick: () => onNavigate?.("/group-call?type=conference") },
     ];
     const actionCircleBg = muiTheme.palette.mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(17,27,33,0.08)";
     const actionCircleHover = muiTheme.palette.mode === "dark" ? "rgba(255,255,255,0.1)" : "rgba(17,27,33,0.14)";
@@ -304,10 +305,10 @@ export default function OneToOneCall({
         <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
         <Box className="desktop-calls-layout" sx={{ bgcolor: 'transparent' }}>
           <Box className="desktop-calls-list-pane" sx={{ borderRight: `1px solid ${muiTheme.palette.divider}` }}>
-            <Box sx={{ px: 2.5, pt: 2.5, pb: 1.5 }}>
-              <Typography sx={{ fontSize: { xs: "2.25rem", md: "2.5rem" }, fontWeight: 600, color: "text.primary", lineHeight: 1 }}>Calls</Typography>
+            <Box sx={{ px: 2, pt: 2, pb: 1 }}>
+              <Typography sx={{ fontSize: compact.titleXL, fontWeight: 600, color: "text.primary", lineHeight: 1 }}>Calls</Typography>
             </Box>
-            <Box sx={{ px: 2, pb: 1.5 }}>
+            <Box sx={{ px: 1.75, pb: 1 }}>
               <TextField
                 fullWidth
                 size="small"
@@ -317,25 +318,25 @@ export default function OneToOneCall({
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: 999,
-                    minHeight: 44,
+                    minHeight: compact.searchHeight,
                     bgcolor: muiTheme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(17,27,33,0.07)',
                     '& fieldset': { borderColor: 'transparent' },
                     '&:hover fieldset': { borderColor: 'transparent' },
                     '&.Mui-focused fieldset': { borderColor: `${accentColor}80`, borderWidth: '1px' }
                   },
-                  '& input': { fontSize: "0.95rem" }
+                  '& input': { fontSize: compact.metaFont }
                 }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchRoundedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                      <SearchRoundedIcon sx={{ color: 'text.secondary', fontSize: compact.searchIcon }} />
                     </InputAdornment>
                   )
                 }}
               />
             </Box>
-            <Box sx={{ px: 2.5, pb: 1 }}>
-              <Typography sx={{ fontSize: { xs: '1.5rem', md: '1.75rem' }, fontWeight: 600, color: 'text.primary', lineHeight: 1.1 }}>Recent</Typography>
+            <Box sx={{ px: 2, pb: 0.6 }}>
+              <Typography sx={{ fontSize: compact.titleLG, fontWeight: 600, color: 'text.primary', lineHeight: 1.1 }}>Recent</Typography>
             </Box>
             <Box className="desktop-pane-scroll no-scrollbar" sx={{ overflowY: 'auto' }}>
               <List sx={{ py: 0 }}>
@@ -349,13 +350,13 @@ export default function OneToOneCall({
                         onNavigate?.(`/call?type=${callType}&contact=${encodeURIComponent(call.name)}&state=connecting${moduleParam}`);
                       }}
                       sx={{
-                        px: 2.25,
-                        py: 1.3,
+                        px: 1.9,
+                        py: compact.listRowVPadding,
                         '&:hover': { bgcolor: muiTheme.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(17,27,33,0.04)' }
                       }}
                     >
                       <ListItemAvatar>
-                        <Avatar src={call.avatar} sx={{ width: 50, height: 50 }} />
+                        <Avatar src={call.avatar} sx={{ width: compact.avatarRow, height: compact.avatarRow }} />
                       </ListItemAvatar>
                       <ListItemTextComp
                         primary={
@@ -363,7 +364,7 @@ export default function OneToOneCall({
                             <Typography
                               sx={{
                                 color: 'text.primary',
-                                fontSize: { xs: '1.04rem', md: '1.1rem' },
+                                fontSize: compact.nameFont,
                                 fontWeight: 600,
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
@@ -372,14 +373,14 @@ export default function OneToOneCall({
                             >
                               {call.name}
                             </Typography>
-                            <Typography sx={{ fontSize: '13px', color: 'text.secondary', flexShrink: 0 }}>{call.time}</Typography>
+                            <Typography sx={{ fontSize: compact.metaFont, color: 'text.secondary', flexShrink: 0 }}>{call.time}</Typography>
                           </Box>
                         }
                         secondary={
                           <Typography
                             sx={{
                               color: call.missed ? '#ef5350' : 'text.secondary',
-                              fontSize: '0.85rem',
+                              fontSize: compact.metaFont,
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
                               whiteSpace: 'nowrap'
@@ -404,12 +405,12 @@ export default function OneToOneCall({
             <Box
               sx={{
                 width: '100%',
-                maxWidth: 840,
-                px: { xs: 2.5, md: 6 },
-                py: { xs: 4.5, md: 5.5 },
+                maxWidth: 760,
+                px: { xs: 2.5, md: 4 },
+                py: { xs: 3.5, md: 4.5 },
                 display: 'grid',
                 gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-                gap: { xs: 2, md: 2.5 },
+                gap: { xs: 1.5, md: 2 },
                 alignItems: 'start'
               }}
             >
@@ -429,8 +430,8 @@ export default function OneToOneCall({
                 >
                   <Box
                     sx={{
-                      width: { xs: 80, md: 88 },
-                      height: { xs: 80, md: 88 },
+                      width: compact.quickActionCircleDesktop,
+                      height: compact.quickActionCircleDesktop,
                       borderRadius: '50%',
                       display: 'flex',
                       alignItems: 'center',
@@ -450,7 +451,7 @@ export default function OneToOneCall({
                   <Typography
                     sx={{
                       mt: 0.25,
-                      fontSize: { xs: '0.95rem', md: '1rem' },
+                      fontSize: compact.quickActionLabelDesktop,
                       fontWeight: 500,
                       lineHeight: 1.2,
                       color: 'text.secondary',
@@ -471,14 +472,13 @@ export default function OneToOneCall({
   // If showing calls list, render list view (after all hooks)
   if (showCallList) {
     const actionButtons = [
-      { icon: <CallRoundedIcon sx={{ fontSize: { xs: 22, sm: 25 }, color: 'text.primary' }} />, label: 'Call', onClick: () => onNavigate?.('/call?type=video&state=dialing') },
-      { icon: <CalendarMonthRoundedIcon sx={{ fontSize: { xs: 22, sm: 25 }, color: 'text.primary' }} />, label: 'Schedule', onClick: () => onNavigate?.('/meetings/book') },
-      { icon: <DialpadRoundedIcon sx={{ fontSize: { xs: 22, sm: 25 }, color: 'text.primary' }} />, label: 'Keypad', onClick: () => onNavigate?.('/call?type=voice&state=dialing') },
-      { icon: <FavoriteBorderRoundedIcon sx={{ fontSize: { xs: 22, sm: 25 }, color: 'text.primary' }} />, label: 'Favorites', onClick: () => onNavigate?.('/group-call?type=conference') },
+      { icon: <CallRoundedIcon sx={{ fontSize: { xs: 21, sm: 23 }, color: 'text.primary' }} />, label: 'Call', onClick: () => onNavigate?.('/call?type=video&state=dialing') },
+      { icon: <CalendarMonthRoundedIcon sx={{ fontSize: { xs: 21, sm: 23 }, color: 'text.primary' }} />, label: 'Schedule', onClick: () => onNavigate?.('/meetings/book') },
+      { icon: <DialpadRoundedIcon sx={{ fontSize: { xs: 21, sm: 23 }, color: 'text.primary' }} />, label: 'Keypad', onClick: () => onNavigate?.('/call?type=voice&state=dialing') },
+      { icon: <FavoriteBorderRoundedIcon sx={{ fontSize: { xs: 21, sm: 23 }, color: 'text.primary' }} />, label: 'Favorites', onClick: () => onNavigate?.('/group-call?type=conference') },
     ];
     const quickActionBg = muiTheme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(17,27,33,0.08)';
     const quickActionHover = muiTheme.palette.mode === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(17,27,33,0.14)';
-    const utilityBg = muiTheme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(17,27,33,0.1)';
     const searchBg = muiTheme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(17,27,33,0.08)';
     const rowBorder = muiTheme.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(17,27,33,0.08)';
     
@@ -486,41 +486,13 @@ export default function OneToOneCall({
       <>
         <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
         <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'transparent', color: 'text.primary' }}>
-          <Box sx={{ px: { xs: 2, sm: 2.5 }, pt: { xs: 1.5, sm: 2 }, pb: 1 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
-              <IconButton
-                onClick={(e) => setMenuEl(e.currentTarget)}
-                sx={{
-                  width: 40,
-                  height: 40,
-                  bgcolor: utilityBg,
-                  color: 'text.primary',
-                  '&:hover': { bgcolor: quickActionHover }
-                }}
-                aria-label="More options"
-              >
-                <MoreHorizRoundedIcon sx={{ fontSize: 22 }} />
-              </IconButton>
-              <IconButton
-                onClick={() => onNavigate?.('/group-call?type=conference')}
-                sx={{
-                  width: 40,
-                  height: 40,
-                  bgcolor: accentColor,
-                  color: '#001a11',
-                  '&:hover': { bgcolor: accentColor, filter: 'brightness(1.07)' }
-                }}
-                aria-label="Start new call"
-              >
-                <AddRoundedIcon sx={{ fontSize: 24 }} />
-              </IconButton>
-            </Box>
-            <Typography sx={{ fontSize: { xs: '2.35rem', sm: '2.6rem' }, fontWeight: 700, lineHeight: 1, color: 'text.primary' }}>
+          <Box sx={{ px: { xs: 2, sm: 2.25 }, pt: { xs: 1.25, sm: 1.5 }, pb: 0.8 }}>
+            <Typography sx={{ fontSize: compact.titleXL, fontWeight: 700, lineHeight: 1, color: 'text.primary' }}>
               Calls
             </Typography>
           </Box>
 
-          <Box sx={{ px: { xs: 2, sm: 2.5 }, pb: 2 }}>
+          <Box sx={{ px: { xs: 2, sm: 2.25 }, pb: 1.4 }}>
             <TextField
               fullWidth
               size="small"
@@ -530,33 +502,33 @@ export default function OneToOneCall({
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 3,
-                  minHeight: 48,
+                  minHeight: compact.searchHeight,
                   bgcolor: searchBg,
                   '& fieldset': { borderColor: 'transparent' },
                   '&:hover fieldset': { borderColor: 'transparent' },
                   '&.Mui-focused fieldset': { borderColor: `${accentColor}80`, borderWidth: '1px' }
                 },
                 '& input': {
-                  fontSize: '1.02rem',
+                  fontSize: compact.metaFont,
                   color: 'text.primary'
                 }
               }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchRoundedIcon sx={{ color: 'text.secondary', fontSize: 23 }} />
+                    <SearchRoundedIcon sx={{ color: 'text.secondary', fontSize: compact.searchIcon }} />
                   </InputAdornment>
                 )
               }}
             />
           </Box>
 
-          <Box sx={{ px: { xs: 2, sm: 2.5 }, pb: 2.3 }}>
+          <Box sx={{ px: { xs: 2, sm: 2.25 }, pb: 1.5 }}>
             <Box
               sx={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-                gap: { xs: 0.8, sm: 1.2 },
+                gap: { xs: 0.7, sm: 1 },
                 alignItems: 'flex-start',
                 width: '100%'
               }}
@@ -568,7 +540,7 @@ export default function OneToOneCall({
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    gap: 0.85,
+                    gap: 0.65,
                     cursor: 'pointer',
                     minWidth: 0,
                     width: '100%'
@@ -577,8 +549,8 @@ export default function OneToOneCall({
                 >
                   <Box
                     sx={{
-                      width: { xs: 62, sm: 66 },
-                      height: { xs: 62, sm: 66 },
+                      width: compact.quickActionCircleMobile,
+                      height: compact.quickActionCircleMobile,
                       borderRadius: '50%',
                       bgcolor: quickActionBg,
                       border: `1px solid ${muiTheme.palette.divider}`,
@@ -597,8 +569,8 @@ export default function OneToOneCall({
                   </Box>
                   <Typography
                     sx={{
-                      mt: 0.1,
-                      fontSize: { xs: '0.73rem', sm: '0.78rem' },
+                      mt: 0.05,
+                      fontSize: compact.quickActionLabelMobile,
                       color: 'text.secondary',
                       fontWeight: 500,
                       textAlign: 'center',
@@ -613,8 +585,8 @@ export default function OneToOneCall({
             </Box>
           </Box>
 
-          <Box sx={{ px: { xs: 2, sm: 2.5 }, pb: 0.75 }}>
-            <Typography sx={{ fontSize: { xs: '2rem', sm: '2.15rem' }, fontWeight: 700, lineHeight: 1, color: 'text.primary' }}>
+          <Box sx={{ px: { xs: 2, sm: 2.25 }, pb: 0.6 }}>
+            <Typography sx={{ fontSize: compact.titleLG, fontWeight: 700, lineHeight: 1, color: 'text.primary' }}>
               Recent
             </Typography>
           </Box>
@@ -639,14 +611,14 @@ export default function OneToOneCall({
                     button
                     onClick={() => onNavigate?.(`/call?type=${call.type}&contact=${encodeURIComponent(call.name)}&state=dialing`)}
                     sx={{
-                      px: { xs: 2, sm: 2.5 },
-                      py: 1.2,
+                      px: { xs: 2, sm: 2.25 },
+                      py: compact.listRowVPadding,
                       borderBottom: idx < filteredCalls.length - 1 ? `1px solid ${rowBorder}` : 'none',
                       alignItems: 'center'
                     }}
                   >
-                    <ListItemAvatar sx={{ minWidth: 58 }}>
-                      <Avatar src={call.avatar} sx={{ width: 52, height: 52 }} />
+                    <ListItemAvatar sx={{ minWidth: compact.avatarRow + 10 }}>
+                      <Avatar src={call.avatar} sx={{ width: compact.avatarRow, height: compact.avatarRow }} />
                     </ListItemAvatar>
 
                     <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -654,7 +626,7 @@ export default function OneToOneCall({
                         <Typography
                           sx={{
                             color: isMissed ? '#ff5f75' : 'text.primary',
-                            fontSize: { xs: '1.05rem', sm: '1.12rem' },
+                            fontSize: compact.nameFont,
                             fontWeight: 500,
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
@@ -663,7 +635,7 @@ export default function OneToOneCall({
                         >
                           {call.name}
                         </Typography>
-                        <Typography sx={{ fontSize: { xs: '1rem', sm: '1.06rem' }, color: 'text.secondary', flexShrink: 0, fontWeight: 500 }}>
+                        <Typography sx={{ fontSize: compact.nameFont, color: 'text.secondary', flexShrink: 0, fontWeight: 500 }}>
                           {call.time}
                         </Typography>
                       </Box>
@@ -673,7 +645,7 @@ export default function OneToOneCall({
                         <Typography
                           sx={{
                             color: directionColor,
-                            fontSize: { xs: '0.9rem', sm: '0.95rem' },
+                            fontSize: compact.metaFont,
                             fontWeight: 500,
                             lineHeight: 1.15
                           }}
@@ -686,7 +658,7 @@ export default function OneToOneCall({
                         <Typography
                           sx={{
                             mt: 0.15,
-                            fontSize: { xs: '0.75rem', sm: '0.78rem' },
+                            fontSize: compact.subMetaFont,
                             color: 'text.secondary',
                             opacity: 0.75,
                             whiteSpace: 'nowrap',
@@ -703,8 +675,8 @@ export default function OneToOneCall({
                       size="small"
                       sx={{
                         ml: 0.6,
-                        width: 30,
-                        height: 30,
+                        width: compact.infoButton,
+                        height: compact.infoButton,
                         color: 'text.secondary',
                         border: `1px solid ${muiTheme.palette.divider}`,
                         bgcolor: 'transparent'
@@ -722,24 +694,6 @@ export default function OneToOneCall({
             </List>
           </Box>
 
-          <Menu
-            anchorEl={menuEl}
-            open={Boolean(menuEl)}
-            onClose={() => setMenuEl(null)}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-            transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-            PaperProps={{
-              sx: {
-                mt: 0.5,
-                borderRadius: 2,
-                bgcolor: 'background.paper',
-                minWidth: 170
-              }
-            }}
-          >
-            <MenuItem onClick={() => { setMenuEl(null); onNavigate?.('/settings'); }}>Call settings</MenuItem>
-            <MenuItem onClick={() => { setMenuEl(null); onNavigate?.('/help'); }}>Help</MenuItem>
-          </Menu>
         </Box>
       </>
     );

@@ -44,7 +44,7 @@ const SESSIONS = [
 /**
  * U10-28 — Security (Sessions & Devices + 2FA)
  */
-export default function SecuritySessionsDevices({ onBack }) {
+export default function SecuritySessionsDevices({ onBack, layoutMode = 'mobile' }) {
   const muiTheme = useMuiTheme();
   const { accentColor } = useTheme();
   const [snack, setSnack] = useState('');
@@ -166,3 +166,4 @@ export default function SecuritySessionsDevices({ onBack }) {
     </>
   );
 }
+

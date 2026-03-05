@@ -29,8 +29,14 @@ import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
 import DesktopChatWorkspace from "./DesktopChatWorkspace";
+import DesktopPageWorkspace from "./DesktopPageWorkspace";
 import { useCall } from "../context/CallContext";
 import { isValidChatChannel } from "../constants/chatChannels";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import PermMediaRoundedIcon from "@mui/icons-material/PermMediaRounded";
+import TranslateRoundedIcon from "@mui/icons-material/TranslateRounded";
+import DoNotDisturbOnRoundedIcon from "@mui/icons-material/DoNotDisturbOnRounded";
+import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
 
 const navMap: Record<string, string> = {
   inbox: "/inbox",
@@ -242,7 +248,7 @@ function DesktopFrame({ children }) {
 
   return (
     <Box
-      className="desktop-shell"
+      className="desktop-shell desktop-wa-compact"
       sx={{
         bgcolor: muiTheme.palette.background.default,
         transition: "background-color 0.3s ease",
@@ -390,6 +396,18 @@ export default function EVZUserDesktopShell({ registry: externalRegistry = {} })
   const MeetingConfirmation = getComponent(registry, "U-M5", () => <Screen title="Meeting Confirmed" />);
   const MyAvailability = getComponent(registry, "U-M6", () => <Screen title="My Availability" />);
   const LiveMeeting = getComponent(registry, "U-M7", () => <Screen title="Live Meeting" />);
+  const pageWorkspace = (
+    Component: React.ComponentType<any>,
+    title: string,
+    icon: React.ReactNode,
+    extraProps: Record<string, any> = {}
+  ) => (
+    <DesktopPageWorkspace
+      title={title}
+      icon={icon}
+      leftPane={<RouteWrapper Component={Component} layoutMode="desktop" {...extraProps} />}
+    />
+  );
 
   return (
     <HashRouter>
@@ -434,26 +452,56 @@ export default function EVZUserDesktopShell({ registry: externalRegistry = {} })
             }
           />
 
-          <Route path="/search" element={<RouteWrapper Component={Search} layoutMode="desktop" />} />
-          <Route path="/media" element={<RouteWrapper Component={Media} layoutMode="desktop" />} />
-          <Route path="/dealz" element={<RouteWrapper Component={Dealz} layoutMode="desktop" />} />
-          <Route path="/settings" element={<RouteWrapper Component={Settings} layoutMode="desktop" />} />
-          <Route path="/security" element={<RouteWrapper Component={Security} layoutMode="desktop" />} />
-          <Route path="/create-channel" element={<RouteWrapper Component={CreateChannel} layoutMode="desktop" />} />
-          <Route path="/invite" element={<RouteWrapper Component={Invite} layoutMode="desktop" />} />
-          <Route path="/theme" element={<RouteWrapper Component={Theme} layoutMode="desktop" />} />
-          <Route path="/language" element={<RouteWrapper Component={Language} layoutMode="desktop" />} />
-          <Route path="/dnd" element={<RouteWrapper Component={DND} layoutMode="desktop" />} />
-          <Route path="/safety" element={<RouteWrapper Component={Safety} layoutMode="desktop" />} />
-          <Route path="/profile" element={<RouteWrapper Component={Profile} layoutMode="desktop" />} />
-          <Route path="/help" element={<RouteWrapper Component={Help} layoutMode="desktop" />} />
+          <Route path="/search" element={pageWorkspace(Search, "Search", <SearchRoundedIcon sx={{ fontSize: 64 }} />)} />
+          <Route path="/media" element={pageWorkspace(Media, "Media", <PermMediaRoundedIcon sx={{ fontSize: 64 }} />)} />
+          <Route path="/dealz" element={pageWorkspace(Dealz, "Dealz", <ShoppingBagRoundedIcon sx={{ fontSize: 64 }} />)} />
+          <Route path="/settings" element={pageWorkspace(Settings, "Settings", <SettingsRoundedIcon sx={{ fontSize: 64 }} />)} />
+          <Route path="/security" element={pageWorkspace(Security, "Security", <ShieldRoundedIcon sx={{ fontSize: 64 }} />)} />
+          <Route path="/create-channel" element={pageWorkspace(CreateChannel, "Create Group", <GroupAddRoundedIcon sx={{ fontSize: 64 }} />)} />
+          <Route path="/invite" element={pageWorkspace(Invite, "Invite", <QrCode2RoundedIcon sx={{ fontSize: 64 }} />)} />
+          <Route path="/theme" element={pageWorkspace(Theme, "Theme", <BrushRoundedIcon sx={{ fontSize: 64 }} />)} />
+          <Route path="/language" element={pageWorkspace(Language, "Language", <TranslateRoundedIcon sx={{ fontSize: 64 }} />)} />
+          <Route path="/dnd" element={pageWorkspace(DND, "Do Not Disturb", <DoNotDisturbOnRoundedIcon sx={{ fontSize: 64 }} />)} />
+          <Route path="/safety" element={pageWorkspace(Safety, "Safety Center", <ShieldRoundedIcon sx={{ fontSize: 64 }} />)} />
+          <Route path="/profile" element={pageWorkspace(Profile, "Profile", <PersonRoundedIcon sx={{ fontSize: 64 }} />)} />
+          <Route path="/help" element={pageWorkspace(Help, "Help", <HelpOutlineRoundedIcon sx={{ fontSize: 64 }} />)} />
 
-          <Route path="/meetings" element={<RouteWrapper Component={MyMeetings} registry={registry} layoutMode="desktop" />} />
-          <Route path="/meetings/book" element={<RouteWrapper Component={MeetingBooking} registry={registry} layoutMode="desktop" />} />
-          <Route path="/meetings/:id" element={<RouteWrapper Component={MeetingDetails} registry={registry} layoutMode="desktop" />} />
-          <Route path="/meetings/book/:slug" element={<RouteWrapper Component={PublicBooking} registry={registry} layoutMode="desktop" />} />
-          <Route path="/meetings/confirm/:id" element={<RouteWrapper Component={MeetingConfirmation} registry={registry} layoutMode="desktop" />} />
-          <Route path="/meetings/availability" element={<RouteWrapper Component={MyAvailability} registry={registry} layoutMode="desktop" />} />
+          <Route
+            path="/meetings"
+            element={pageWorkspace(MyMeetings, "My Meetings", <CalendarMonthRoundedIcon sx={{ fontSize: 64 }} />, {
+              registry,
+            })}
+          />
+          <Route
+            path="/meetings/book"
+            element={pageWorkspace(MeetingBooking, "Schedule Meeting", <CalendarMonthRoundedIcon sx={{ fontSize: 64 }} />, {
+              registry,
+            })}
+          />
+          <Route
+            path="/meetings/:id"
+            element={pageWorkspace(MeetingDetails, "Meeting Details", <CalendarMonthRoundedIcon sx={{ fontSize: 64 }} />, {
+              registry,
+            })}
+          />
+          <Route
+            path="/meetings/book/:slug"
+            element={pageWorkspace(PublicBooking, "Public Booking", <CalendarMonthRoundedIcon sx={{ fontSize: 64 }} />, {
+              registry,
+            })}
+          />
+          <Route
+            path="/meetings/confirm/:id"
+            element={pageWorkspace(MeetingConfirmation, "Meeting Confirmed", <CalendarMonthRoundedIcon sx={{ fontSize: 64 }} />, {
+              registry,
+            })}
+          />
+          <Route
+            path="/meetings/availability"
+            element={pageWorkspace(MyAvailability, "Availability", <CalendarMonthRoundedIcon sx={{ fontSize: 64 }} />, {
+              registry,
+            })}
+          />
 
           <Route path="/call" element={<RouteWrapper Component={Call} layoutMode="desktop" />} />
           <Route path="/group-call" element={<RouteWrapper Component={GroupCallParticipants} layoutMode="desktop" />} />

@@ -32,7 +32,7 @@ const MODULES = ["Marketplace","Rides","School","Medical","Charging","Travel","I
  * - Posting mode: Auto-approve / Pre-approval / Admin-only
  * - Options: allow media, mentions, approval to join, list in directory
  */
-export default function GroupChannelCreate({ onBack, onCreated }) {
+export default function GroupChannelCreate({ onBack, onCreated, layoutMode = 'mobile' }) {
   const muiTheme = useMuiTheme();
   const [snack, setSnack] = useState("");
 
@@ -200,3 +200,4 @@ export default function GroupChannelCreate({ onBack, onCreated }) {
     </>
   );
 }
+

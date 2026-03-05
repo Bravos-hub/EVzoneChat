@@ -61,7 +61,7 @@ function rangeDates(start, end) {
   return out;
 }
 
-export default function PublicBookingPage({ onBack, onNavigate }) {
+export default function PublicBookingPage({ onBack, onNavigate, layoutMode = 'mobile' }) {
   const muiTheme = useMuiTheme();
   const { accent, isDark } = useTheme();
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
@@ -527,3 +527,4 @@ export default function PublicBookingPage({ onBack, onNavigate }) {
     expect(screen.getByText(/Book a slot/i)).toBeInTheDocument();
   });
 */
+

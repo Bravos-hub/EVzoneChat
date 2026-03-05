@@ -55,7 +55,7 @@ function highlight(text, q, muiTheme){
   return parts.map((p,i)=> p.toLowerCase()===q.toLowerCase()? <mark key={i} style={{ backgroundColor: highlightColor, padding: '0 2px', borderRadius: '2px' }}>{p}</mark> : <span key={i}>{p}</span>);
 }
 
-export default function SearchGlobalInThread({ onBack, onOpenResult }) {
+export default function SearchGlobalInThread({ onBack, onOpenResult, layoutMode = 'mobile' }) {
   const muiTheme = useMuiTheme();
   const { accentColor } = useTheme();
   const [tab, setTab] = useState(0); // 0 global, 1 in-thread
@@ -366,3 +366,4 @@ export default function SearchGlobalInThread({ onBack, onOpenResult }) {
     </>
   );
 }
+

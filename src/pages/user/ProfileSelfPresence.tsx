@@ -44,7 +44,7 @@ const CONTACTS = {
  * Avatar edit, name/handle, bio, presence (online/away/DND/custom), share status across modules
  * Also handles viewing other contacts' profiles via ?contact= parameter
  */
-export default function ProfileSelfPresence({ onBack, initial, location, onNavigate }) {
+export default function ProfileSelfPresence({ onBack, initial, location, onNavigate, layoutMode = 'mobile' }) {
   const muiTheme = useMuiTheme();
   // const { actualMode } = useTheme();
   
@@ -298,3 +298,4 @@ export default function ProfileSelfPresence({ onBack, initial, location, onNavig
     </>
   );
 }
+

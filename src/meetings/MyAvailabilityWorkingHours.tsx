@@ -53,7 +53,7 @@ const DEFAULT_MODULES = [
   },
 ];
 
-export default function MyAvailabilityWorkingHours({ onBack, onNavigate }) {
+export default function MyAvailabilityWorkingHours({ onBack, onNavigate, layoutMode = 'mobile' }) {
   const muiTheme = useMuiTheme();
   const { accent, isDark } = useTheme();
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
@@ -281,3 +281,4 @@ export default function MyAvailabilityWorkingHours({ onBack, onNavigate }) {
     expect(screen.getByText(/My availability/i)).toBeInTheDocument();
   });
 */
+

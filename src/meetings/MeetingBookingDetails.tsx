@@ -50,7 +50,7 @@ const DEMO_BOOKING = {
   bookingLink: "https://evzone.meet/book/req-1234",
 };
 
-export default function MeetingBookingDetails({ onBack, onNavigate, location: routeLocation }) {
+export default function MeetingBookingDetails({ onBack, onNavigate, location: routeLocation, layoutMode = 'mobile' }) {
   const muiTheme = useMuiTheme();
   const { isDark } = useTheme();
   const [snack, setSnack] = useState("");
@@ -336,3 +336,4 @@ export default function MeetingBookingDetails({ onBack, onNavigate, location: ro
     expect(screen.getByText(/Meeting booking details/i)).toBeInTheDocument();
   });
 */
+

@@ -31,7 +31,7 @@ import { useTheme as useMuiTheme } from "@mui/material/styles";
 /**
  * U10-30 — Theme (EV Colors) & Export/Delete & Tips
  */
-export default function ThemeExportDeleteTips({ onBack }) {
+export default function ThemeExportDeleteTips({ onBack, layoutMode = 'mobile' }) {
   const { mode, setMode, accent, setAccent, accentColor, actualMode, isSystem } = useTheme();
   const muiTheme = useMuiTheme();
   const [snack, setSnack] = useState('');
@@ -215,3 +215,4 @@ export default function ThemeExportDeleteTips({ onBack }) {
     </>
   );
 }
+

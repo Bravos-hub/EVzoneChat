@@ -36,6 +36,7 @@ import PromoRingAvatar from "../../components/PromoRingAvatar";
 import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
 import PlayCircleFilledWhiteRoundedIcon from "@mui/icons-material/PlayCircleFilledWhiteRounded";
 import { CHAT_CHANNELS } from "../../constants/chatChannels";
+import { DESKTOP_COMPACT, isDesktopCompact } from "../../constants/desktopCompact";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
@@ -138,6 +139,8 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
   const navigate = useNavigate();
   const location = useLocation();
   const isDesktopLayout = layoutMode === 'desktop';
+  const isCompactDesktop = isDesktopCompact(layoutMode);
+  const compact = DESKTOP_COMPACT;
   const [q, setQ] = useState("");
   const [tab, setTab] = useState(0); // 0 = E-Commerce, 1 = Other
   const [selectedModule, setSelectedModule] = useState('E-Commerce');
@@ -245,7 +248,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
     return filtered;
   }, [filtered, desktopFilter]);
 
-  if (isDesktopLayout) {
+  if (isCompactDesktop) {
     return (
       <>
         <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
@@ -261,16 +264,16 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
         >
           <Box
             sx={{
-              px: 2.25,
-              pt: 2,
-              pb: 1.5,
+              px: 1.75,
+              pt: 1.5,
+              pb: 1,
               borderBottom: `1px solid ${muiTheme.palette.divider}`,
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
             }}
           >
-            <Typography sx={{ fontSize: "32px", fontWeight: 600, lineHeight: 1 }}>Chats</Typography>
+            <Typography sx={{ fontSize: compact.titleXL, fontWeight: 600, lineHeight: 1 }}>Chats</Typography>
             <Box sx={{ display: "flex", gap: 0.5 }}>
               <IconButton onClick={onNew} aria-label="New chat" sx={{ color: "text.secondary" }}>
                 <AddRoundedIcon />
@@ -281,7 +284,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
             </Box>
           </Box>
 
-          <Box sx={{ px: 2, pt: 1.5, pb: 1 }}>
+          <Box sx={{ px: 1.75, pt: 1.1, pb: 0.8 }}>
             <TextField
               fullWidth
               size="small"
@@ -292,22 +295,24 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                 "& .MuiOutlinedInput-root": {
                   bgcolor: muiTheme.palette.mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(17,27,33,0.07)",
                   borderRadius: 5,
+                  minHeight: compact.searchHeight,
                   "& fieldset": { borderColor: "transparent" },
                   "&:hover fieldset": { borderColor: "transparent" },
                   "&.Mui-focused fieldset": { borderColor: `${accentColor}80`, borderWidth: "1px" },
                 },
+                "& .MuiInputBase-input": { fontSize: compact.metaFont },
               }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchRoundedIcon sx={{ color: "text.secondary", fontSize: 20 }} />
+                    <SearchRoundedIcon sx={{ color: "text.secondary", fontSize: compact.searchIcon }} />
                   </InputAdornment>
                 ),
               }}
             />
           </Box>
 
-          <Box sx={{ px: 2, pb: 1, display: "flex", gap: 1, borderBottom: `1px solid ${muiTheme.palette.divider}` }}>
+          <Box sx={{ px: 1.75, pb: 0.75, display: "flex", gap: 0.75, borderBottom: `1px solid ${muiTheme.palette.divider}` }}>
             {[
               { key: "all", label: "All" },
               { key: "unread", label: "Unread" },
@@ -320,12 +325,13 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                   label={chip.label}
                   onClick={() => setDesktopFilter(chip.key)}
                   sx={{
-                    height: 30,
+                    height: compact.chipHeight,
                     borderRadius: 16,
                     color: selected ? "#ffffff" : "text.secondary",
                     bgcolor: selected ? accentColor : "transparent",
                     border: `1px solid ${selected ? accentColor : muiTheme.palette.divider}`,
                     fontWeight: selected ? 600 : 500,
+                    fontSize: compact.subMetaFont,
                   }}
                 />
               );
@@ -343,8 +349,8 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                     button
                     onClick={() => onOpen?.(conversation)}
                     sx={{
-                      px: 1.5,
-                      py: 0.75,
+                      px: 1.25,
+                      py: compact.listRowVPadding,
                       borderBottom: `1px solid ${muiTheme.palette.divider}66`,
                       bgcolor: isSelected
                         ? (muiTheme.palette.mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.04)")
@@ -360,13 +366,13 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                           "& .MuiBadge-badge": {
                             bgcolor: accentColor,
                             color: "#fff",
-                            fontSize: "10px",
+                            fontSize: compact.subMetaFont,
                             minWidth: "18px",
                             height: "18px",
                           },
                         }}
                       >
-                        <Avatar src={conversation.avatar} sx={{ width: 48, height: 48 }} />
+                        <Avatar src={conversation.avatar} sx={{ width: compact.avatarRow, height: compact.avatarRow }} />
                       </Badge>
                     </ListItemAvatar>
                     <ListItemText
@@ -376,7 +382,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                             variant="body1"
                             sx={{
                               color: "text.primary",
-                              fontSize: "17px",
+                              fontSize: compact.nameFont,
                               fontWeight: isSelected ? 700 : 500,
                               overflow: "hidden",
                               textOverflow: "ellipsis",
@@ -389,7 +395,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                             variant="caption"
                             sx={{
                               color: conversation.unread ? accentColor : "text.secondary",
-                              fontSize: "12px",
+                              fontSize: compact.subMetaFont,
                               fontWeight: conversation.unread ? 600 : 500,
                               flexShrink: 0,
                             }}
@@ -403,7 +409,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                           variant="body2"
                           sx={{
                             color: conversation.unread ? "text.primary" : "text.secondary",
-                            fontSize: "13px",
+                            fontSize: compact.metaFont,
                             fontWeight: conversation.unread ? 500 : 400,
                             overflow: "hidden",
                             textOverflow: "ellipsis",
@@ -418,7 +424,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                 );
               })}
               {desktopFiltered.length === 0 && (
-                <Box sx={{ px: 2.5, py: 6, color: "text.secondary", textAlign: "center" }}>
+                <Box sx={{ px: 2, py: 4, color: "text.secondary", textAlign: "center", fontSize: compact.metaFont }}>
                   No conversations found.
                 </Box>
               )}

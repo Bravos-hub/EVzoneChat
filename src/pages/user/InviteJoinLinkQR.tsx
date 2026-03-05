@@ -33,7 +33,7 @@ import LinkRoundedIcon from "@mui/icons-material/LinkRounded";
  * - Link expiry + permissions
  * - Join by code
  */
-export default function InviteJoinLinkQR({ onBack, info = { name:'Charging Crew — Kampala', code:'evz-crew-kla', link:'https://evzone.app/invite/evz-crew-kla' } }) {
+export default function InviteJoinLinkQR({ onBack, info = { name:'Charging Crew — Kampala', code:'evz-crew-kla', link:'https://evzone.app/invite/evz-crew-kla' }, layoutMode = 'mobile' }) {
   const muiTheme = useMuiTheme();
   // const { actualMode } = useTheme();
   const [snack, setSnack] = useState('');
@@ -158,3 +158,4 @@ export default function InviteJoinLinkQR({ onBack, info = { name:'Charging Crew 
     fireEvent.click(screen.getByRole('button', { name: /^join$/i }));
   });
 */
+

@@ -44,7 +44,7 @@ const DEMO_CONFIRM = {
   canCancel: true,
 };
 
-export default function MeetingConfirmationJoin({ onBack, onNavigate }) {
+export default function MeetingConfirmationJoin({ onBack, onNavigate, layoutMode = 'mobile' }) {
   const muiTheme = useMuiTheme();
   const { accent, isDark } = useTheme();
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
@@ -297,3 +297,4 @@ export default function MeetingConfirmationJoin({ onBack, onNavigate }) {
     expect(screen.getByText(/Meeting confirmed/i)).toBeInTheDocument();
   });
 */
+

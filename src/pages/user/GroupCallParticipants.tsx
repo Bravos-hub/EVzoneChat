@@ -33,6 +33,7 @@ import ChatBubbleOutlineRoundedIcon from "@mui/icons-material/ChatBubbleOutlineR
 import SignalCellularAltRoundedIcon from "@mui/icons-material/SignalCellularAltRounded";
 import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded";
 import VolumeUpRoundedIcon from "@mui/icons-material/VolumeUpRounded";
+import { DESKTOP_COMPACT, isDesktopCompact } from "../../constants/desktopCompact";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
@@ -62,12 +63,18 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
   const { accentColor } = useTheme();
   const { endCall, activeCall } = useCall();
   const isDesktopLayout = layoutMode === 'desktop';
+  const isCompactDesktop = isDesktopCompact(layoutMode);
+  const compact = DESKTOP_COMPACT;
   const [open, setOpen] = useState(false);
   const [people, setPeople] = useState(DEMO);
   const [menuEl, setMenuEl] = useState(null);
   const [elapsed, setElapsed] = useState(0);
   const [muted, setMuted] = useState(false);
   const [videoOn, setVideoOn] = useState(true);
+  const controlButtonSize = isCompactDesktop ? 42 : { xs: 44, sm: 48 };
+  const endButtonSize = isCompactDesktop ? 46 : { xs: 48, sm: 56 };
+  const controlIconSize = isCompactDesktop ? 22 : { xs: 22, sm: 24 };
+  const endIconSize = isCompactDesktop ? 24 : { xs: 24, sm: 28 };
 
   // Close participants view when call ends
   useEffect(() => {
@@ -153,29 +160,35 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
         }}
       >
         <AppBar elevation={0} position="static" sx={{ bgcolor:'rgba(0,0,0,0.55)', color:'#fff' }}>
-          <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
+          <Toolbar
+            className={isCompactDesktop ? '' : '!min-h-[56px]'}
+            sx={{
+              minHeight: isCompactDesktop ? compact.toolbarHeight : undefined,
+              px: isCompactDesktop ? 1.5 : { xs: 1.5, sm: 3 }
+            }}
+          >
             <IconButton onClick={() => {
               onBack?.();
-            }} aria-label="Back" sx={{ color:'#fff', padding: { xs: '6px', sm: '8px' } }}>
-              <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+            }} aria-label="Back" sx={{ color:'#fff', padding: isCompactDesktop ? '6px' : { xs: '6px', sm: '8px' } }}>
+              <ArrowBackRoundedIcon sx={{ fontSize: isCompactDesktop ? 20 : { xs: 20, sm: 24 } }} />
             </IconButton>
-            <Box sx={{ flex: 1, minWidth: 0, ml: 1 }}>
-              <Typography variant="h6" className="font-bold" sx={{ fontSize: { xs: '16px', sm: '18px' }, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <Box sx={{ flex: 1, minWidth: 0, ml: isCompactDesktop ? 0.75 : 1 }}>
+              <Typography variant="h6" className="font-bold" sx={{ fontSize: isCompactDesktop ? compact.nameFont : { xs: '16px', sm: '18px' }, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {isVideoCall ? 'Group Call' : 'Group Call'}
               </Typography>
-              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: { xs: '11px', sm: '12px' } }}>
+              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', fontSize: isCompactDesktop ? compact.subMetaFont : { xs: '11px', sm: '12px' } }}>
                 {isVideoCall ? 'Video' : 'Voice'} • {timeString}
               </Typography>
             </Box>
             <IconButton 
               aria-label="More options" 
               onClick={(e) => setMenuEl(e.currentTarget)} 
-              sx={{ color:'#fff', padding: { xs: '6px', sm: '8px' }, mr: { xs: 0.5, sm: 1 } }}
+              sx={{ color:'#fff', padding: isCompactDesktop ? '6px' : { xs: '6px', sm: '8px' }, mr: isCompactDesktop ? 0.5 : { xs: 0.5, sm: 1 } }}
             >
-              <MoreVertRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+              <MoreVertRoundedIcon sx={{ fontSize: isCompactDesktop ? 20 : { xs: 20, sm: 24 } }} />
             </IconButton>
-            <IconButton aria-label="Participants" onClick={()=>setOpen(true)} sx={{ color:'#fff', padding: { xs: '6px', sm: '8px' } }}>
-              <PeopleAltRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+            <IconButton aria-label="Participants" onClick={()=>setOpen(true)} sx={{ color:'#fff', padding: isCompactDesktop ? '6px' : { xs: '6px', sm: '8px' } }}>
+              <PeopleAltRoundedIcon sx={{ fontSize: isCompactDesktop ? 20 : { xs: 20, sm: 24 } }} />
             </IconButton>
           </Toolbar>
         </AppBar>
@@ -254,7 +267,7 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden',
-              pb: isDesktopLayout ? '112px' : { xs: '90px', sm: '100px' }, // Space for controls
+              pb: isDesktopLayout ? (isCompactDesktop ? '104px' : '112px') : { xs: '90px', sm: '100px' }, // Space for controls
               borderRight: open ? { xs: 'none', sm: '1px solid rgba(255,255,255,0.1)' } : 'none',
               transition: 'width 0.3s ease'
             }}
@@ -287,9 +300,9 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
                       md: spotlightParticipants.length <= 2 ? 'repeat(2, 1fr)' : 
                           spotlightParticipants.length === 3 ? 'repeat(3, 1fr)' : 'repeat(2, 1fr)'
                     },
-                    gap: { xs: 1, sm: 1.5, md: 2 },
-                    p: { xs: 1.5, sm: 2, md: 2.5 },
-                    pt: { xs: 1.5, sm: 2, md: 2.5 }
+                    gap: isCompactDesktop ? 1.25 : { xs: 1, sm: 1.5, md: 2 },
+                    p: isCompactDesktop ? 1.5 : { xs: 1.5, sm: 2, md: 2.5 },
+                    pt: isCompactDesktop ? 1.5 : { xs: 1.5, sm: 2, md: 2.5 }
                   }}
                 >
                   {spotlightParticipants.map((p) => (
@@ -300,7 +313,7 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
                         borderColor: 'rgba(255,255,255,0.15)', 
                         boxShadow: p.active ? `0 0 0 2px ${accentColor}` : undefined,
                         aspectRatio: '16/9',
-                        minHeight: { xs: '140px', sm: '180px', md: '220px' },
+                        minHeight: isCompactDesktop ? { xs: '130px', sm: '170px', md: '198px' } : { xs: '140px', sm: '180px', md: '220px' },
                         width: '100%'
                       }}
                     >
@@ -311,17 +324,17 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
                 </div>
               )}
               <div className="absolute left-2 bottom-2 right-2 flex items-center text-white" style={{ gap: '4px' }}>
-                        <Avatar src={p.avatar} sx={{ width: { xs: 20, sm: 24 }, height: { xs: 20, sm: 24 } }} />
-                        <span className="truncate" style={{ fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, fontWeight: 500 }}>{p.name}</span>
-                        {p.muted && <MicOffRoundedIcon sx={{ fontSize: { xs: 14, sm: 16 } }} />}
-                        {!p.video && <VideocamOffRoundedIcon sx={{ fontSize: { xs: 14, sm: 16 } }} />}
+                        <Avatar src={p.avatar} sx={{ width: isCompactDesktop ? 20 : { xs: 20, sm: 24 }, height: isCompactDesktop ? 20 : { xs: 20, sm: 24 } }} />
+                        <span className="truncate" style={{ fontSize: isCompactDesktop ? '11px' : '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, fontWeight: 500 }}>{p.name}</span>
+                        {p.muted && <MicOffRoundedIcon sx={{ fontSize: isCompactDesktop ? 13 : { xs: 14, sm: 16 } }} />}
+                        {!p.video && <VideocamOffRoundedIcon sx={{ fontSize: isCompactDesktop ? 13 : { xs: 14, sm: 16 } }} />}
                         {p.role !== 'member' && (
                           <Chip 
                             size="small" 
                             label={p.role} 
                             sx={{ 
-                              height: { xs: 18, sm: 20 }, 
-                              fontSize: { xs: '9px', sm: '10px' }, 
+                              height: isCompactDesktop ? 18 : { xs: 18, sm: 20 }, 
+                              fontSize: isCompactDesktop ? compact.subMetaFont : { xs: '9px', sm: '10px' }, 
                               bgcolor: accentColor, 
                               color: '#fff', 
                               ml: 'auto',
@@ -346,9 +359,9 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
                       md: 'repeat(5, 1fr)',
                       lg: 'repeat(6, 1fr)'
                     },
-                    gap: { xs: 0.75, sm: 1, md: 1.25 },
-                    px: { xs: 1.5, sm: 2, md: 2.5 },
-                    pb: remainingCount > 0 ? { xs: 1, sm: 1.5 } : { xs: 1.5, sm: 2 }
+                    gap: isCompactDesktop ? 1 : { xs: 0.75, sm: 1, md: 1.25 },
+                    px: isCompactDesktop ? 1.5 : { xs: 1.5, sm: 2, md: 2.5 },
+                    pb: remainingCount > 0 ? (isCompactDesktop ? 1 : { xs: 1, sm: 1.5 }) : (isCompactDesktop ? 1.5 : { xs: 1.5, sm: 2 })
                   }}
                 >
                   {otherParticipants.map((p) => (
@@ -358,7 +371,7 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
                       sx={{ 
                         borderColor: 'rgba(255,255,255,0.15)', 
                         aspectRatio: '16/9',
-                        minHeight: { xs: '80px', sm: '100px', md: '120px' },
+                        minHeight: isCompactDesktop ? { xs: '78px', sm: '94px', md: '108px' } : { xs: '80px', sm: '100px', md: '120px' },
                         width: '100%'
                       }}
                     >
@@ -383,15 +396,15 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
               {remainingCount > 0 && (
                 <Box
                   sx={{
-                    px: { xs: 1.5, sm: 2, md: 2.5 },
-                    pb: { xs: 1.5, sm: 2 }
+                    px: isCompactDesktop ? 1.5 : { xs: 1.5, sm: 2, md: 2.5 },
+                    pb: isCompactDesktop ? 1.5 : { xs: 1.5, sm: 2 }
                   }}
                 >
                   <Box
                     className="relative rounded-lg overflow-hidden bg-black/40 border border-white/20 flex items-center justify-center"
                     sx={{
                       aspectRatio: '16/9',
-                      minHeight: { xs: '80px', sm: '100px', md: '120px' },
+                      minHeight: isCompactDesktop ? { xs: '78px', sm: '94px', md: '108px' } : { xs: '80px', sm: '100px', md: '120px' },
                       cursor: 'pointer',
                       '&:hover': { bgcolor: 'rgba(0,0,0,0.6)' }
                     }}
@@ -401,7 +414,7 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
                       variant="h6"
                       sx={{
                         color: '#fff',
-                        fontSize: { xs: '18px', sm: '24px', md: '28px' },
+                        fontSize: isCompactDesktop ? '22px' : { xs: '18px', sm: '24px', md: '28px' },
                         fontWeight: 600
                       }}
                     >
@@ -415,7 +428,7 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
                         left: '50%',
                         transform: 'translateX(-50%)',
                         color: 'rgba(255,255,255,0.9)',
-                        fontSize: { xs: '10px', sm: '11px' }
+                        fontSize: isCompactDesktop ? compact.subMetaFont : { xs: '10px', sm: '11px' }
                       }}
                     >
                       more
@@ -454,7 +467,7 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
                 alignItems: 'center',
                 justifyContent: 'space-between'
               }}>
-                <Typography variant="subtitle1" className="font-semibold" sx={{ fontSize: { xs: '15px', sm: '16px' }, color: '#fff' }}>
+                <Typography variant="subtitle1" className="font-semibold" sx={{ fontSize: isCompactDesktop ? compact.nameFont : { xs: '15px', sm: '16px' }, color: '#fff' }}>
                   Participants
                 </Typography>
                 <Chip 
@@ -462,8 +475,8 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
                   label={people.length} 
                   sx={{ 
                     bgcolor: EV.light, 
-                    fontSize: { xs: '11px', sm: '12px' }, 
-                    height: { xs: 22, sm: 24 },
+                    fontSize: isCompactDesktop ? compact.metaFont : { xs: '11px', sm: '12px' }, 
+                    height: isCompactDesktop ? compact.chipHeight : { xs: 22, sm: 24 },
                     color: '#000'
                   }} 
                 />
@@ -493,7 +506,7 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
                               borderColor: accentColor, 
                               color: accentColor, 
                               textTransform:'none', 
-                              fontSize: { xs: '11px', sm: '12px' }, 
+                              fontSize: isCompactDesktop ? compact.metaFont : { xs: '11px', sm: '12px' }, 
                               py: { xs: 0.25, sm: 0.5 } 
                             }}
                           >
@@ -509,7 +522,7 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
                             borderColor: accentColor, 
                             color: accentColor, 
                             textTransform:'none', 
-                            fontSize: { xs: '11px', sm: '12px' }, 
+                            fontSize: isCompactDesktop ? compact.metaFont : { xs: '11px', sm: '12px' }, 
                             py: { xs: 0.25, sm: 0.5 } 
                           }}
                         >
@@ -519,21 +532,21 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
                     } 
                     sx={{ 
                       px: { xs: 2, sm: 3 }, 
-                      py: { xs: 1, sm: 1.25 },
+                      py: isCompactDesktop ? 0.85 : { xs: 1, sm: 1.25 },
                       borderBottom: '1px solid rgba(255,255,255,0.05)'
                     }}
                   >
                     <ListItemAvatar>
-                      <Avatar src={p.avatar} sx={{ width: { xs: 36, sm: 40 }, height: { xs: 36, sm: 40 } }} />
+                      <Avatar src={p.avatar} sx={{ width: isCompactDesktop ? compact.avatarRow : { xs: 36, sm: 40 }, height: isCompactDesktop ? compact.avatarRow : { xs: 36, sm: 40 } }} />
                     </ListItemAvatar>
                   <ListItemText 
                       primary={
-                        <span className="font-semibold" style={{ fontSize: '14px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#fff' }}>
+                        <span className="font-semibold" style={{ fontSize: isCompactDesktop ? compact.nameFont : '14px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#fff' }}>
                           {p.name}
                         </span>
                       } 
                       secondary={
-                        <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>
+                        <span style={{ fontSize: isCompactDesktop ? compact.metaFont : '12px', color: 'rgba(255,255,255,0.7)' }}>
                           {p.role}{p.muted?' • muted':''}{!p.video?' • video off':''}
                         </span>
                       } 
@@ -556,14 +569,14 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
             width: isDesktopLayout ? 'calc(100% - 24px)' : '100%',
             maxWidth: isDesktopLayout ? '920px' : 'none',
             zIndex: isDesktopLayout ? 20 : 1000,
-            px: { xs: 2, sm: 3 },
-            py: { xs: 1.5, sm: 2 },
+            px: isCompactDesktop ? 1.5 : { xs: 2, sm: 3 },
+            py: isCompactDesktop ? 1.25 : { xs: 1.5, sm: 2 },
             display: 'flex',
             justifyContent: 'center',
             bgcolor: 'rgba(0,0,0,0.85)',
             backdropFilter: 'blur(20px)',
             borderTop: '1px solid rgba(255,255,255,0.1)',
-            pb: isDesktopLayout ? { xs: 1.5, sm: 2 } : { xs: `calc(1.5rem + env(safe-area-inset-bottom))`, sm: `calc(2rem + env(safe-area-inset-bottom))` },
+            pb: isDesktopLayout ? (isCompactDesktop ? 1.25 : { xs: 1.5, sm: 2 }) : { xs: `calc(1.5rem + env(safe-area-inset-bottom))`, sm: `calc(2rem + env(safe-area-inset-bottom))` },
             borderRadius: isDesktopLayout ? 3 : 0
           }}
         >
@@ -574,10 +587,10 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
               justifyContent: "center",
               bgcolor: "rgba(0,0,0,0.85)",
               borderRadius: 3,
-              px: { xs: 1.5, sm: 2 },
-              py: { xs: 1, sm: 1.5 },
+              px: isCompactDesktop ? 1.25 : { xs: 1.5, sm: 2 },
+              py: isCompactDesktop ? 0.85 : { xs: 1, sm: 1.5 },
               backdropFilter: "blur(20px)",
-              gap: { xs: 0.75, sm: 1 },
+              gap: isCompactDesktop ? 0.75 : { xs: 0.75, sm: 1 },
               flexWrap: "nowrap",
               overflowX: 'auto',
               '&::-webkit-scrollbar': { display: 'none' },
@@ -595,12 +608,12 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
                 color: "#fff",
                 flexShrink: 0,
                 bgcolor: muted ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.1)",
-                width: { xs: "44px", sm: "48px" },
-                height: { xs: "44px", sm: "48px" },
+                width: controlButtonSize,
+                height: controlButtonSize,
                 "&:hover": { bgcolor: "rgba(255,255,255,0.2)" }
               }}
             >
-              {muted ? <MicOffRoundedIcon sx={{ fontSize: { xs: 22, sm: 24 } }} /> : <MicNoneRoundedIcon sx={{ fontSize: { xs: 22, sm: 24 } }} />}
+              {muted ? <MicOffRoundedIcon sx={{ fontSize: controlIconSize }} /> : <MicNoneRoundedIcon sx={{ fontSize: controlIconSize }} />}
             </IconButton>
 
             {/* Video On/Off */}
@@ -611,12 +624,12 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
                 color: "#fff",
                 flexShrink: 0,
                 bgcolor: !videoOn ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.1)",
-                width: { xs: "44px", sm: "48px" },
-                height: { xs: "44px", sm: "48px" },
+                width: controlButtonSize,
+                height: controlButtonSize,
                 "&:hover": { bgcolor: "rgba(255,255,255,0.2)" }
               }}
             >
-              {videoOn ? <VideocamRoundedIcon sx={{ fontSize: { xs: 22, sm: 24 } }} /> : <VideocamOffRoundedIcon sx={{ fontSize: { xs: 22, sm: 24 } }} />}
+              {videoOn ? <VideocamRoundedIcon sx={{ fontSize: controlIconSize }} /> : <VideocamOffRoundedIcon sx={{ fontSize: controlIconSize }} />}
             </IconButton>
 
             {/* Speaker */}
@@ -626,12 +639,12 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
                 color: "#fff", 
                 flexShrink: 0,
                 bgcolor: "rgba(255,255,255,0.1)",
-                width: { xs: "44px", sm: "48px" },
-                height: { xs: "44px", sm: "48px" },
+                width: controlButtonSize,
+                height: controlButtonSize,
                 "&:hover": { bgcolor: "rgba(255,255,255,0.2)" }
               }}
             >
-              <VolumeUpRoundedIcon sx={{ fontSize: { xs: 22, sm: 24 } }} />
+              <VolumeUpRoundedIcon sx={{ fontSize: controlIconSize }} />
             </IconButton>
 
             {/* Chat */}
@@ -644,12 +657,12 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
                 color: "#fff", 
                 flexShrink: 0,
                 bgcolor: "rgba(255,255,255,0.1)",
-                width: { xs: "44px", sm: "48px" },
-                height: { xs: "44px", sm: "48px" },
+                width: controlButtonSize,
+                height: controlButtonSize,
                 "&:hover": { bgcolor: "rgba(255,255,255,0.2)" }
               }}
             >
-              <ChatBubbleOutlineRoundedIcon sx={{ fontSize: { xs: 22, sm: 24 } }} />
+              <ChatBubbleOutlineRoundedIcon sx={{ fontSize: controlIconSize }} />
             </IconButton>
 
             {/* End Call - Prominent */}
@@ -671,14 +684,14 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
                 bgcolor: "#e53935",
                 "&:hover": { bgcolor: "#c62828" },
                 "&:active": { bgcolor: "#b71c1c", transform: "scale(0.95)" },
-                width: { xs: "48px", sm: "56px" },
-                height: { xs: "48px", sm: "56px" },
+                width: endButtonSize,
+                height: endButtonSize,
                 flexShrink: 0,
                 transition: "all 0.2s ease",
                 boxShadow: '0 2px 8px rgba(229,57,53,0.4)'
               }}
             >
-              <CallEndRoundedIcon sx={{ fontSize: { xs: 24, sm: 28 } }} />
+              <CallEndRoundedIcon sx={{ fontSize: endIconSize }} />
             </IconButton>
           </Box>
         </Box>
