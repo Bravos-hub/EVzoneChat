@@ -242,7 +242,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
         flexDirection: 'column',
         position: 'relative'
       }}>
-        {/* 1. Top Header - Parent Section (Theme Color Background) */}
+        {/* 1. Top Header - Centered Title */}
         <AppBar
           elevation={0}
           position="static"
@@ -252,46 +252,34 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
             boxShadow: 'none'
           }}
         >
-          <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
-            <IconButton
-              aria-label="Back"
-              onClick={onBack}
-              sx={{ color: '#fff', mr: { xs: 0.75, sm: 1 }, padding: { xs: '6px', sm: '8px' } }}
-            >
-              <ArrowBackRoundedIcon sx={{ fontSize: { xs: '20px', sm: '24px' } }} />
-            </IconButton>
+          <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 }, justifyContent: 'center' }}>
             <Typography
               variant="h6"
               sx={{
                 fontSize: { xs: '16px', sm: '18px' },
                 fontWeight: 700,
                 color: '#fff',
-                flexGrow: 1
+                textAlign: 'center'
               }}
             >
               Inbox
             </Typography>
-            <NotificationIconButton />
           </Toolbar>
         </AppBar>
 
 
 
-        {/* 3. Message Drawer (White Rounded Panel) - Separate from Live Ongoing */}
+        {/* 3. Message Drawer (White Rounded Panel) - Flush Layout */}
         <Paper
           elevation={0}
           sx={{
             flex: 1,
             bgcolor: 'background.paper',
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-            mt: 2,
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
             position: 'relative',
-            zIndex: 0,
-            boxShadow: isDark ? '0 -2px 8px rgba(0,0,0,0.2)' : '0 -2px 8px rgba(0,0,0,0.1)'
+            zIndex: 0
           }}
         >
           {/* Drawer Header */}
@@ -663,17 +651,23 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                     onClick={onNew}
                     startIcon={<AddRoundedIcon />}
                     sx={{
-                      bgcolor: isDark ? `${accentColor}25` : `${accentColor}15`,
-                      color: accentColor,
+                      bgcolor: accentColor,
+                      color: '#fff',
                       fontWeight: 700,
                       borderRadius: '24px',
                       textTransform: 'none',
-                      px: 3,
+                      px: 4,
                       py: 1.25,
                       fontSize: '15px',
+                      boxShadow: isDark ? `0 4px 12px ${accentColor}40` : `0 4px 12px ${accentColor}30`,
                       '&:hover': {
-                        bgcolor: isDark ? `${accentColor}35` : `${accentColor}25`,
-                      }
+                        bgcolor: isDark ? `${accentColor}dd` : `${accentColor}dd`,
+                        transform: 'translateY(-1px)'
+                      },
+                      '&:active': {
+                        transform: 'translateY(1px)'
+                      },
+                      transition: 'all 0.2s ease'
                     }}
                   >
                     Start New Chat

@@ -152,144 +152,11 @@ function ShellFrame({ children }) {
       position: 'relative',
       transition: 'background-color 0.3s ease'
     }}>
-      {/* Header (mobile frame) - always visible for consistent mobile experience */}
-      <AppBar
-        elevation={0}
-        position="fixed"
-        sx={{
-          bgcolor: accentColor,
-          color: '#fff',
-          width: '100%',
-          zIndex: 1200,
-          transition: 'background-color 0.3s ease'
-        }}
-      >
-        <Toolbar className="!min-h-[56px] !px-3" sx={{ width: '100%' }}>
-          <Avatar
-            src="https://i.pravatar.cc/100?img=20"
-            onClick={() => navigate('/profile')}
-            sx={{
-              bgcolor: '#fff',
-              color: EV.green,
-              width: '2rem',
-              height: '2rem',
-              mr: 1.5,
-              cursor: 'pointer',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
-            }}
-            title="Open profile"
-          />
-          <Typography variant="subtitle1" className="font-semibold" sx={{ fontSize: '16px', fontWeight: 600 }}>
-            EVzone Chat
-          </Typography>
-          <Box sx={{ flexGrow: 1 }} />
-          <IconButton
-            size="small"
-            sx={{ color: '#fff' }}
-            aria-label="More"
-            onClick={openMenu}
-          >
-            <MoreHorizRoundedIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-
-      {/* Mobile-sized 3-dots menu */}
-      <Menu
-        anchorEl={menuEl}
-        open={Boolean(menuEl)}
-        onClose={closeMenu}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        PaperProps={{
-          sx: {
-            width: '90vw',
-            maxWidth: 'calc(100vw - 1rem)',
-            borderRadius: 2,
-            py: 0.5,
-            mx: 'auto',
-            bgcolor: 'background.paper',
-            '& .MuiMenuItem-root': {
-              color: 'text.primary',
-            }
-          }
-        }}
-      >
-        {/* Global quick actions */}
-        <MenuItem onClick={() => go('/new-message')}>
-          <ListItemIcon><AddCommentRoundedIcon fontSize="small" /></ListItemIcon>
-          <ListItemText primary="New message" />
-        </MenuItem>
-        <MenuItem onClick={() => go('/create-channel')}>
-          <ListItemIcon><GroupAddRoundedIcon fontSize="small" /></ListItemIcon>
-          <ListItemText primary="Create group/channel" />
-        </MenuItem>
-        <MenuItem onClick={() => go('/invite')}>
-          <ListItemIcon><QrCode2RoundedIcon fontSize="small" /></ListItemIcon>
-          <ListItemText primary="Scan QR / Invite link" />
-        </MenuItem>
-        <MenuItem onClick={() => go('/call')}>
-          <ListItemIcon><CallRoundedIcon fontSize="small" /></ListItemIcon>
-          <ListItemText primary="Start call" />
-        </MenuItem>
-        <MenuItem onClick={() => go('/meetings/book')}>
-          <ListItemIcon><EventAvailableRoundedIcon fontSize="small" /></ListItemIcon>
-          <ListItemText primary="Schedule meeting" />
-        </MenuItem>
-        <MenuItem onClick={() => go('/meetings')}>
-          <ListItemIcon><EventAvailableRoundedIcon fontSize="small" sx={{ opacity: 0.7 }} /></ListItemIcon>
-          <ListItemText primary="My meetings" />
-        </MenuItem>
-        <MenuItem onClick={() => go('/media')}>
-          <ListItemIcon><ImageRoundedIcon fontSize="small" /></ListItemIcon>
-          <ListItemText primary="Media & Docs" />
-        </MenuItem>
-        <Divider sx={{ my: 0.5 }} />
-        {/* Personalization */}
-        <MenuItem onClick={() => go('/theme')}>
-          <ListItemIcon><BrushRoundedIcon fontSize="small" /></ListItemIcon>
-          <ListItemText primary="Theme" secondary="Light · Dark · System" />
-        </MenuItem>
-        <MenuItem onClick={() => go('/language')}>
-          <ListItemIcon><TranslateRoundedIcon fontSize="small" /></ListItemIcon>
-          <ListItemText primary="Language" />
-        </MenuItem>
-        <MenuItem onClick={() => go('/dnd')}>
-          <ListItemIcon><NotificationsPausedRoundedIcon fontSize="small" /></ListItemIcon>
-          <ListItemText primary="Quiet hours / DND" />
-        </MenuItem>
-        <Divider sx={{ my: 0.5 }} />
-        {/* Help & safety */}
-        <MenuItem onClick={() => go('/safety')}>
-          <ListItemIcon><ShieldRoundedIcon fontSize="small" /></ListItemIcon>
-          <ListItemText primary="Safety Center" />
-        </MenuItem>
-        <MenuItem onClick={() => go('/help')}>
-          <ListItemIcon><HelpOutlineRoundedIcon fontSize="small" /></ListItemIcon>
-          <ListItemText primary="Help" />
-        </MenuItem>
-        <Divider sx={{ my: 0.5 }} />
-        {/* Account */}
-        <MenuItem onClick={() => go('/settings')}>
-          <ListItemIcon><SettingsRoundedIcon fontSize="small" /></ListItemIcon>
-          <ListItemText primary="Settings" />
-        </MenuItem>
-        <MenuItem onClick={() => go('/security')}>
-          <ListItemIcon><SecurityRoundedIcon fontSize="small" /></ListItemIcon>
-          <ListItemText primary="Security" />
-        </MenuItem>
-        <MenuItem onClick={() => { closeMenu(); alert('Signed out'); }}>
-          <ListItemIcon><LogoutRoundedIcon fontSize="small" /></ListItemIcon>
-          <ListItemText primary="Sign out" />
-        </MenuItem>
-      </Menu>
-
-      {/* Content (mobile frame) - always has padding for header and bottom nav */}
+      {/* Content (mobile frame) - always has padding for bottom nav */}
       <Box sx={{
-        pt: '56px',
         pb: '88px',
         width: '100%',
-        minHeight: 'calc(100vh - 144px)',
+        minHeight: 'calc(100vh - 88px)',
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
@@ -405,7 +272,7 @@ function Launcher({ unread = 0 }) {
       position: 'fixed',
       left: 0,
       right: 0,
-      bottom: 96,
+      bottom: 76,
       display: 'flex',
       justifyContent: 'center',
       zIndex: 1000,
