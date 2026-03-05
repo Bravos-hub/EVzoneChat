@@ -238,32 +238,7 @@ function DesktopRail() {
 }
 
 function DesktopFrame({ children }) {
-  const location = useLocation();
   const muiTheme = useMuiTheme();
-  const { activeCall } = useCall();
-
-  const isBypassRoute =
-    location.pathname.startsWith("/call") ||
-    location.pathname.startsWith("/group-call") ||
-    location.pathname.startsWith("/meetings/live/");
-
-  const isOnCallPage = location.pathname.startsWith("/call") && activeCall;
-
-  if (isBypassRoute) {
-    return (
-      <Box
-        sx={{
-          width: "100%",
-          minHeight: "100vh",
-          bgcolor: muiTheme.palette.background.default,
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        {children}
-      </Box>
-    );
-  }
 
   return (
     <Box
@@ -275,7 +250,6 @@ function DesktopFrame({ children }) {
     >
       <DesktopRail />
       <Box className="desktop-main">{children}</Box>
-      {isOnCallPage ? null : null}
     </Box>
   );
 }

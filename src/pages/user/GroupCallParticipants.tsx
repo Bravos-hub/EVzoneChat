@@ -58,9 +58,10 @@ const DEMO = [
  * U04-11 — Group Call Participants Panel
  * Mobile-first group video call interface with participants management
  */
-export default function GroupCallParticipants({ onBack, onNavigate, onEnd, location }) {
+export default function GroupCallParticipants({ onBack, onNavigate, onEnd, location, layoutMode = 'mobile' }) {
   const { accentColor } = useTheme();
   const { endCall, activeCall } = useCall();
+  const isDesktopLayout = layoutMode === 'desktop';
   const [open, setOpen] = useState(false);
   const [people, setPeople] = useState(DEMO);
   const [menuEl, setMenuEl] = useState(null);
@@ -139,7 +140,18 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
 
-      <Box className="w-full h-full max-w-sm mx-auto bg-black flex flex-col">
+      <Box
+        className="w-full h-full bg-black flex flex-col"
+        sx={{
+          width: '100%',
+          height: '100%',
+          minHeight: 0,
+          maxWidth: isDesktopLayout ? 'none' : '24rem',
+          mx: isDesktopLayout ? 0 : 'auto',
+          position: 'relative',
+          overflow: 'hidden'
+        }}
+      >
         <AppBar elevation={0} position="static" sx={{ bgcolor:'rgba(0,0,0,0.55)', color:'#fff' }}>
           <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
             <IconButton onClick={() => {
@@ -230,7 +242,7 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
           sx={{ 
             overflow: 'hidden',
             position: 'relative',
-            flexDirection: { xs: 'column', sm: 'row' }
+            flexDirection: isDesktopLayout ? 'row' : { xs: 'column', sm: 'row' }
           }}
         >
           {/* Video Grid Area - Zoom-like layout */}
@@ -242,7 +254,7 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden',
-              pb: { xs: '90px', sm: '100px' }, // Space for bottom controls
+              pb: isDesktopLayout ? '112px' : { xs: '90px', sm: '100px' }, // Space for controls
               borderRight: open ? { xs: 'none', sm: '1px solid rgba(255,255,255,0.1)' } : 'none',
               transition: 'width 0.3s ease'
             }}
@@ -536,12 +548,14 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
         {/* Call Controls Bar - Fixed at bottom (like Zoom) */}
         <Box
           sx={{
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            width: '100%',
-            zIndex: 1000,
+            position: isDesktopLayout ? 'absolute' : 'fixed',
+            bottom: isDesktopLayout ? 12 : 0,
+            left: isDesktopLayout ? '50%' : 0,
+            right: isDesktopLayout ? 'auto' : 0,
+            transform: isDesktopLayout ? 'translateX(-50%)' : 'none',
+            width: isDesktopLayout ? 'calc(100% - 24px)' : '100%',
+            maxWidth: isDesktopLayout ? '920px' : 'none',
+            zIndex: isDesktopLayout ? 20 : 1000,
             px: { xs: 2, sm: 3 },
             py: { xs: 1.5, sm: 2 },
             display: 'flex',
@@ -549,7 +563,8 @@ export default function GroupCallParticipants({ onBack, onNavigate, onEnd, locat
             bgcolor: 'rgba(0,0,0,0.85)',
             backdropFilter: 'blur(20px)',
             borderTop: '1px solid rgba(255,255,255,0.1)',
-            pb: { xs: `calc(1.5rem + env(safe-area-inset-bottom))`, sm: `calc(2rem + env(safe-area-inset-bottom))` }
+            pb: isDesktopLayout ? { xs: 1.5, sm: 2 } : { xs: `calc(1.5rem + env(safe-area-inset-bottom))`, sm: `calc(2rem + env(safe-area-inset-bottom))` },
+            borderRadius: isDesktopLayout ? 3 : 0
           }}
         >
           <Box

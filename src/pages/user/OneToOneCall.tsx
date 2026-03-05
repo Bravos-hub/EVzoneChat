@@ -5,7 +5,8 @@ import { useCall } from "../../context/CallContext";
 import { useTheme } from "../../context/ThemeContext";
 import {
   AppBar, Toolbar, IconButton, Box, Avatar, Button, Menu, MenuItem, ListItemIcon, ListItemText,
-  List, ListItem, ListItemAvatar, ListItemText as ListItemTextComp, Divider, Chip, Typography
+  List, ListItem, ListItemAvatar, ListItemText as ListItemTextComp, Divider, Chip, Typography,
+  TextField, InputAdornment
 } from "@mui/material";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
@@ -28,6 +29,10 @@ import PeopleAltRoundedIcon from "@mui/icons-material/PeopleAltRounded";
 import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
 import VideoCallRoundedIcon from "@mui/icons-material/VideoCallRounded";
 import EventAvailableRoundedIcon from "@mui/icons-material/EventAvailableRounded";
+import LinkRoundedIcon from "@mui/icons-material/LinkRounded";
+import DialpadRoundedIcon from "@mui/icons-material/DialpadRounded";
+import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
@@ -50,8 +55,10 @@ export default function OneToOneCall({
   onOpenChat, onReport, onHelp,
   flags = { share: false, captions: false },
   location,
-  onNavigate
+  onNavigate,
+  layoutMode = 'mobile'
 }) {
+  const isDesktopLayout = layoutMode === 'desktop';
   // Get call parameters from URL
   const callType = useMemo(() => {
     const params = new URLSearchParams(location?.search || '');
@@ -123,6 +130,7 @@ export default function OneToOneCall({
   const [captions, setCaptions] = useState(flags.captions);
   const [menuEl, setMenuEl] = useState(null);
   const [showMoreButtons, setShowMoreButtons] = useState(false);
+  const [callSearch, setCallSearch] = useState("");
 
   // Call state management - auto-transition through dialing states
   const [callState, setCallState] = useState(callStateFromUrl);
@@ -173,6 +181,12 @@ export default function OneToOneCall({
     () => `${String(Math.floor(elapsed / 60)).padStart(2, "0")}:${String(elapsed % 60).padStart(2, "0")}`,
     [elapsed]
   );
+
+  const filteredCalls = useMemo(() => {
+    const q = callSearch.trim().toLowerCase();
+    if (!q) return CALLS;
+    return CALLS.filter((call) => [call.name, call.module, call.type].join(" ").toLowerCase().includes(q));
+  }, [CALLS, callSearch]);
 
   // PiP drag (video) - Positioned from top-left, above control bar
   const pipRef = useRef(null);
@@ -271,6 +285,148 @@ export default function OneToOneCall({
       default: return "";
     }
   }, [callState, actualType, hhmmss, isGroupCall]);
+
+  if (showCallList && isDesktopLayout) {
+    const desktopActions = [
+      { icon: <VideocamRoundedIcon sx={{ fontSize: 28 }} />, label: "Start call", onClick: () => onNavigate?.("/call?type=video&state=dialing") },
+      { icon: <LinkRoundedIcon sx={{ fontSize: 28 }} />, label: "New call link", onClick: () => onNavigate?.("/group-call?type=conference") },
+      { icon: <DialpadRoundedIcon sx={{ fontSize: 28 }} />, label: "Call a number", onClick: () => onNavigate?.("/call?type=voice&state=dialing") },
+      { icon: <CalendarMonthRoundedIcon sx={{ fontSize: 28 }} />, label: "Schedule call", onClick: () => onNavigate?.("/meetings/book") },
+    ];
+
+    return (
+      <>
+        <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none`}</style>
+        <Box className="desktop-calls-layout" sx={{ bgcolor: 'transparent' }}>
+          <Box className="desktop-calls-list-pane" sx={{ borderRight: `1px solid ${muiTheme.palette.divider}` }}>
+            <Box sx={{ px: 2.5, pt: 2.5, pb: 1.5 }}>
+              <Typography sx={{ fontSize: "36px", fontWeight: 600, color: "text.primary", lineHeight: 1 }}>Calls</Typography>
+            </Box>
+            <Box sx={{ px: 2, pb: 1.5 }}>
+              <TextField
+                fullWidth
+                size="small"
+                value={callSearch}
+                onChange={(e) => setCallSearch(e.target.value)}
+                placeholder="Search name or number"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 6,
+                    bgcolor: muiTheme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(17,27,33,0.07)',
+                    '& fieldset': { borderColor: 'transparent' },
+                    '&:hover fieldset': { borderColor: 'transparent' },
+                    '&.Mui-focused fieldset': { borderColor: `${accentColor}80`, borderWidth: '1px' }
+                  }
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchRoundedIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                    </InputAdornment>
+                  )
+                }}
+              />
+            </Box>
+            <Box sx={{ px: 2.5, pb: 1 }}>
+              <Typography sx={{ fontSize: '28px', fontWeight: 600, color: 'text.primary', lineHeight: 1.1 }}>Recent</Typography>
+            </Box>
+            <Box className="desktop-pane-scroll no-scrollbar" sx={{ overflowY: 'auto' }}>
+              <List sx={{ py: 0 }}>
+                {filteredCalls.map((call, idx) => (
+                  <React.Fragment key={call.id}>
+                    <ListItem
+                      button
+                      onClick={() => {
+                        const moduleParam = call.module ? `&module=${encodeURIComponent(call.module)}` : '';
+                        const callType = call.type === 'conference' || call.type === 'meeting' ? 'video' : call.type;
+                        onNavigate?.(`/call?type=${callType}&contact=${encodeURIComponent(call.name)}&state=connecting${moduleParam}`);
+                      }}
+                      sx={{ px: 2, py: 1.25 }}
+                    >
+                      <ListItemAvatar>
+                        <Avatar src={call.avatar} sx={{ width: 48, height: 48 }} />
+                      </ListItemAvatar>
+                      <ListItemTextComp
+                        primary={
+                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+                            <Typography
+                              sx={{
+                                color: 'text.primary',
+                                fontSize: '19px',
+                                fontWeight: 600,
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap'
+                              }}
+                            >
+                              {call.name}
+                            </Typography>
+                            <Typography sx={{ fontSize: '13px', color: 'text.secondary', flexShrink: 0 }}>{call.time}</Typography>
+                          </Box>
+                        }
+                        secondary={
+                          <Typography
+                            sx={{
+                              color: call.missed ? '#ef5350' : 'text.secondary',
+                              fontSize: '14px',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap'
+                            }}
+                          >
+                            {call.missed ? 'Missed' : call.type === 'video' ? 'Outgoing video call' : 'Outgoing voice call'}
+                          </Typography>
+                        }
+                      />
+                    </ListItem>
+                    {idx < filteredCalls.length - 1 && <Divider component="li" />}
+                  </React.Fragment>
+                ))}
+                {filteredCalls.length === 0 && (
+                  <Box sx={{ px: 2, py: 4, color: 'text.secondary', textAlign: 'center' }}>No recent calls found.</Box>
+                )}
+              </List>
+            </Box>
+          </Box>
+
+          <Box className="desktop-calls-right-pane">
+            <Box
+              sx={{
+                width: '100%',
+                maxWidth: 520,
+                px: 3,
+                py: 4,
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr 1fr', md: '1fr 1fr' },
+                gap: 3
+              }}
+            >
+              {desktopActions.map((action) => (
+                <Box
+                  key={action.label}
+                  onClick={action.onClick}
+                  sx={{
+                    border: `1px solid ${muiTheme.palette.divider}`,
+                    borderRadius: 3,
+                    py: 3.5,
+                    px: 2,
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    color: 'text.primary',
+                    bgcolor: 'rgba(255,255,255,0.02)',
+                    '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' }
+                  }}
+                >
+                  <Box sx={{ display: 'inline-flex', mb: 1.5, color: accentColor }}>{action.icon}</Box>
+                  <Typography sx={{ fontSize: '22px', fontWeight: 600, lineHeight: 1.2 }}>{action.label}</Typography>
+                </Box>
+              ))}
+            </Box>
+          </Box>
+        </Box>
+      </>
+    );
+  }
 
   // If showing calls list, render list view (after all hooks)
   if (showCallList) {
@@ -544,14 +700,14 @@ export default function OneToOneCall({
         sx={{ 
           bgcolor: '#000 !important', 
           color: '#fff', 
-          position: 'fixed', 
-          top: 0, 
-          left: 0, 
-          right: 0, 
-          bottom: 0, 
-          zIndex: 1300,
-          height: '100dvh', // Dynamic viewport height for mobile (fallback to 100vh for older browsers)
-          minHeight: '100vh',
+          position: isDesktopLayout ? 'relative' : 'fixed',
+          top: isDesktopLayout ? 'auto' : 0,
+          left: isDesktopLayout ? 'auto' : 0,
+          right: isDesktopLayout ? 'auto' : 0,
+          bottom: isDesktopLayout ? 'auto' : 0,
+          zIndex: isDesktopLayout ? 1 : 1300,
+          height: isDesktopLayout ? '100%' : '100dvh', // Dynamic viewport height for mobile (fallback to 100vh for older browsers)
+          minHeight: isDesktopLayout ? 0 : '100vh',
           maxHeight: '100%',
           overflow: 'hidden'
         }}
@@ -563,7 +719,7 @@ export default function OneToOneCall({
           sx={{ 
             bgcolor: "rgba(0,0,0,0.55) !important", 
             color: "#fff",
-            pt: 'env(safe-area-inset-top)',
+            pt: isDesktopLayout ? 0 : 'env(safe-area-inset-top)',
             minHeight: { xs: '56px', sm: '64px' }
           }}
         >
@@ -1260,22 +1416,22 @@ export default function OneToOneCall({
         {/* Controls (glass) - Positioned just above bottom navigation */}
         <Box 
           sx={{ 
-            position: 'fixed',
+            position: isDesktopLayout ? 'absolute' : 'fixed',
             // Position directly above bottom nav with small gap
-            bottom: { 
+            bottom: isDesktopLayout ? 16 : { 
               xs: 'calc(4.5rem + 1.5rem + env(safe-area-inset-bottom) + 8px)', 
               sm: 'calc(4.5rem + 1.5rem + env(safe-area-inset-bottom) + 10px)',
               md: 'calc(4.5rem + 1.5rem + env(safe-area-inset-bottom) + 12px)'
             },
             left: '50%',
             transform: 'translateX(-50%)',
-            zIndex: 1200, // Above bottom nav (zIndex 1100)
+            zIndex: isDesktopLayout ? 40 : 1200, // Above bottom nav (zIndex 1100)
             width: { 
-              xs: 'calc(100% - 32px)', 
+              xs: isDesktopLayout ? 'calc(100% - 32px)' : 'calc(100% - 32px)', 
               sm: 'calc(100% - 32px)', 
               md: 'auto' 
             },
-            maxWidth: { xs: '100%', sm: '600px', md: '700px' },
+            maxWidth: isDesktopLayout ? { xs: '100%', sm: '760px', md: '860px' } : { xs: '100%', sm: '600px', md: '700px' },
             px: { xs: 1, sm: 1.5, md: 2 }
           }}
         >

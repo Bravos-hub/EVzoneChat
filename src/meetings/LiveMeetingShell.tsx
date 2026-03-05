@@ -45,9 +45,10 @@ const DEMO_MEETING = {
   location: "Online",
 };
 
-export default function LiveMeetingShell({ onBack, onNavigate, location, registry }) {
+export default function LiveMeetingShell({ onBack, onNavigate, location, registry, layoutMode = 'mobile' }) {
   const muiTheme = useMuiTheme();
   const routeLocation = useLocation();
+  const isDesktopLayout = layoutMode === 'desktop';
   
   // Set document title
   useEffect(() => {
@@ -85,7 +86,7 @@ export default function LiveMeetingShell({ onBack, onNavigate, location, registr
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none`}</style>
 
-      <Box sx={{ width: '100%', height: '100%', bgcolor: '#000', overflowX: 'hidden', margin: 0, padding: 0 }}>
+      <Box sx={{ width: '100%', height: '100%', minHeight: 0, bgcolor: '#000', overflowX: 'hidden', margin: 0, padding: 0 }}>
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
           {/* Header - matching Dealz Status style (dark theme for live meeting) */}
           <AppBar
@@ -176,7 +177,7 @@ export default function LiveMeetingShell({ onBack, onNavigate, location, registr
           </Box>
 
           {/* Live call area — plug in U04‑10 / U04‑11 here */}
-          <Box className="flex-1" sx={{ px: 0, pb: 0, pt: 1 }}>
+          <Box className="flex-1" sx={{ px: 0, pb: 0, pt: 1, minHeight: 0 }}>
             <Box className="w-full h-full flex flex-col">
               {m.type === '1:1' && OneToOneCall ? (
                 <OneToOneCall 
@@ -186,12 +187,14 @@ export default function LiveMeetingShell({ onBack, onNavigate, location, registr
                   onBack={onBack}
                   onNavigate={onNavigate}
                   location={routeLocation}
+                  layoutMode={layoutMode}
                 />
               ) : m.type === 'group' && GroupCallParticipants ? (
                 <GroupCallParticipants 
                   onBack={onBack}
                   onNavigate={onNavigate}
                   location={routeLocation}
+                  layoutMode={layoutMode}
                 />
               ) : (
               <Box className="w-full h-full flex items-center justify-center text-center text-white/70 px-4">
@@ -215,7 +218,7 @@ export default function LiveMeetingShell({ onBack, onNavigate, location, registr
             position: "sticky", 
             bottom: 0, 
             width: '100%',
-            pb: { xs: `calc(2rem + env(safe-area-inset-bottom))`, sm: 2, md: 2.5 }, 
+            pb: isDesktopLayout ? { xs: 1.5, sm: 2, md: 2.5 } : { xs: `calc(2rem + env(safe-area-inset-bottom))`, sm: 2, md: 2.5 }, 
             display: "flex", 
             justifyContent: "center",
             zIndex: 100
