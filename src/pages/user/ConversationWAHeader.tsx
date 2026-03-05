@@ -480,6 +480,11 @@ export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel
     }
     return 'default';
   }, [location]);
+  const isConversationNewRoute = location?.pathname === '/conversation/new';
+  const fixedHeaderTop = isConversationNewRoute ? 0 : '3.5rem';
+  const messagesTopPadding = isConversationNewRoute ? '3.5rem' : '7rem';
+  const messagesBottomPadding = isConversationNewRoute ? '5.75rem' : '11.25rem';
+  const composerBottom = isConversationNewRoute ? 'env(safe-area-inset-bottom)' : '5.5rem';
 
   // Load draft from localStorage on mount
   const [draft, setDraft] = useState(() => {
@@ -1472,7 +1477,7 @@ export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel
               bgcolor: 'transparent',
               color: 'text.primary',
               borderBottom: `1px solid ${muiTheme.palette.divider}`,
-              top: '3.5rem',
+              top: fixedHeaderTop,
               width: '100%',
               zIndex: 1101,
               boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.04)'
@@ -1517,7 +1522,7 @@ export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel
               bgcolor: 'transparent',
               color: 'text.primary',
               borderBottom: `1px solid ${muiTheme.palette.divider}`,
-              top: '3.5rem', // Below main shell header
+              top: fixedHeaderTop,
               width: '100%',
               zIndex: 1100,
               boxShadow: isDark ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.04)'
@@ -1793,8 +1798,8 @@ export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel
           className="flex-1 no-scrollbar"
           sx={{
             overflowY: 'auto',
-            pt: '7rem', // shell header + conversation header
-            pb: '11.25rem', // Space for composer + bottom nav + padding
+            pt: messagesTopPadding,
+            pb: messagesBottomPadding,
             px: { xs: 2, sm: 3 },
             minHeight: 0,
             display: 'flex',
@@ -1842,7 +1847,7 @@ export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel
             px: { xs: 1.5, sm: 2 },
             py: { xs: 1, sm: 1.5 },
             position: 'fixed',
-            bottom: '5.5rem', // Above bottom nav
+            bottom: composerBottom,
             left: 0,
             right: 0,
             width: '100%',

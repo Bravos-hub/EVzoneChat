@@ -96,6 +96,7 @@ function ShellFrame({ children }) {
 
   // Check if we're on a conversation page
   const isConversationPage = location.pathname.startsWith('/conversation') || location.pathname.startsWith('/new-message');
+  const hideShellNavForRoute = location.pathname === '/conversation/new';
 
   // Check if we're on the call page
   const isOnCallPage = location.pathname.startsWith('/call') && activeCall;
@@ -155,9 +156,9 @@ function ShellFrame({ children }) {
     }}>
       {/* Content (mobile frame) - always has padding for bottom nav */}
       <Box sx={{
-        pb: '88px',
+        pb: hideShellNavForRoute ? 0 : '88px',
         width: '100%',
-        minHeight: 'calc(100vh - 88px)',
+        minHeight: hideShellNavForRoute ? '100vh' : 'calc(100vh - 88px)',
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
@@ -169,20 +170,22 @@ function ShellFrame({ children }) {
 
 
       {/* Bottom nav (mobile frame) - always visible for consistent mobile navigation */}
-      <Box sx={{
-        position: 'fixed',
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 1100,
-        bgcolor: actualMode === 'dark' ? 'rgba(18,18,18,0.95)' : 'rgba(255,255,255,0.95)',
-        backdropFilter: 'blur(12px)',
-        borderTop: actualMode === 'dark' ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.08)',
-        boxShadow: actualMode === 'dark' ? '0 -4px 20px rgba(0,0,0,0.5)' : '0 -4px 20px rgba(0,0,0,0.08)',
-        pb: 'env(safe-area-inset-bottom)'
-      }}>
-        <MobileBottomNav />
-      </Box>
+      {!hideShellNavForRoute && (
+        <Box sx={{
+          position: 'fixed',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 1100,
+          bgcolor: actualMode === 'dark' ? 'rgba(18,18,18,0.95)' : 'rgba(255,255,255,0.95)',
+          backdropFilter: 'blur(12px)',
+          borderTop: actualMode === 'dark' ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.08)',
+          boxShadow: actualMode === 'dark' ? '0 -4px 20px rgba(0,0,0,0.5)' : '0 -4px 20px rgba(0,0,0,0.08)',
+          pb: 'env(safe-area-inset-bottom)'
+        }}>
+          <MobileBottomNav />
+        </Box>
+      )}
 
       {/* Launcher — fixed to right edge of the mobile frame (hidden on conversation pages) */}
       {!isConversationPage && <Launcher unread={2} />}
