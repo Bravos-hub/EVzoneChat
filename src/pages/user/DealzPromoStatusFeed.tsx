@@ -451,13 +451,13 @@ export default function DealzPromoStatusFeed({ onBack }) {
       <Box 
         className="w-full h-full flex flex-col"
         sx={{ 
-          bgcolor: actualMode === 'dark' ? '#121212' : EV.light,
+          bgcolor: 'transparent',
           minHeight: '100vh',
           width: '100%'
         }}
       >
         {/* Header - matching Settings style */}
-        <AppBar elevation={0} position="static" sx={{ bgcolor: 'background.paper', color: 'text.primary', borderBottom:`1px solid ${muiTheme.palette.divider}` }}>
+        <AppBar elevation={0} position="static" sx={{ bgcolor: 'transparent', color: 'text.primary', borderBottom:`1px solid ${muiTheme.palette.divider}` }}>
           <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
             <IconButton onClick={onBack} aria-label="Back" sx={{ color: 'text.primary', padding: { xs: '6px', sm: '8px' } }}>
               <ArrowBackRoundedIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
@@ -475,7 +475,7 @@ export default function DealzPromoStatusFeed({ onBack }) {
               pb: { xs: 10, sm: 12 }, 
               px: { xs: 1.5, sm: 2, md: 3 },
               pt: { xs: 2, sm: 3 },
-              bgcolor: actualMode === 'dark' ? '#121212' : EV.light,
+              bgcolor: 'transparent',
               width: '100%'
             }}
           >

@@ -1458,7 +1458,7 @@ export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel
         width: '100%',
         height: '100%',
         mx: 'auto',
-        bgcolor: 'background.paper',
+        bgcolor: 'transparent',
         display: 'flex',
         flexDirection: 'column',
         position: 'relative'
@@ -1469,7 +1469,7 @@ export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel
             elevation={0}
             position="fixed"
             sx={{
-              bgcolor: 'background.paper',
+              bgcolor: 'transparent',
               color: 'text.primary',
               borderBottom: `1px solid ${muiTheme.palette.divider}`,
               top: '3.5rem',
@@ -1514,7 +1514,7 @@ export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel
             elevation={0}
             position="fixed"
             sx={{
-              bgcolor: 'background.paper',
+              bgcolor: 'transparent',
               color: 'text.primary',
               borderBottom: `1px solid ${muiTheme.palette.divider}`,
               top: '3.5rem', // Below main shell header
@@ -1799,7 +1799,7 @@ export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel
             minHeight: 0,
             display: 'flex',
             flexDirection: 'column',
-            bgcolor: 'background.default'
+            bgcolor: 'transparent'
           }}
         >
           <div className="space-y-3" style={{ paddingTop: 8, paddingBottom: 8 }}>
@@ -1838,7 +1838,7 @@ export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel
         <Box
           sx={{
             borderTop: `1px solid ${muiTheme.palette.divider}`,
-            bgcolor: 'background.paper',
+            bgcolor: 'transparent',
             px: { xs: 1.5, sm: 2 },
             py: { xs: 1, sm: 1.5 },
             position: 'fixed',

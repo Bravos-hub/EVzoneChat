@@ -42,7 +42,7 @@ const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2
 const DEMO = [];
 
 const LIVE_DEMO = [
-  { id: 'ride_123', module: 'Rides', title: 'Kampala → Entebbe', subtitle: 'ETA 22 min', host: 'John Driver', startedAt: '7m', cta: 'Resume' },
+  { id: 'ride_123', module: 'Rides', title: 'Kampala â†’ Entebbe', subtitle: 'ETA 22 min', host: 'John Driver', startedAt: '7m', cta: 'Resume' },
   { id: 'lesson_45', module: 'School', title: 'Mathematics', subtitle: "Newton's Laws of Motion", host: 'Leslie Alexander', startedAt: '12m', cta: 'Join' },
   { id: 'tour_88', module: 'Travel', title: 'Evening Old Town Tour', subtitle: 'Live Q&A ongoing', host: 'Ada Guide', startedAt: '3m', cta: 'Join' },
 ];
@@ -236,7 +236,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
       <Box sx={{
         width: '100%',
         mx: 'auto',
-        bgcolor: 'background.default',
+        bgcolor: 'transparent',
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
@@ -274,7 +274,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
           elevation={0}
           sx={{
             flex: 1,
-            bgcolor: 'background.paper',
+            bgcolor: 'transparent',
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
@@ -282,154 +282,156 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
             zIndex: 0
           }}
         >
-          {/* Drawer Header */}
-          <Box sx={{ px: 2, pt: 2, pb: 1 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    fontSize: '18px',
-                    fontWeight: 700,
-                    color: 'text.primary'
-                  }}
-                >
-                  Messages
-                </Typography>
-                {totalUnread > 0 && (
-                  <Badge
-                    badgeContent={totalUnread}
+          {/* Drawer Header - Only show if there are actual items or user is searching */}
+          {(items.length > 0 || q.length > 0) && (
+            <Box sx={{ px: 2, pt: 2, pb: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography
+                    variant="h6"
                     sx={{
-                      '& .MuiBadge-badge': {
-                        backgroundColor: accentColor,
-                        color: '#fff',
-                        fontSize: '11px',
-                        minWidth: '20px',
-                        height: '20px',
-                        padding: '0 6px'
+                      fontSize: '18px',
+                      fontWeight: 700,
+                      color: 'text.primary'
+                    }}
+                  >
+                    Messages
+                  </Typography>
+                  {totalUnread > 0 && (
+                    <Badge
+                      badgeContent={totalUnread}
+                      sx={{
+                        '& .MuiBadge-badge': {
+                          backgroundColor: accentColor,
+                          color: '#fff',
+                          fontSize: '11px',
+                          minWidth: '20px',
+                          height: '20px',
+                          padding: '0 6px'
+                        }
+                      }}
+                    />
+                  )}
+                </Box>
+                <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                  <IconButton
+                    aria-label="Refresh"
+                    onClick={onRefresh}
+                    size="small"
+                    sx={{ color: 'text.secondary' }}
+                  >
+                    <RefreshRoundedIcon fontSize="small" />
+                  </IconButton>
+                  <IconButton
+                    aria-label="Search"
+                    onClick={() => {
+                      setShowSearch(!showSearch);
+                      if (!showSearch) {
+                        setTimeout(() => searchInputRef.current?.focus(), 100);
+                      } else {
+                        setQ('');
                       }
                     }}
-                  />
-                )}
+                    size="small"
+                    sx={{ color: showSearch ? accentColor : 'text.secondary' }}
+                  >
+                    <SearchRoundedIcon fontSize="small" />
+                  </IconButton>
+                </Box>
               </Box>
-              <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-                <IconButton
-                  aria-label="Refresh"
-                  onClick={onRefresh}
-                  size="small"
-                  sx={{ color: 'text.secondary' }}
-                >
-                  <RefreshRoundedIcon fontSize="small" />
-                </IconButton>
-                <IconButton
-                  aria-label="Search"
-                  onClick={() => {
-                    setShowSearch(!showSearch);
-                    if (!showSearch) {
-                      setTimeout(() => searchInputRef.current?.focus(), 100);
+
+              {/* Tabs: E-Commerce and Other - Inside Drawer */}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Tabs
+                  value={tab}
+                  onChange={(e, v) => {
+                    if (v === 1) {
+                      // When clicking "Other" tab, switch to it AND show module selection menu
+                      setTab(1);
+                      setModuleMenuEl(e.currentTarget);
                     } else {
-                      setQ('');
+                      setTab(v);
                     }
                   }}
-                  size="small"
-                  sx={{ color: showSearch ? accentColor : 'text.secondary' }}
-                >
-                  <SearchRoundedIcon fontSize="small" />
-                </IconButton>
-              </Box>
-            </Box>
-
-            {/* Tabs: E-Commerce and Other - Inside Drawer */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Tabs
-                value={tab}
-                onChange={(e, v) => {
-                  if (v === 1) {
-                    // When clicking "Other" tab, switch to it AND show module selection menu
-                    setTab(1);
-                    setModuleMenuEl(e.currentTarget);
-                  } else {
-                    setTab(v);
-                  }
-                }}
-                textColor="inherit"
-                TabIndicatorProps={{
-                  style: { background: accentColor }
-                }}
-                sx={{
-                  minHeight: 40,
-                  flex: 1,
-                  '& .MuiTab-root': {
-                    color: 'text.secondary',
-                    fontWeight: 500,
-                    textTransform: 'none',
-                    fontSize: '14px',
+                  textColor="inherit"
+                  TabIndicatorProps={{
+                    style: { background: accentColor }
+                  }}
+                  sx={{
                     minHeight: 40,
-                    px: 2,
-                    '&.Mui-selected': {
-                      color: accentColor,
-                      fontWeight: 600
+                    flex: 1,
+                    '& .MuiTab-root': {
+                      color: 'text.secondary',
+                      fontWeight: 500,
+                      textTransform: 'none',
+                      fontSize: '14px',
+                      minHeight: 40,
+                      px: 2,
+                      '&.Mui-selected': {
+                        color: accentColor,
+                        fontWeight: 600
+                      }
+                    }
+                  }}
+                >
+                  <Tab label={selectedModule} onClick={(e) => {
+                    if (tab === 0) {
+                      e.stopPropagation();
+                      setModuleMenuEl(e.currentTarget);
+                    }
+                  }} />
+                  <Tab label="Other" />
+                </Tabs>
+              </Box>
+
+              {/* Module Selection Menu */}
+              <Menu
+                anchorEl={moduleMenuEl}
+                open={Boolean(moduleMenuEl)}
+                onClose={() => setModuleMenuEl(null)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+                PaperProps={{
+                  sx: {
+                    width: '90vw',
+                    maxWidth: 'calc(100vw - 1rem)',
+                    borderRadius: 2,
+                    py: 0.5,
+                    bgcolor: 'transparent',
+                    '& .MuiMenuItem-root': {
+                      color: 'text.primary',
                     }
                   }
                 }}
               >
-                <Tab label={selectedModule} onClick={(e) => {
-                  if (tab === 0) {
-                    e.stopPropagation();
-                    setModuleMenuEl(e.currentTarget);
-                  }
-                }} />
-                <Tab label="Other" />
-              </Tabs>
-            </Box>
-
-            {/* Module Selection Menu */}
-            <Menu
-              anchorEl={moduleMenuEl}
-              open={Boolean(moduleMenuEl)}
-              onClose={() => setModuleMenuEl(null)}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-              PaperProps={{
-                sx: {
-                  width: '90vw',
-                  maxWidth: 'calc(100vw - 1rem)',
-                  borderRadius: 2,
-                  py: 0.5,
-                  bgcolor: 'background.paper',
-                  '& .MuiMenuItem-root': {
-                    color: 'text.primary',
-                  }
-                }
-              }}
-            >
-              {MODULES.filter(m => m !== selectedModule).map((module) => (
+                {MODULES.filter(m => m !== selectedModule).map((module) => (
+                  <MenuItem
+                    key={module}
+                    onClick={() => {
+                      // When selecting a new module from "Other" menu:
+                      // 1. The selected module becomes the new active tab
+                      // 2. Switch to tab 0 to show the selected module's conversations
+                      setSelectedModule(module);
+                      setTab(0); // Switch to the first tab (selected module tab)
+                      setModuleMenuEl(null);
+                    }}
+                  >
+                    {module}
+                  </MenuItem>
+                ))}
+                {/* Option to view "Other" tab (all conversations not matching selected module) */}
                 <MenuItem
-                  key={module}
                   onClick={() => {
-                    // When selecting a new module from "Other" menu:
-                    // 1. The selected module becomes the new active tab
-                    // 2. Switch to tab 0 to show the selected module's conversations
-                    setSelectedModule(module);
-                    setTab(0); // Switch to the first tab (selected module tab)
+                    // Switch to "Other" tab to show all conversations except selected module
+                    setTab(1);
                     setModuleMenuEl(null);
                   }}
                 >
-                  {module}
+                  View All Other Conversations
                 </MenuItem>
-              ))}
-              {/* Option to view "Other" tab (all conversations not matching selected module) */}
-              <MenuItem
-                onClick={() => {
-                  // Switch to "Other" tab to show all conversations except selected module
-                  setTab(1);
-                  setModuleMenuEl(null);
-                }}
-              >
-                View All Other Conversations
-              </MenuItem>
-            </Menu>
-          </Box>
+              </Menu>
+            </Box>
+          )}
 
           {/* Search - shown when search icon is clicked - Inside Drawer */}
           {showSearch && (
@@ -539,7 +541,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                                 fontWeight: 500
                               }}
                             >
-                              {c.name} typing…
+                              {c.name} typingâ€¦
                             </Typography>
                           ) : (() => {
                             // Check for draft message from the drafts map
@@ -596,7 +598,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                 </Box>
               )}
 
-              {filtered.length === 0 && q.trim().length === 0 && (
+              {items.length === 0 && q.trim().length === 0 && (
                 <Box
                   sx={{
                     display: 'flex',
@@ -604,8 +606,10 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                     alignItems: 'center',
                     justifyContent: 'center',
                     px: 4,
-                    py: 8,
-                    textAlign: 'center'
+                    py: { xs: 12, sm: 16 }, // Add plenty of padding specifically on top/bottom to center it in the remaining viewport
+                    textAlign: 'center',
+                    height: '100%',
+                    flex: 1
                   }}
                 >
                   <Box
@@ -616,7 +620,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                       animation: 'float 3s ease-in-out infinite'
                     }}
                   >
-                    🔥
+                    ðŸ”¥
                   </Box>
                   <style>{`
                   @keyframes float {

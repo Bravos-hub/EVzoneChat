@@ -297,7 +297,7 @@ export default function MeetingBooking({ onBack, onNavigate, location: routeLoca
         height: '100%', 
         display: 'flex', 
         flexDirection: 'column', 
-        bgcolor: 'background.default',
+        bgcolor: 'transparent',
         position: 'relative',
         overflowX: 'hidden',
         margin: 0,
@@ -308,7 +308,7 @@ export default function MeetingBooking({ onBack, onNavigate, location: routeLoca
           elevation={0} 
           position="static" 
           sx={{ 
-            bgcolor: 'background.paper', 
+            bgcolor: 'transparent', 
             color: 'text.primary', 
             borderBottom: `1px solid ${muiTheme.palette.divider}`
           }}
@@ -914,7 +914,7 @@ export default function MeetingBooking({ onBack, onNavigate, location: routeLoca
             py: { xs: 2, sm: 2.5, md: 3 },
             pb: { xs: `calc(2rem + env(safe-area-inset-bottom))`, sm: 2.5, md: 3 },
             borderTop: `1px solid ${muiTheme.palette.divider}`,
-            bgcolor: 'background.paper',
+            bgcolor: 'transparent',
             position: 'sticky',
             bottom: 0,
             zIndex: 100,

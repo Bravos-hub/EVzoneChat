@@ -84,10 +84,10 @@ export default function MyAvailabilityWorkingHours({ onBack, onNavigate }) {
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none`}</style>
 
-      <Box sx={{ width: '100%', height: '100%', bgcolor: 'background.default', overflowX: 'hidden', margin: 0, padding: 0 }}>
+      <Box sx={{ width: '100%', height: '100%', bgcolor: 'transparent', overflowX: 'hidden', margin: 0, padding: 0 }}>
         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
           {/* Header - matching Dealz Status style */}
-          <AppBar elevation={0} position="static" sx={{ bgcolor: 'background.paper', color: 'text.primary', borderBottom: `1px solid ${muiTheme.palette.divider}` }}>
+          <AppBar elevation={0} position="static" sx={{ bgcolor: 'transparent', color: 'text.primary', borderBottom: `1px solid ${muiTheme.palette.divider}` }}>
             <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
               <IconButton
                 onClick={onBack}
@@ -242,7 +242,7 @@ export default function MyAvailabilityWorkingHours({ onBack, onNavigate }) {
                 pt: { xs: 2, sm: 2.5, md: 3 },
                 pb: { xs: 2, sm: 2.5, md: 3 },
                 borderTop: `1px solid ${muiTheme.palette.divider}`,
-                bgcolor: 'background.paper',
+                bgcolor: 'transparent',
               }}
             >
               <Button

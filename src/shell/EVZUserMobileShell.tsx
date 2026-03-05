@@ -86,7 +86,8 @@ function useTabFromLocation() {
 function ShellFrame({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { actualMode, accent } = useTheme();
+  const { actualMode } = useTheme();
+  const muiTheme = useMuiTheme();
   const { activeCall, isInCall, endCall } = useCall();
   const [menuEl, setMenuEl] = useState(null);
   const openMenu = (e) => setMenuEl(e.currentTarget);
@@ -99,7 +100,7 @@ function ShellFrame({ children }) {
   // Check if we're on the call page
   const isOnCallPage = location.pathname.startsWith('/call') && activeCall;
 
-  const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
+  const shellBackground = muiTheme.palette.background.default;
 
   // Calculate call duration
   const [callDuration, setCallDuration] = useState(0);
@@ -134,16 +135,16 @@ function ShellFrame({ children }) {
       metaThemeColor.setAttribute('name', 'theme-color');
       document.head.appendChild(metaThemeColor);
     }
-    metaThemeColor.setAttribute('content', actualMode === 'dark' ? '#121212' : accentColor);
+    metaThemeColor.setAttribute('content', shellBackground);
 
     return () => {
       html.style.colorScheme = '';
     };
-  }, [actualMode, accentColor]);
+  }, [actualMode, shellBackground]);
 
   return (
     <Box sx={{
-      bgcolor: actualMode === 'dark' ? '#121212' : EV.light,
+      bgcolor: shellBackground,
       minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
@@ -160,7 +161,7 @@ function ShellFrame({ children }) {
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
-        bgcolor: actualMode === 'dark' ? '#121212' : 'transparent',
+        bgcolor: 'transparent',
         transition: 'background-color 0.3s ease'
       }}>
         {children}

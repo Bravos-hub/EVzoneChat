@@ -143,9 +143,9 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
     <>
       <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
 
-      <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.paper' }}>
+      <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'transparent' }}>
         {/* Header with centered title */}
-        <AppBar elevation={0} position="static" sx={{ bgcolor: 'background.paper', color: 'text.primary', borderBottom: `1px solid ${muiTheme.palette.divider}` }}>
+        <AppBar elevation={0} position="static" sx={{ bgcolor: 'transparent', color: 'text.primary', borderBottom: `1px solid ${muiTheme.palette.divider}` }}>
           <Toolbar className="!min-h-[56px]" sx={{ position: 'relative', px: { xs: 1.5, sm: 3 } }}>
             <IconButton 
               onClick={() => {
@@ -200,7 +200,7 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
 
         {/* To: field with chips and action button - only show in group mode or when sharing contact */}
         {(isGroupMode || sharingContact) && (
-          <Box sx={{ px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 3 }, pb: 2, borderBottom: `1px solid ${muiTheme.palette.divider}`, bgcolor: 'background.paper', position: 'sticky', top: 0, zIndex: 5 }}>
+          <Box sx={{ px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 3 }, pb: 2, borderBottom: `1px solid ${muiTheme.palette.divider}`, bgcolor: 'transparent', position: 'sticky', top: 0, zIndex: 5 }}>
             <Typography 
               variant="body2" 
               sx={{ 
