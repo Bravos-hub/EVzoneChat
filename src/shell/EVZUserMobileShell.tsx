@@ -72,7 +72,8 @@ function getComponent(registry, id, fallback) {
 ------------------------------------------------------------ */
 function useTabFromLocation() {
   const { pathname } = useLocation();
-  if (pathname.startsWith('/search')) return 'search';
+  if (pathname.startsWith('/search')) return 'search'; // Keep mapping just in case
+  if (pathname.startsWith('/meetings')) return 'events';
   if (pathname.startsWith('/call')) return 'call';
   if (pathname.startsWith('/dealz')) return 'dealz';
   if (pathname.startsWith('/settings')) return 'settings';
@@ -346,7 +347,7 @@ function MobileBottomNav() {
   return (
     <BottomNavigation
       value={value}
-      onChange={(_, v) => { const map = { inbox: '/inbox', call: '/call', dealz: '/dealz', search: '/search', settings: '/settings' }; if (map[v]) nav(map[v]); }}
+      onChange={(_, v) => { const map = { inbox: '/inbox', call: '/call', dealz: '/dealz', events: '/meetings', settings: '/settings' }; if (map[v]) nav(map[v]); }}
       showLabels
       sx={{
         height: '4.5rem',
@@ -381,7 +382,7 @@ function MobileBottomNav() {
       <BottomNavigationAction value="inbox" label="Inbox" icon={<ChatBubbleOutlineRoundedIcon />} />
       <BottomNavigationAction value="call" label="Calls" icon={<PhoneRoundedIcon />} />
       <BottomNavigationAction value="dealz" label="Dealz" icon={<ShoppingBagRoundedIcon />} />
-      <BottomNavigationAction value="search" label="Search" icon={<SearchRoundedIcon />} />
+      <BottomNavigationAction value="events" label="Events" icon={<EventAvailableRoundedIcon />} />
       <BottomNavigationAction value="settings" label="Settings" icon={<SettingsRoundedIcon />} />
     </BottomNavigation>
   );
