@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { useTheme as useMuiTheme } from "@mui/material/styles";
 import { useTheme } from "../../context/ThemeContext";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -15,10 +15,12 @@ import {
   ListItemAvatar,
   Avatar,
   ListItemText,
-  Button
+  Button,
+  MenuItem
 } from "@mui/material";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import GroupAddRoundedIcon from "@mui/icons-material/GroupAddRounded";
+import { CHAT_CHANNELS } from "../../constants/chatChannels";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
@@ -31,6 +33,27 @@ const PEOPLE = [
   { id: 'g2', name: 'Workspace Team A', role: 'Workspace • Channel', avatar: 'https://i.pravatar.cc/100?img=17' },
 ];
 
+const normalizeContactIds = (contactsParam) => {
+  if (!contactsParam) return [];
+
+  const rawContacts = contactsParam
+    .split(",")
+    .map((value) => decodeURIComponent(value).trim())
+    .filter(Boolean);
+
+  const mappedContacts = rawContacts.map((value) => {
+    const byId = PEOPLE.find((person) => person.id === value);
+    if (byId) return byId.id;
+
+    const byName = PEOPLE.find((person) => person.name.toLowerCase() === value.toLowerCase());
+    if (byName) return byName.id;
+
+    return value;
+  });
+
+  return [...new Set(mappedContacts)];
+};
+
 export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
   const muiTheme = useMuiTheme();
   const { accent } = useTheme();
@@ -40,6 +63,10 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
   const [selected, setSelected] = useState([]); // ids
   const [forwardingMessages, setForwardingMessages] = useState(null);
   const [isGroupMode, setIsGroupMode] = useState(false); // Track if we're creating a group
+  const [selectedChannel, setSelectedChannel] = useState("");
+  const [channelError, setChannelError] = useState(false);
+  const [prefilledContacts, setPrefilledContacts] = useState([]);
+  const autoStartFromPrefillRef = useRef(false);
   
   // Get theme accent color
   const accentColor = accent === 'orange' ? EV.orange : accent === 'green' ? EV.green : EV.grey;
@@ -62,6 +89,11 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
       return;
     }
 
+    if (!selectedChannel) {
+      setChannelError(true);
+      return;
+    }
+
     // If in group mode, toggle selection
     if (isGroupMode) {
       toggle(id);
@@ -70,7 +102,7 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
 
     // If NOT in group mode and NOT sharing contact, immediately start 1:1 chat
     if (!isGroupMode && !sharingContact) {
-      onStart?.([id]);
+      onStart?.([id], undefined, selectedChannel);
     }
   };
 
@@ -89,22 +121,44 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
     const forwardParam = params.get('forward');
     const shareContactParam = params.get('shareContact');
     const returnToParam = params.get('returnTo');
-    
-    if (forwardParam) {
-      setForwardingMessages(forwardParam.split(','));
-    }
-    if (shareContactParam === 'true') {
-      setSharingContact(true);
-    }
-    if (returnToParam) {
-      setReturnTo(decodeURIComponent(returnToParam));
-    }
+    const contactsParam = params.get("contacts");
+    const groupParam = params.get("group");
+    const normalizedContacts = normalizeContactIds(contactsParam);
+    const shouldUseGroupMode = groupParam === "true" || normalizedContacts.length > 1;
+
+    autoStartFromPrefillRef.current = false;
+    setForwardingMessages(forwardParam ? forwardParam.split(",") : null);
+    setSharingContact(shareContactParam === "true");
+    setReturnTo(returnToParam ? decodeURIComponent(returnToParam) : null);
+    setSelected(normalizedContacts);
+    setPrefilledContacts(normalizedContacts);
+    setIsGroupMode(shouldUseGroupMode);
   }, [location.search]);
 
+  useEffect(() => {
+    if (sharingContact || !selectedChannel || prefilledContacts.length === 0 || autoStartFromPrefillRef.current) {
+      return;
+    }
+
+    autoStartFromPrefillRef.current = true;
+    if (forwardingMessages && forwardingMessages.length > 0) {
+      onStart?.(prefilledContacts, forwardingMessages, selectedChannel);
+      return;
+    }
+
+    onStart?.(prefilledContacts, undefined, selectedChannel);
+  }, [sharingContact, selectedChannel, prefilledContacts, forwardingMessages, onStart]);
+
   const chips = selected.map(id => PEOPLE.find(p => p.id === id)).filter(Boolean);
+  const contactsEnabled = sharingContact || Boolean(selectedChannel);
 
   const handleStart = () => {
     if (selected.length === 0) return;
+
+    if (!sharingContact && !selectedChannel) {
+      setChannelError(true);
+      return;
+    }
     
     // If sharing contact, create contact message and return to conversation
     if (sharingContact && returnTo) {
@@ -126,10 +180,10 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
     }
     
     // If forwarding messages, pass them along
-    if (forwardingMessages) {
-      onStart?.(selected, forwardingMessages);
+    if (forwardingMessages && forwardingMessages.length > 0) {
+      onStart?.(selected, forwardingMessages, selectedChannel);
     } else {
-      onStart?.(selected);
+      onStart?.(selected, undefined, selectedChannel);
     }
     
     // Reset group mode after starting chat
@@ -151,6 +205,8 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
               onClick={() => {
                 setIsGroupMode(false);
                 setSelected([]);
+                setSelectedChannel("");
+                setChannelError(false);
                 onClose?.();
               }} 
               aria-label="Close"
@@ -197,6 +253,54 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
             )}
           </Toolbar>
         </AppBar>
+
+        {!sharingContact && (
+          <Box sx={{ px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 3 }, pb: 2, borderBottom: `1px solid ${muiTheme.palette.divider}`, bgcolor: 'transparent' }}>
+            <TextField
+              select
+              fullWidth
+              size="small"
+              required
+              value={selectedChannel}
+              label="Channel"
+              onChange={(e) => {
+                setSelectedChannel(e.target.value);
+                setChannelError(false);
+              }}
+              error={channelError}
+              helperText={channelError ? "Select a channel before starting a chat." : "Choose the channel for this chat."}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  bgcolor: 'background.default',
+                  '& fieldset': {
+                    borderColor: muiTheme.palette.divider,
+                  },
+                  '&:hover fieldset': {
+                    borderColor: accentColor,
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: accentColor,
+                    borderWidth: '2px',
+                  },
+                },
+                '& .MuiInputBase-input': {
+                  color: 'text.primary',
+                  py: { xs: 1.25, sm: 1.5 },
+                  fontSize: { xs: '14px', sm: '15px' },
+                },
+                '& .MuiFormHelperText-root': {
+                  mx: 0,
+                }
+              }}
+            >
+              {CHAT_CHANNELS.map((module) => (
+                <MenuItem key={module} value={module}>
+                  {module}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Box>
+        )}
 
         {/* To: field with chips and action button - only show in group mode or when sharing contact */}
         {(isGroupMode || sharingContact) && (
@@ -295,7 +399,7 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
         )}
         
         {/* Search field - always visible */}
-        <Box sx={{ px: { xs: 2, sm: 3 }, pt: isGroupMode || sharingContact ? { xs: 1.5, sm: 2 } : { xs: 2, sm: 3 }, pb: 2 }}>
+        <Box sx={{ px: { xs: 2, sm: 3 }, pt: { xs: 1.5, sm: 2 }, pb: 2 }}>
           <TextField
             fullWidth
             size="small"
@@ -330,7 +434,7 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
         </Box>
 
         {/* Select Participant section */}
-        <Box sx={{ px: { xs: 2, sm: 3 }, pb: 1, pt: isGroupMode || sharingContact ? { xs: 1.5, sm: 2 } : { xs: 2, sm: 3 } }}>
+        <Box sx={{ px: { xs: 2, sm: 3 }, pb: 1, pt: { xs: 1.5, sm: 2 } }}>
           <Typography
             variant="body2"
             sx={{
@@ -344,6 +448,14 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
           >
             {isGroupMode ? 'Select Participants' : 'Select Participant'}
           </Typography>
+          {!contactsEnabled && (
+            <Typography
+              variant="caption"
+              sx={{ color: 'text.secondary', display: 'block', mt: 0.75 }}
+            >
+              Select a channel first to enable participant selection.
+            </Typography>
+          )}
         </Box>
 
         {/* Contact list - simplified, no checkboxes, no role text */}
@@ -363,6 +475,7 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
                 <ListItem
                   key={p.id}
                   button
+                  disabled={!contactsEnabled}
                   onClick={() => handleContactClick(p.id)}
                   sx={{
                     py: 1.5,
@@ -378,6 +491,7 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
                           : `rgba(${accent === 'orange' ? '247, 127, 0' : accent === 'green' ? '3, 205, 140' : '166, 166, 166'}, 0.12)`)
                         : (muiTheme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)'),
                     },
+                    opacity: contactsEnabled ? 1 : 0.6,
                   }}
                 >
                   <ListItemAvatar>
@@ -390,7 +504,7 @@ export default function NewMessagePicker({ onClose, onStart, onNavigate }) {
                         sx={{
                           fontWeight: 600,
                           fontSize: { xs: '14px', sm: '15px' },
-                          color: isSelected ? accentColor : 'text.primary',
+                          color: isSelected ? accentColor : (contactsEnabled ? 'text.primary' : 'text.secondary'),
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           whiteSpace: 'nowrap',

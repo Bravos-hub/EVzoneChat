@@ -42,6 +42,7 @@ import SecurityRoundedIcon from "@mui/icons-material/SecurityRounded";
 import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import EventAvailableRoundedIcon from "@mui/icons-material/EventAvailableRounded";
+import { isValidChatChannel } from "../constants/chatChannels";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
@@ -413,6 +414,23 @@ function RouteWrapper({ Component, registry, ...props }: { Component?: React.Com
   const navigate = useNavigate();
   const location = useLocation();
   const { endCall } = useCall();
+  const isConversationNewRoute = location.pathname === "/conversation/new";
+  const routeParams = new URLSearchParams(location.search);
+  const routeModule = routeParams.get("module");
+
+  if (isConversationNewRoute && !isValidChatChannel(routeModule || "")) {
+    const redirectParams = new URLSearchParams();
+    const contacts = routeParams.get("contacts");
+    const group = routeParams.get("group");
+    const forward = routeParams.get("forward");
+
+    if (contacts) redirectParams.set("contacts", contacts);
+    if (group) redirectParams.set("group", group);
+    if (forward) redirectParams.set("forward", forward);
+
+    const redirectSearch = redirectParams.toString();
+    return <Navigate to={`/new-message${redirectSearch ? `?${redirectSearch}` : ""}`} replace />;
+  }
 
   // Provide comprehensive navigation props to components that need them
   const navProps: any = {
@@ -452,16 +470,26 @@ function RouteWrapper({ Component, registry, ...props }: { Component?: React.Com
       // Handle module filter change
       console.log('Module changed to:', module);
     },
-    onStart: (selected, forwardMessages) => {
+    onStart: (selected, forwardMessages, module) => {
       // Start new conversation with selected contacts
       if (selected && selected.length > 0) {
-        const forwardParam = forwardMessages ? `&forward=${forwardMessages.join(',')}` : '';
+        const params = new URLSearchParams();
+        params.set("contacts", selected.join(","));
+
         // If multiple contacts, automatically open as group chat
         if (selected.length > 1) {
-          navigate(`/conversation/new?contacts=${selected.join(',')}&group=true${forwardParam}`);
-        } else {
-          navigate(`/conversation/new?contacts=${selected.join(',')}${forwardParam}`);
+          params.set("group", "true");
         }
+
+        if (forwardMessages && forwardMessages.length > 0) {
+          params.set("forward", forwardMessages.join(","));
+        }
+
+        if (module) {
+          params.set("module", module);
+        }
+
+        navigate(`/conversation/new?${params.toString()}`);
       }
     },
     onOpenResult: (result) => {

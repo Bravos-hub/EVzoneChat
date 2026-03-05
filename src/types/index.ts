@@ -58,10 +58,9 @@ export interface NavigationProps {
   onRefresh?: () => void;
   onLiveOpen?: (live: LiveSession) => void;
   onModuleChange?: (module: string) => void;
-  onStart?: (selected: string[], forwardMessages?: string[]) => void;
+  onStart?: (selected: string[], forwardMessages?: string[], module?: string) => void;
   onOpenResult?: (result: SearchResult) => void;
   registry?: ComponentRegistry;
 }
 
 export type ComponentRegistry = Record<string, React.ComponentType<any>>;
-

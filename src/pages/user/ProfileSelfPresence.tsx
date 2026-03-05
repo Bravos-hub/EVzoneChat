@@ -183,7 +183,7 @@ export default function ProfileSelfPresence({ onBack, initial, location, onNavig
                   <Button
                     variant="outlined"
                     startIcon={<ChatBubbleOutlineRoundedIcon />}
-                    onClick={() => onNavigate?.(`/conversation/new?contacts=${encodeURIComponent(contactName)}`)}
+                    onClick={() => onNavigate?.(`/new-message?contacts=${encodeURIComponent(contactName)}`)}
                     sx={{ textTransform: 'none', fontSize: { xs: '12px', sm: '13px' }, py: { xs: 0.75, sm: 1 } }}
                   >
                     Chat

@@ -35,6 +35,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import PromoRingAvatar from "../../components/PromoRingAvatar";
 import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
 import PlayCircleFilledWhiteRoundedIcon from "@mui/icons-material/PlayCircleFilledWhiteRounded";
+import { CHAT_CHANNELS } from "../../constants/chatChannels";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
@@ -194,9 +195,6 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
   const totalUnread = useMemo(() => {
     return items.reduce((sum, item) => sum + (item.unread || 0), 0);
   }, [items]);
-
-  // Available modules
-  const MODULES = ['E-Commerce', 'EV Charging', 'Rides & Logistics', 'School & E-Learning', 'Medical & Health Care', 'Travel & Tourism', 'Green Investments', 'Faith Hub', 'Social Networking', 'Virtual Workspace', 'Wallet & Payments', 'AI Chatbot'];
 
   // Get drafts for all conversations - reactive to draftRefresh and location changes
   const drafts = useMemo(() => {
@@ -404,7 +402,7 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
                   }
                 }}
               >
-                {MODULES.filter(m => m !== selectedModule).map((module) => (
+                {CHAT_CHANNELS.filter(m => m !== selectedModule).map((module) => (
                   <MenuItem
                     key={module}
                     onClick={() => {
