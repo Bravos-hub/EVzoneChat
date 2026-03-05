@@ -52,6 +52,7 @@ export interface NavigationProps {
   onClose?: () => void;
   onNavigate?: (path: string) => void;
   onEnd?: () => void;
+  layoutMode?: 'mobile' | 'desktop';
   location?: Location;
   onOpen?: (item: ConversationItem) => void;
   onNew?: () => void;

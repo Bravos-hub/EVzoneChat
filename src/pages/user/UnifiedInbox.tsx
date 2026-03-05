@@ -132,14 +132,16 @@ import AddRoundedIcon from "@mui/icons-material/AddRounded";
  * 2. Live Ongoing Section (Dark Grey): Shows active session card
  * 3. Message Drawer (White Rounded Panel): Contains Messages title, icons, tabs, and chat list
  */
-export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, onRefresh, onNew, onLiveOpen, onModuleChange, onBack }) {
+export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, onRefresh, onNew, onLiveOpen, onModuleChange, onBack, layoutMode = 'mobile' }) {
   const { accent, isDark } = useTheme();
   const muiTheme = useMuiTheme();
   const navigate = useNavigate();
   const location = useLocation();
+  const isDesktopLayout = layoutMode === 'desktop';
   const [q, setQ] = useState("");
   const [tab, setTab] = useState(0); // 0 = E-Commerce, 1 = Other
   const [selectedModule, setSelectedModule] = useState('E-Commerce');
+  const [desktopFilter, setDesktopFilter] = useState("all");
   const [moduleMenuEl, setModuleMenuEl] = useState(null);
   const [showSearch, setShowSearch] = useState(false);
   const searchInputRef = useRef(null);
@@ -224,6 +226,208 @@ export default function UnifiedInbox({ items = DEMO, lives = LIVE_DEMO, onOpen, 
       return matchQ && matchTab;
     });
   }, [q, items, tab, selectedModule]);
+
+  const selectedConversationId = useMemo(() => {
+    const pathParts = location.pathname.split("/");
+    if (pathParts[1] !== "conversation") return null;
+    const id = pathParts[2];
+    if (!id || id === "new") return null;
+    return decodeURIComponent(id);
+  }, [location.pathname]);
+
+  const desktopFiltered = useMemo(() => {
+    if (desktopFilter === "unread") {
+      return filtered.filter((conversation) => conversation.unread > 0);
+    }
+    if (desktopFilter === "favorites") {
+      return filtered.filter((conversation) => (conversation.promos?.length || 0) > 0);
+    }
+    return filtered;
+  }, [filtered, desktopFilter]);
+
+  if (isDesktopLayout) {
+    return (
+      <>
+        <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
+        <Box
+          sx={{
+            width: "100%",
+            height: "100%",
+            bgcolor: muiTheme.palette.mode === "dark" ? "#0f1419" : "#ffffff",
+            color: "text.primary",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <Box
+            sx={{
+              px: 2.25,
+              pt: 2,
+              pb: 1.5,
+              borderBottom: `1px solid ${muiTheme.palette.divider}`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Typography sx={{ fontSize: "32px", fontWeight: 600, lineHeight: 1 }}>Chats</Typography>
+            <Box sx={{ display: "flex", gap: 0.5 }}>
+              <IconButton onClick={onNew} aria-label="New chat" sx={{ color: "text.secondary" }}>
+                <AddRoundedIcon />
+              </IconButton>
+              <IconButton onClick={onRefresh} aria-label="Refresh" sx={{ color: "text.secondary" }}>
+                <RefreshRoundedIcon />
+              </IconButton>
+            </Box>
+          </Box>
+
+          <Box sx={{ px: 2, pt: 1.5, pb: 1 }}>
+            <TextField
+              fullWidth
+              size="small"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Search or start a new chat"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  bgcolor: muiTheme.palette.mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(17,27,33,0.07)",
+                  borderRadius: 5,
+                  "& fieldset": { borderColor: "transparent" },
+                  "&:hover fieldset": { borderColor: "transparent" },
+                  "&.Mui-focused fieldset": { borderColor: `${accentColor}80`, borderWidth: "1px" },
+                },
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchRoundedIcon sx={{ color: "text.secondary", fontSize: 20 }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Box>
+
+          <Box sx={{ px: 2, pb: 1, display: "flex", gap: 1, borderBottom: `1px solid ${muiTheme.palette.divider}` }}>
+            {[
+              { key: "all", label: "All" },
+              { key: "unread", label: "Unread" },
+              { key: "favorites", label: "Favorites" },
+            ].map((chip) => {
+              const selected = desktopFilter === chip.key;
+              return (
+                <Chip
+                  key={chip.key}
+                  label={chip.label}
+                  onClick={() => setDesktopFilter(chip.key)}
+                  sx={{
+                    height: 30,
+                    borderRadius: 16,
+                    color: selected ? "#ffffff" : "text.secondary",
+                    bgcolor: selected ? accentColor : "transparent",
+                    border: `1px solid ${selected ? accentColor : muiTheme.palette.divider}`,
+                    fontWeight: selected ? 600 : 500,
+                  }}
+                />
+              );
+            })}
+          </Box>
+
+          <Box className="flex-1 no-scrollbar" sx={{ overflowY: "auto", minHeight: 0 }}>
+            <List sx={{ py: 0 }}>
+              {desktopFiltered.map((conversation) => {
+                const draftText = drafts[conversation.id];
+                const isSelected = conversation.id === selectedConversationId;
+                return (
+                  <ListItem
+                    key={conversation.id}
+                    button
+                    onClick={() => onOpen?.(conversation)}
+                    sx={{
+                      px: 1.5,
+                      py: 0.75,
+                      borderBottom: `1px solid ${muiTheme.palette.divider}66`,
+                      bgcolor: isSelected
+                        ? (muiTheme.palette.mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.04)")
+                        : "transparent",
+                    }}
+                  >
+                    <ListItemAvatar>
+                      <Badge
+                        invisible={!conversation.unread}
+                        badgeContent={conversation.unread}
+                        overlap="circular"
+                        sx={{
+                          "& .MuiBadge-badge": {
+                            bgcolor: accentColor,
+                            color: "#fff",
+                            fontSize: "10px",
+                            minWidth: "18px",
+                            height: "18px",
+                          },
+                        }}
+                      >
+                        <Avatar src={conversation.avatar} sx={{ width: 48, height: 48 }} />
+                      </Badge>
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={
+                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
+                          <Typography
+                            variant="body1"
+                            sx={{
+                              color: "text.primary",
+                              fontSize: "17px",
+                              fontWeight: isSelected ? 700 : 500,
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {conversation.name}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: conversation.unread ? accentColor : "text.secondary",
+                              fontSize: "12px",
+                              fontWeight: conversation.unread ? 600 : 500,
+                              flexShrink: 0,
+                            }}
+                          >
+                            {conversation.time}
+                          </Typography>
+                        </Box>
+                      }
+                      secondary={
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: conversation.unread ? "text.primary" : "text.secondary",
+                            fontSize: "13px",
+                            fontWeight: conversation.unread ? 500 : 400,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {draftText ? `Draft: ${draftText}` : conversation.last}
+                        </Typography>
+                      }
+                    />
+                  </ListItem>
+                );
+              })}
+              {desktopFiltered.length === 0 && (
+                <Box sx={{ px: 2.5, py: 6, color: "text.secondary", textAlign: "center" }}>
+                  No conversations found.
+                </Box>
+              )}
+            </List>
+          </Box>
+        </Box>
+      </>
+    );
+  }
 
 
   return (

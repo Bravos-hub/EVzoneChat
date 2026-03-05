@@ -425,7 +425,7 @@ function Bubble({ msg, onQuote, onAction, scrollTo, onSelect, isSelected, isSele
   );
 }
 
-export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel = 'E-Commerce', onNavigate, location }) {
+export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel = 'E-Commerce', onNavigate, location, layoutMode = 'mobile' }) {
   const muiTheme = useMuiTheme();
   const { isDark, accent } = useTheme();
   const { encryptMessage, decryptMessage, rekeySession, isInitialized: encryptionReady } = useEncryption();
@@ -481,10 +481,11 @@ export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel
     return 'default';
   }, [location]);
   const isConversationNewRoute = location?.pathname === '/conversation/new';
-  const fixedHeaderTop = isConversationNewRoute ? 0 : '3.5rem';
-  const messagesTopPadding = isConversationNewRoute ? '3.5rem' : '7rem';
-  const messagesBottomPadding = isConversationNewRoute ? '5.75rem' : '11.25rem';
-  const composerBottom = isConversationNewRoute ? 'env(safe-area-inset-bottom)' : '5.5rem';
+  const isDesktopLayout = layoutMode === 'desktop';
+  const fixedHeaderTop = isDesktopLayout ? 0 : (isConversationNewRoute ? 0 : '3.5rem');
+  const messagesTopPadding = isDesktopLayout ? '0.75rem' : (isConversationNewRoute ? '3.5rem' : '7rem');
+  const messagesBottomPadding = isDesktopLayout ? '0.75rem' : (isConversationNewRoute ? '5.75rem' : '11.25rem');
+  const composerBottom = isDesktopLayout ? 0 : (isConversationNewRoute ? 'env(safe-area-inset-bottom)' : '5.5rem');
 
   // Load draft from localStorage on mount
   const [draft, setDraft] = useState(() => {
@@ -1472,7 +1473,7 @@ export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel
         {selectedMessages.size > 0 && (
           <AppBar
             elevation={0}
-            position="fixed"
+            position={isDesktopLayout ? "static" : "fixed"}
             sx={{
               bgcolor: 'transparent',
               color: 'text.primary',
@@ -1517,7 +1518,7 @@ export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel
         {selectedMessages.size === 0 && (
           <AppBar
             elevation={0}
-            position="fixed"
+            position={isDesktopLayout ? "static" : "fixed"}
             sx={{
               bgcolor: 'transparent',
               color: 'text.primary',
@@ -1795,7 +1796,7 @@ export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel
         {/* Messages - with proper spacing from top header and bottom composer + bottom nav */}
         <Box
           ref={listRef}
-          className="flex-1 no-scrollbar"
+          className={`flex-1 no-scrollbar ${isDesktopLayout ? 'desktop-chat-canvas' : ''}`}
           sx={{
             overflowY: 'auto',
             pt: messagesTopPadding,
@@ -1846,14 +1847,14 @@ export default function ConversationWAHeader({ onBack, kind = '1:1', moduleLabel
             bgcolor: 'transparent',
             px: { xs: 1.5, sm: 2 },
             py: { xs: 1, sm: 1.5 },
-            position: 'fixed',
-            bottom: composerBottom,
-            left: 0,
-            right: 0,
+            position: isDesktopLayout ? 'static' : 'fixed',
+            bottom: isDesktopLayout ? 'auto' : composerBottom,
+            left: isDesktopLayout ? 'auto' : 0,
+            right: isDesktopLayout ? 'auto' : 0,
             width: '100%',
             mx: 'auto',
-            zIndex: 1200,
-            boxShadow: isDark ? '0 -2px 8px rgba(0,0,0,0.3)' : '0 -2px 8px rgba(0,0,0,0.04)'
+            zIndex: isDesktopLayout ? 1 : 1200,
+            boxShadow: isDesktopLayout ? 'none' : (isDark ? '0 -2px 8px rgba(0,0,0,0.3)' : '0 -2px 8px rgba(0,0,0,0.04)')
           }}
         >
           {replyTo && (

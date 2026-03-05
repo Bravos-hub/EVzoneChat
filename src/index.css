@@ -14,6 +14,87 @@ html, body, #root {
   transition: background-color 0.3s ease;
 }
 
+:root {
+  --desktop-rail-w: 72px;
+  --desktop-list-w: 380px;
+  --desktop-pane-border: rgba(255, 255, 255, 0.08);
+}
+
+.desktop-shell {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: stretch;
+}
+
+.desktop-rail {
+  width: var(--desktop-rail-w);
+  min-width: var(--desktop-rail-w);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 10px;
+  background: rgba(17, 27, 33, 0.96);
+  backdrop-filter: blur(8px);
+}
+
+.desktop-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 100vh;
+  display: flex;
+}
+
+.desktop-chat-workspace {
+  flex: 1;
+  min-width: 0;
+  min-height: 100vh;
+  display: flex;
+}
+
+.desktop-chat-list-pane {
+  width: var(--desktop-list-w);
+  min-width: var(--desktop-list-w);
+  max-width: var(--desktop-list-w);
+  min-height: 100vh;
+  border-right: 1px solid var(--desktop-pane-border);
+}
+
+.desktop-chat-right-pane {
+  flex: 1;
+  min-width: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.desktop-chat-placeholder {
+  flex: 1;
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 22% 24%, rgba(3, 205, 140, 0.09), transparent 36%),
+    radial-gradient(circle at 78% 75%, rgba(3, 205, 140, 0.07), transparent 42%);
+}
+
+.desktop-chat-placeholder-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.desktop-chat-canvas {
+  background-color: rgba(17, 27, 33, 0.45);
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
+  background-size: 22px 22px;
+}
+
 /* Light mode default */
 body {
   background: #f2f2f2;
