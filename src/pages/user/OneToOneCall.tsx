@@ -9,8 +9,6 @@ import {
   TextField, InputAdornment
 } from "@mui/material";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
-import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
-import ExpandLessRoundedIcon from "@mui/icons-material/ExpandLessRounded";
 import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
 import MicNoneRoundedIcon from "@mui/icons-material/MicNoneRounded";
 import MicOffRoundedIcon from "@mui/icons-material/MicOffRounded";
@@ -29,10 +27,16 @@ import PeopleAltRoundedIcon from "@mui/icons-material/PeopleAltRounded";
 import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
 import VideoCallRoundedIcon from "@mui/icons-material/VideoCallRounded";
 import EventAvailableRoundedIcon from "@mui/icons-material/EventAvailableRounded";
-import LinkRoundedIcon from "@mui/icons-material/LinkRounded";
 import DialpadRoundedIcon from "@mui/icons-material/DialpadRounded";
 import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
+import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
+import AddRoundedIcon from "@mui/icons-material/AddRounded";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import CallMadeRoundedIcon from "@mui/icons-material/CallMadeRounded";
+import CallReceivedRoundedIcon from "@mui/icons-material/CallReceivedRounded";
+import CallMissedRoundedIcon from "@mui/icons-material/CallMissedRounded";
 
 const EV = { green: "#03cd8c", orange: "#f77f00", grey: "#a6a6a6", light: "#f2f2f2" };
 
@@ -108,12 +112,12 @@ export default function OneToOneCall({
 
   // Calls list data
   const CALLS = [
-    { id: 'c1', name: 'Leslie Alexander', avatar: 'https://i.pravatar.cc/100?img=5', type: 'video', time: '2:30 PM', duration: '14:22', status: 'completed', missed: false, module: 'E-Commerce' },
-    { id: 'c2', name: 'Etty Duke', avatar: 'https://i.pravatar.cc/100?img=1', type: 'voice', time: 'Yesterday', duration: '5:10', status: 'completed', missed: false, module: 'Rides & Logistics' },
-    { id: 'c3', name: 'Dr. Cohen', avatar: 'https://i.pravatar.cc/100?img=12', type: 'video', time: 'Mon', duration: '—', status: 'missed', missed: true, module: 'Medical & Health Care' },
-    { id: 'c4', name: 'EVzone Support', avatar: 'https://i.pravatar.cc/100?img=8', type: 'voice', time: 'Last week', duration: '8:45', status: 'completed', missed: false, module: 'EV Charging' },
-    { id: 'c5', name: 'Team Meeting', avatar: 'https://i.pravatar.cc/100?img=15', type: 'conference', time: 'Today', duration: '32:15', status: 'completed', missed: false, module: 'Virtual Workspace' },
-    { id: 'c6', name: 'Project Review', avatar: 'https://i.pravatar.cc/100?img=16', type: 'meeting', time: 'Today', duration: '45:30', status: 'completed', missed: false, module: 'Virtual Workspace' },
+    { id: 'c1', name: 'Leslie Alexander', avatar: 'https://i.pravatar.cc/100?img=5', type: 'video', time: '2:30 PM', duration: '14:22', status: 'completed', missed: false, direction: 'outgoing', module: 'E-Commerce' },
+    { id: 'c2', name: 'Etty Duke', avatar: 'https://i.pravatar.cc/100?img=1', type: 'voice', time: 'Yesterday', duration: '5:10', status: 'completed', missed: false, direction: 'incoming', module: 'Rides & Logistics' },
+    { id: 'c3', name: 'Dr. Cohen', avatar: 'https://i.pravatar.cc/100?img=12', type: 'video', time: 'Mon', duration: '—', status: 'missed', missed: true, direction: 'missed', module: 'Medical & Health Care' },
+    { id: 'c4', name: 'EVzone Support', avatar: 'https://i.pravatar.cc/100?img=8', type: 'voice', time: 'Last week', duration: '8:45', status: 'completed', missed: false, direction: 'outgoing', module: 'EV Charging' },
+    { id: 'c5', name: 'Team Meeting', avatar: 'https://i.pravatar.cc/100?img=15', type: 'conference', time: 'Today', duration: '32:15', status: 'completed', missed: false, direction: 'incoming', module: 'Virtual Workspace' },
+    { id: 'c6', name: 'Project Review', avatar: 'https://i.pravatar.cc/100?img=16', type: 'meeting', time: 'Today', duration: '45:30', status: 'completed', missed: false, direction: 'outgoing', module: 'Virtual Workspace' },
   ];
 
   // All hooks must be called before any conditional returns
@@ -129,7 +133,6 @@ export default function OneToOneCall({
   const [sharing, setSharing] = useState(flags.share);
   const [captions, setCaptions] = useState(flags.captions);
   const [menuEl, setMenuEl] = useState(null);
-  const [showMoreButtons, setShowMoreButtons] = useState(false);
   const [callSearch, setCallSearch] = useState("");
 
   // Call state management - auto-transition through dialing states
@@ -288,19 +291,21 @@ export default function OneToOneCall({
 
   if (showCallList && isDesktopLayout) {
     const desktopActions = [
-      { icon: <VideocamRoundedIcon sx={{ fontSize: 28 }} />, label: "Start call", onClick: () => onNavigate?.("/call?type=video&state=dialing") },
-      { icon: <LinkRoundedIcon sx={{ fontSize: 28 }} />, label: "New call link", onClick: () => onNavigate?.("/group-call?type=conference") },
-      { icon: <DialpadRoundedIcon sx={{ fontSize: 28 }} />, label: "Call a number", onClick: () => onNavigate?.("/call?type=voice&state=dialing") },
-      { icon: <CalendarMonthRoundedIcon sx={{ fontSize: 28 }} />, label: "Schedule call", onClick: () => onNavigate?.("/meetings/book") },
+      { icon: <CallRoundedIcon sx={{ fontSize: 34 }} />, label: "Call", onClick: () => onNavigate?.("/call?type=video&state=dialing") },
+      { icon: <CalendarMonthRoundedIcon sx={{ fontSize: 34 }} />, label: "Schedule", onClick: () => onNavigate?.("/meetings/book") },
+      { icon: <DialpadRoundedIcon sx={{ fontSize: 34 }} />, label: "Keypad", onClick: () => onNavigate?.("/call?type=voice&state=dialing") },
+      { icon: <FavoriteBorderRoundedIcon sx={{ fontSize: 34 }} />, label: "Favorites", onClick: () => onNavigate?.("/group-call?type=conference") },
     ];
+    const actionCircleBg = muiTheme.palette.mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(17,27,33,0.08)";
+    const actionCircleHover = muiTheme.palette.mode === "dark" ? "rgba(255,255,255,0.1)" : "rgba(17,27,33,0.14)";
 
     return (
       <>
-        <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none`}</style>
+        <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
         <Box className="desktop-calls-layout" sx={{ bgcolor: 'transparent' }}>
           <Box className="desktop-calls-list-pane" sx={{ borderRight: `1px solid ${muiTheme.palette.divider}` }}>
             <Box sx={{ px: 2.5, pt: 2.5, pb: 1.5 }}>
-              <Typography sx={{ fontSize: "36px", fontWeight: 600, color: "text.primary", lineHeight: 1 }}>Calls</Typography>
+              <Typography sx={{ fontSize: { xs: "2.25rem", md: "2.5rem" }, fontWeight: 600, color: "text.primary", lineHeight: 1 }}>Calls</Typography>
             </Box>
             <Box sx={{ px: 2, pb: 1.5 }}>
               <TextField
@@ -311,12 +316,14 @@ export default function OneToOneCall({
                 placeholder="Search name or number"
                 sx={{
                   '& .MuiOutlinedInput-root': {
-                    borderRadius: 6,
+                    borderRadius: 999,
+                    minHeight: 44,
                     bgcolor: muiTheme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(17,27,33,0.07)',
                     '& fieldset': { borderColor: 'transparent' },
                     '&:hover fieldset': { borderColor: 'transparent' },
                     '&.Mui-focused fieldset': { borderColor: `${accentColor}80`, borderWidth: '1px' }
-                  }
+                  },
+                  '& input': { fontSize: "0.95rem" }
                 }}
                 InputProps={{
                   startAdornment: (
@@ -328,7 +335,7 @@ export default function OneToOneCall({
               />
             </Box>
             <Box sx={{ px: 2.5, pb: 1 }}>
-              <Typography sx={{ fontSize: '28px', fontWeight: 600, color: 'text.primary', lineHeight: 1.1 }}>Recent</Typography>
+              <Typography sx={{ fontSize: { xs: '1.5rem', md: '1.75rem' }, fontWeight: 600, color: 'text.primary', lineHeight: 1.1 }}>Recent</Typography>
             </Box>
             <Box className="desktop-pane-scroll no-scrollbar" sx={{ overflowY: 'auto' }}>
               <List sx={{ py: 0 }}>
@@ -341,10 +348,14 @@ export default function OneToOneCall({
                         const callType = call.type === 'conference' || call.type === 'meeting' ? 'video' : call.type;
                         onNavigate?.(`/call?type=${callType}&contact=${encodeURIComponent(call.name)}&state=connecting${moduleParam}`);
                       }}
-                      sx={{ px: 2, py: 1.25 }}
+                      sx={{
+                        px: 2.25,
+                        py: 1.3,
+                        '&:hover': { bgcolor: muiTheme.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(17,27,33,0.04)' }
+                      }}
                     >
                       <ListItemAvatar>
-                        <Avatar src={call.avatar} sx={{ width: 48, height: 48 }} />
+                        <Avatar src={call.avatar} sx={{ width: 50, height: 50 }} />
                       </ListItemAvatar>
                       <ListItemTextComp
                         primary={
@@ -352,7 +363,7 @@ export default function OneToOneCall({
                             <Typography
                               sx={{
                                 color: 'text.primary',
-                                fontSize: '19px',
+                                fontSize: { xs: '1.04rem', md: '1.1rem' },
                                 fontWeight: 600,
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
@@ -368,7 +379,7 @@ export default function OneToOneCall({
                           <Typography
                             sx={{
                               color: call.missed ? '#ef5350' : 'text.secondary',
-                              fontSize: '14px',
+                              fontSize: '0.85rem',
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
                               whiteSpace: 'nowrap'
@@ -393,12 +404,13 @@ export default function OneToOneCall({
             <Box
               sx={{
                 width: '100%',
-                maxWidth: 520,
-                px: 3,
-                py: 4,
+                maxWidth: 840,
+                px: { xs: 2.5, md: 6 },
+                py: { xs: 4.5, md: 5.5 },
                 display: 'grid',
-                gridTemplateColumns: { xs: '1fr 1fr', md: '1fr 1fr' },
-                gap: 3
+                gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+                gap: { xs: 2, md: 2.5 },
+                alignItems: 'start'
               }}
             >
               {desktopActions.map((action) => (
@@ -406,19 +418,47 @@ export default function OneToOneCall({
                   key={action.label}
                   onClick={action.onClick}
                   sx={{
-                    border: `1px solid ${muiTheme.palette.divider}`,
-                    borderRadius: 3,
-                    py: 3.5,
-                    px: 2,
-                    textAlign: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 1.5,
                     cursor: 'pointer',
                     color: 'text.primary',
-                    bgcolor: 'rgba(255,255,255,0.02)',
-                    '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' }
+                    minWidth: 0
                   }}
                 >
-                  <Box sx={{ display: 'inline-flex', mb: 1.5, color: accentColor }}>{action.icon}</Box>
-                  <Typography sx={{ fontSize: '22px', fontWeight: 600, lineHeight: 1.2 }}>{action.label}</Typography>
+                  <Box
+                    sx={{
+                      width: { xs: 80, md: 88 },
+                      height: { xs: 80, md: 88 },
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'text.primary',
+                      border: `1px solid ${muiTheme.palette.divider}`,
+                      bgcolor: actionCircleBg,
+                      transition: 'all 0.2s ease',
+                      '&:hover': {
+                        bgcolor: actionCircleHover,
+                        transform: 'translateY(-2px)'
+                      }
+                    }}
+                  >
+                    {action.icon}
+                  </Box>
+                  <Typography
+                    sx={{
+                      mt: 0.25,
+                      fontSize: { xs: '0.95rem', md: '1rem' },
+                      fontWeight: 500,
+                      lineHeight: 1.2,
+                      color: 'text.secondary',
+                      textAlign: 'center'
+                    }}
+                  >
+                    {action.label}
+                  </Typography>
                 </Box>
               ))}
             </Box>
@@ -431,259 +471,275 @@ export default function OneToOneCall({
   // If showing calls list, render list view (after all hooks)
   if (showCallList) {
     const actionButtons = [
-      { icon: <VideocamRoundedIcon sx={{ fontSize: { xs: 24, sm: 28, md: 32 }, color: '#fff' }} />, label: 'Video call', onClick: () => onNavigate?.('/call?type=video&state=dialing') },
-      { icon: <GroupsRoundedIcon sx={{ fontSize: { xs: 24, sm: 28, md: 32 }, color: '#fff' }} />, label: 'Group call', onClick: () => onNavigate?.('/group-call?type=conference') },
-      { icon: <EventAvailableRoundedIcon sx={{ fontSize: { xs: 24, sm: 28, md: 32 }, color: '#fff' }} />, label: 'My Meetings', onClick: () => onNavigate?.('/meetings') },
-      { icon: <CallRoundedIcon sx={{ fontSize: { xs: 24, sm: 28, md: 32 }, color: '#fff' }} />, label: 'Voice Call', onClick: () => onNavigate?.('/call?type=voice&state=dialing') },
+      { icon: <CallRoundedIcon sx={{ fontSize: { xs: 22, sm: 25 }, color: 'text.primary' }} />, label: 'Call', onClick: () => onNavigate?.('/call?type=video&state=dialing') },
+      { icon: <CalendarMonthRoundedIcon sx={{ fontSize: { xs: 22, sm: 25 }, color: 'text.primary' }} />, label: 'Schedule', onClick: () => onNavigate?.('/meetings/book') },
+      { icon: <DialpadRoundedIcon sx={{ fontSize: { xs: 22, sm: 25 }, color: 'text.primary' }} />, label: 'Keypad', onClick: () => onNavigate?.('/call?type=voice&state=dialing') },
+      { icon: <FavoriteBorderRoundedIcon sx={{ fontSize: { xs: 22, sm: 25 }, color: 'text.primary' }} />, label: 'Favorites', onClick: () => onNavigate?.('/group-call?type=conference') },
     ];
-    
-    const visibleButtons = showMoreButtons ? actionButtons : actionButtons.slice(0, 2);
+    const quickActionBg = muiTheme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(17,27,33,0.08)';
+    const quickActionHover = muiTheme.palette.mode === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(17,27,33,0.14)';
+    const utilityBg = muiTheme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(17,27,33,0.1)';
+    const searchBg = muiTheme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(17,27,33,0.08)';
+    const rowBorder = muiTheme.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'rgba(17,27,33,0.08)';
     
     return (
       <>
-        <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none`}</style>
-        <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'background.default' }}>
-          <AppBar elevation={0} position="static" sx={{ bgcolor: 'background.paper', color: 'text.primary', borderBottom: `1px solid ${muiTheme.palette.divider}` }}>
-            <Toolbar className="!min-h-[56px]" sx={{ px: { xs: 1.5, sm: 3 } }}>
-              <Typography variant="h6" className="font-bold" sx={{ color: 'text.primary', fontSize: { xs: '16px', sm: '18px' }, ml: { xs: 0.5, sm: 1 } }}>Calls</Typography>
-              <Box sx={{ flexGrow: 1 }} />
-            </Toolbar>
-          </AppBar>
+        <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
+        <Box className="w-full h-full mx-auto flex flex-col" sx={{ bgcolor: 'transparent', color: 'text.primary' }}>
+          <Box sx={{ px: { xs: 2, sm: 2.5 }, pt: { xs: 1.5, sm: 2 }, pb: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
+              <IconButton
+                onClick={(e) => setMenuEl(e.currentTarget)}
+                sx={{
+                  width: 40,
+                  height: 40,
+                  bgcolor: utilityBg,
+                  color: 'text.primary',
+                  '&:hover': { bgcolor: quickActionHover }
+                }}
+                aria-label="More options"
+              >
+                <MoreHorizRoundedIcon sx={{ fontSize: 22 }} />
+              </IconButton>
+              <IconButton
+                onClick={() => onNavigate?.('/group-call?type=conference')}
+                sx={{
+                  width: 40,
+                  height: 40,
+                  bgcolor: accentColor,
+                  color: '#001a11',
+                  '&:hover': { bgcolor: accentColor, filter: 'brightness(1.07)' }
+                }}
+                aria-label="Start new call"
+              >
+                <AddRoundedIcon sx={{ fontSize: 24 }} />
+              </IconButton>
+            </Box>
+            <Typography sx={{ fontSize: { xs: '2.35rem', sm: '2.6rem' }, fontWeight: 700, lineHeight: 1, color: 'text.primary' }}>
+              Calls
+            </Typography>
+          </Box>
 
-          {/* Action Buttons - Responsive with show more option */}
-          <Box sx={{ 
-            px: { xs: 1.5, sm: 2, md: 3 }, 
-            pt: { xs: 3, sm: 3.5, md: 4 },
-            pb: { xs: 2, sm: 2.5 },
-            bgcolor: 'background.paper',
-            borderBottom: `1px solid ${muiTheme.palette.divider}`
-          }}>
-            <Box sx={{ 
-              display: 'grid', 
-              gridTemplateColumns: { 
-                xs: showMoreButtons ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
-                sm: 'repeat(4, 1fr)' 
-              }, 
-              gap: { xs: 0.75, sm: 1, md: 1.5 },
-              justifyContent: 'center',
-              alignItems: 'flex-start',
-              width: '100%'
-            }}>
-              {visibleButtons.map((button, index) => (
-                <Box 
-                  key={index}
-                  sx={{ 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    alignItems: 'center', 
-                    gap: { xs: 0.5, sm: 0.75 },
+          <Box sx={{ px: { xs: 2, sm: 2.5 }, pb: 2 }}>
+            <TextField
+              fullWidth
+              size="small"
+              value={callSearch}
+              onChange={(e) => setCallSearch(e.target.value)}
+              placeholder="Search"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 3,
+                  minHeight: 48,
+                  bgcolor: searchBg,
+                  '& fieldset': { borderColor: 'transparent' },
+                  '&:hover fieldset': { borderColor: 'transparent' },
+                  '&.Mui-focused fieldset': { borderColor: `${accentColor}80`, borderWidth: '1px' }
+                },
+                '& input': {
+                  fontSize: '1.02rem',
+                  color: 'text.primary'
+                }
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchRoundedIcon sx={{ color: 'text.secondary', fontSize: 23 }} />
+                  </InputAdornment>
+                )
+              }}
+            />
+          </Box>
+
+          <Box sx={{ px: { xs: 2, sm: 2.5 }, pb: 2.3 }}>
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+                gap: { xs: 0.8, sm: 1.2 },
+                alignItems: 'flex-start',
+                width: '100%'
+              }}
+            >
+              {actionButtons.map((button) => (
+                <Box
+                  key={button.label}
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 0.85,
                     cursor: 'pointer',
                     minWidth: 0,
-                    width: '100%',
-                    maxWidth: '100%',
-                    overflow: 'hidden'
+                    width: '100%'
                   }}
                   onClick={button.onClick}
                 >
                   <Box
                     sx={{
-                      width: { xs: 48, sm: 56, md: 64 },
-                      height: { xs: 48, sm: 56, md: 64 },
+                      width: { xs: 62, sm: 66 },
+                      height: { xs: 62, sm: 66 },
                       borderRadius: '50%',
-                      bgcolor: accentColor,
+                      bgcolor: quickActionBg,
+                      border: `1px solid ${muiTheme.palette.divider}`,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      boxShadow: `0 2px 8px ${accentColor}33`,
-                      flexShrink: 0,
+                      transition: 'all 0.2s ease',
                       '&:hover': {
-                        transform: 'scale(1.05)',
-                        boxShadow: `0 4px 12px ${accentColor}66`,
+                        transform: 'translateY(-2px)',
+                        bgcolor: quickActionHover
                       },
-                      transition: 'all 0.2s ease'
+                      flexShrink: 0
                     }}
                   >
                     {button.icon}
                   </Box>
-                  <Typography 
-                    variant="caption" 
-                    sx={{ 
-                      fontSize: { xs: '9px', sm: '10px', md: '11px' }, 
-                      color: 'text.primary', 
-                      fontWeight: 500, 
+                  <Typography
+                    sx={{
+                      mt: 0.1,
+                      fontSize: { xs: '0.73rem', sm: '0.78rem' },
+                      color: 'text.secondary',
+                      fontWeight: 500,
                       textAlign: 'center',
-                      lineHeight: 1.3,
-                      wordBreak: 'break-word',
-                      overflowWrap: 'break-word',
-                      hyphens: 'auto',
-                      maxWidth: '100%',
-                      width: '100%',
-                      px: 0.25,
-                      display: 'block',
-                      whiteSpace: 'normal'
+                      lineHeight: 1.15,
+                      width: '100%'
                     }}
                   >
                     {button.label}
                   </Typography>
                 </Box>
               ))}
-              
-              {/* Show More/Less button for small screens */}
-              {!showMoreButtons && (
-                <Box 
-                  sx={{ 
-                    display: { xs: 'flex', sm: 'none' },
-                    flexDirection: 'column', 
-                    alignItems: 'center', 
-                    gap: { xs: 0.5, sm: 0.75 },
-                    cursor: 'pointer',
-                    minWidth: 0
-                  }}
-                  onClick={() => setShowMoreButtons(true)}
-                >
-                  <Box
-                    sx={{
-                      width: { xs: 48, sm: 56, md: 64 },
-                      height: { xs: 48, sm: 56, md: 64 },
-                      borderRadius: '50%',
-                      bgcolor: 'action.hover',
-                      border: `2px solid ${muiTheme.palette.divider}`,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                      '&:hover': {
-                        bgcolor: 'action.selected',
-                        transform: 'scale(1.05)',
-                      },
-                      transition: 'all 0.2s ease'
-                    }}
-                  >
-                    <ExpandMoreRoundedIcon sx={{ fontSize: { xs: 24, sm: 28, md: 32 }, color: 'text.secondary' }} />
-                  </Box>
-                  <Typography 
-                    variant="caption" 
-                    sx={{ 
-                      fontSize: { xs: '9px', sm: '10px', md: '11px' }, 
-                      color: 'text.primary', 
-                      fontWeight: 500, 
-                      textAlign: 'center',
-                      lineHeight: 1.3,
-                      wordBreak: 'break-word',
-                      overflowWrap: 'break-word',
-                      maxWidth: '100%',
-                      width: '100%',
-                      px: 0.25,
-                      display: 'block',
-                      whiteSpace: 'normal'
-                    }}
-                  >
-                    More
-                  </Typography>
-                </Box>
-              )}
-              
-              {showMoreButtons && (
-                <Box 
-                  sx={{ 
-                    display: { xs: 'flex', sm: 'none' },
-                    flexDirection: 'column', 
-                    alignItems: 'center', 
-                    gap: { xs: 0.5, sm: 0.75 },
-                    cursor: 'pointer',
-                    minWidth: 0
-                  }}
-                  onClick={() => setShowMoreButtons(false)}
-                >
-                  <Box
-                    sx={{
-                      width: { xs: 48, sm: 56, md: 64 },
-                      height: { xs: 48, sm: 56, md: 64 },
-                      borderRadius: '50%',
-                      bgcolor: 'action.hover',
-                      border: `2px solid ${muiTheme.palette.divider}`,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                      '&:hover': {
-                        bgcolor: 'action.selected',
-                        transform: 'scale(1.05)',
-                      },
-                      transition: 'all 0.2s ease'
-                    }}
-                  >
-                    <ExpandLessRoundedIcon sx={{ fontSize: { xs: 24, sm: 28, md: 32 }, color: 'text.secondary' }} />
-                  </Box>
-                  <Typography 
-                    variant="caption" 
-                    sx={{ 
-                      fontSize: { xs: '9px', sm: '10px', md: '11px' }, 
-                      color: 'text.primary', 
-                      fontWeight: 500, 
-                      textAlign: 'center',
-                      lineHeight: 1.3,
-                      wordBreak: 'break-word',
-                      overflowWrap: 'break-word',
-                      maxWidth: '100%',
-                      width: '100%',
-                      px: 0.25,
-                      display: 'block',
-                      whiteSpace: 'normal'
-                    }}
-                  >
-                    Less
-                  </Typography>
-                </Box>
-              )}
             </Box>
           </Box>
 
-          <Box className="flex-1" sx={{ overflowY:'auto', '&::-webkit-scrollbar':{ display:'none' }, scrollbarWidth:'none', msOverflowStyle:'none' }}>
-            <List>
-              {CALLS.map((call, idx) => (
-                <React.Fragment key={call.id}>
-                  <ListItem 
-                    button 
-                    onClick={()=>onNavigate?.(`/call?type=${call.type}&contact=${encodeURIComponent(call.name)}&state=dialing`)}
+          <Box sx={{ px: { xs: 2, sm: 2.5 }, pb: 0.75 }}>
+            <Typography sx={{ fontSize: { xs: '2rem', sm: '2.15rem' }, fontWeight: 700, lineHeight: 1, color: 'text.primary' }}>
+              Recent
+            </Typography>
+          </Box>
+
+          <Box className="flex-1 no-scrollbar" sx={{ overflowY: 'auto' }}>
+            <List disablePadding>
+              {filteredCalls.map((call, idx) => {
+                const direction = (call as any).direction || ((call as any).missed ? 'missed' : 'outgoing');
+                const isMissed = direction === 'missed' || Boolean(call.missed || call.status === 'missed');
+                const isIncoming = direction === 'incoming';
+                const directionIcon = isMissed
+                  ? <CallMissedRoundedIcon sx={{ fontSize: 17, color: '#ff5f75' }} />
+                  : isIncoming
+                    ? <CallReceivedRoundedIcon sx={{ fontSize: 17, color: 'text.secondary' }} />
+                    : <CallMadeRoundedIcon sx={{ fontSize: 17, color: 'text.secondary' }} />;
+                const directionLabel = isMissed ? 'Missed' : isIncoming ? 'Incoming' : 'Outgoing';
+                const directionColor = isMissed ? '#ff5f75' : muiTheme.palette.text.secondary;
+
+                return (
+                  <ListItem
+                    key={call.id}
+                    button
+                    onClick={() => onNavigate?.(`/call?type=${call.type}&contact=${encodeURIComponent(call.name)}&state=dialing`)}
+                    sx={{
+                      px: { xs: 2, sm: 2.5 },
+                      py: 1.2,
+                      borderBottom: idx < filteredCalls.length - 1 ? `1px solid ${rowBorder}` : 'none',
+                      alignItems: 'center'
+                    }}
                   >
-                    <ListItemAvatar>
-                      <Avatar src={call.avatar} />
+                    <ListItemAvatar sx={{ minWidth: 58 }}>
+                      <Avatar src={call.avatar} sx={{ width: 52, height: 52 }} />
                     </ListItemAvatar>
-                    <ListItemTextComp
-                      primary={
-                        <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap' }}>
-                          <span className="font-semibold" style={{ color: muiTheme.palette.text.primary }}>{call.name}</span>
-                          {call.missed && <Chip size="small" label="Missed" sx={{ bgcolor: '#e53935', color: '#fff', height: 18, fontSize: '10px' }} />}
-                          <span className="text-xs ml-auto" style={{ color: muiTheme.palette.text.secondary }}>{call.time}</span>
-                        </Box>
-                      }
-                      secondary={
-                        <Box component="span" sx={{ display: 'flex', flexDirection: 'column', gap: 0.25, mt: 0.5 }}>
-                          <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                          {call.type === 'video' ? (
-                            <VideoCallRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                          ) : call.type === 'conference' ? (
-                            <GroupsRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                          ) : call.type === 'meeting' ? (
-                            <EventAvailableRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                          ) : (
-                            <CallRoundedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                          )}
-                          <span className="text-[12px]" style={{ color: muiTheme.palette.text.secondary }}>{call.duration}</span>
-                          </Box>
-                          {call.module && (
-                            <span className="text-[11px]" style={{ color: muiTheme.palette.text.secondary, opacity: 0.8 }}>{call.module}</span>
-                          )}
-                        </Box>
-                      }
-                    />
+
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+                        <Typography
+                          sx={{
+                            color: isMissed ? '#ff5f75' : 'text.primary',
+                            fontSize: { xs: '1.05rem', sm: '1.12rem' },
+                            fontWeight: 500,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
+                          }}
+                        >
+                          {call.name}
+                        </Typography>
+                        <Typography sx={{ fontSize: { xs: '1rem', sm: '1.06rem' }, color: 'text.secondary', flexShrink: 0, fontWeight: 500 }}>
+                          {call.time}
+                        </Typography>
+                      </Box>
+
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.35, mt: 0.2 }}>
+                        {directionIcon}
+                        <Typography
+                          sx={{
+                            color: directionColor,
+                            fontSize: { xs: '0.9rem', sm: '0.95rem' },
+                            fontWeight: 500,
+                            lineHeight: 1.15
+                          }}
+                        >
+                          {directionLabel}
+                        </Typography>
+                      </Box>
+
+                      {call.module && (
+                        <Typography
+                          sx={{
+                            mt: 0.15,
+                            fontSize: { xs: '0.75rem', sm: '0.78rem' },
+                            color: 'text.secondary',
+                            opacity: 0.75,
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
+                          }}
+                        >
+                          {call.module}
+                        </Typography>
+                      )}
+                    </Box>
+
+                    <IconButton
+                      size="small"
+                      sx={{
+                        ml: 0.6,
+                        width: 30,
+                        height: 30,
+                        color: 'text.secondary',
+                        border: `1px solid ${muiTheme.palette.divider}`,
+                        bgcolor: 'transparent'
+                      }}
+                      aria-label={`Call info for ${call.name}`}
+                    >
+                      <InfoOutlinedIcon sx={{ fontSize: 18 }} />
+                    </IconButton>
                   </ListItem>
-                  {idx < CALLS.length - 1 && <Divider component="li" />}
-                </React.Fragment>
-              ))}
+                );
+              })}
+              {filteredCalls.length === 0 && (
+                <Box sx={{ px: 2, py: 4, color: 'text.secondary', textAlign: 'center' }}>No recent calls found.</Box>
+              )}
             </List>
           </Box>
+
+          <Menu
+            anchorEl={menuEl}
+            open={Boolean(menuEl)}
+            onClose={() => setMenuEl(null)}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+            transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+            PaperProps={{
+              sx: {
+                mt: 0.5,
+                borderRadius: 2,
+                bgcolor: 'background.paper',
+                minWidth: 170
+              }
+            }}
+          >
+            <MenuItem onClick={() => { setMenuEl(null); onNavigate?.('/settings'); }}>Call settings</MenuItem>
+            <MenuItem onClick={() => { setMenuEl(null); onNavigate?.('/help'); }}>Help</MenuItem>
+          </Menu>
         </Box>
       </>
     );
@@ -692,7 +748,7 @@ export default function OneToOneCall({
   // Render call interface
   return (
     <>
-      <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none`}</style>
+      <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}`}</style>
 
       {/* Call interface - Always dark background regardless of theme */}
       <Box 
