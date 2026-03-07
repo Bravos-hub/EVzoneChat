@@ -27,7 +27,4 @@ Opens http://localhost:3000 — default route `/inbox`.
 - `src/pages/user/Uxx-yy.jsx`: All user pages (U01–U12) as components
 - `src/App.js`: Theme + Router + Shell
 
-## Notes
-- Footer uses labels under icons and respects safe-area insets.
-- Main content is constrained to `maxWidth: 390px` for authentic phone feel.
-- Registry ensures any missing page renders a graceful stub instead of crashing.
+
